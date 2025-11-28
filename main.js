@@ -7,13 +7,7 @@ console.log("Main.js: Imports done");
 window.debugLog = [];
 function log(msg) {
     console.log(msg);
-    window.debugLog.push(msg);
-    const debugDiv = document.getElementById('debug-log');
-    if (debugDiv) {
-        const line = document.createElement('div');
-        line.textContent = msg;
-        debugDiv.appendChild(line);
-    }
+    // Debug div removed
 }
 
 // Toast Notification
@@ -360,6 +354,33 @@ form.addEventListener('submit', async (e) => {
     };
     if (cancelBtn) cancelBtn.onclick = handleCancel;
 
+    // Capture existing settings
+    let existingFontSizes = {
+        nameSize: 60,
+        typeSize: 24,
+        raritySize: 24,
+        abilityNameSize: 28,
+        abilityDescSize: 24,
+        descSize: 22,
+        goldSize: 24
+    };
+    let existingOffsets = {
+        name: 0,
+        type: 0,
+        rarity: 0,
+        abilityY: 530,
+        fluffPadding: 20,
+        gold: 0,
+        imageYOffset: 0
+    };
+
+    if (currentCardData && currentCardData.fontSizes) {
+        existingFontSizes = { ...currentCardData.fontSizes };
+    }
+    if (currentCardData && currentCardData.offsets) {
+        existingOffsets = { ...currentCardData.offsets };
+    }
+
     try {
         const attunementCheckbox = document.getElementById('attunement');
         const weaponDamageInput = document.getElementById('weapon-damage');
@@ -407,24 +428,8 @@ form.addEventListener('submit', async (e) => {
                 armorClass: type === 'armor' ? (armorClass || '18') : null,
                 visualPrompt: mockDetails.visualPrompt,
                 originalParams: { level, type: finalType, rarity, ability },
-                fontSizes: {
-                    nameSize: 60,
-                    typeSize: 24,
-                    raritySize: 24,
-                    abilityNameSize: 28,
-                    abilityDescSize: 24,
-                    descSize: 22,
-                    goldSize: 24
-                },
-                offsets: {
-                    name: 0,
-                    type: 0,
-                    rarity: 0,
-                    abilityY: 530,
-                    fluffPadding: 20,
-                    gold: 0,
-                    imageYOffset: 0
-                }
+                fontSizes: existingFontSizes,
+                offsets: existingOffsets
             };
             // log("Mock data set");
         } else {
@@ -448,64 +453,27 @@ form.addEventListener('submit', async (e) => {
             if (isCancelled) return;
 
             currentCardData = {
-                name: itemDetails.name,
-                typeHe: itemDetails.typeHe,
-                rarityHe: itemDetails.rarityHe,
-                abilityName: itemDetails.abilityName,
-                abilityDesc: itemDetails.abilityDesc,
-                description: itemDetails.description,
-                gold: '400',
+                ...itemDetails,
+                gold: '1000', // Default gold
                 imageUrl: imageUrl,
-                requiresAttunement: itemDetails.requiresAttunement,
-                weaponDamage: itemDetails.weaponDamage,
-                damageType: itemDetails.damageType,
-                armorClass: itemDetails.armorClass,
-                visualPrompt: itemDetails.visualPrompt,
                 originalParams: { level, type: finalType, rarity, ability },
-                fontSizes: {
-                    nameSize: 60,
-                    typeSize: 24,
-                    raritySize: 24,
-                    abilityNameSize: 28,
-                    abilityDescSize: 24,
-                    descSize: 22,
-                    goldSize: 24
-                },
-                offsets: {
-                    name: 0,
-                    type: 0,
-                    rarity: 0,
-                    abilityY: 530,
-                    fluffPadding: 20,
-                    gold: 0,
-                    imageYOffset: 0
-                }
+                fontSizes: existingFontSizes,
+                offsets: existingOffsets
             };
         }
 
-        log("Hiding loading overlay");
-        loadingOverlay.classList.add('hidden');
-        const editor = document.getElementById('content-editor');
-        log(`Editor element found: ${!!editor}`);
-        if (editor) {
-            log(`Editor classes before: ${editor.classList.toString()}`);
-            editor.classList.remove('hidden');
-            log(`Editor classes after: ${editor.classList.toString()}`);
-            log("Calling populateEditor");
-            populateEditor(currentCardData);
-        }
-        log("Calling updateLayout");
+        populateEditor(currentCardData);
         updateLayout();
-        downloadBtn.disabled = false;
+        loadingOverlay.classList.add('hidden');
         if (regenerateControls) regenerateControls.classList.remove('hidden');
-        log("Generation complete");
+        if (contentEditor) contentEditor.classList.remove('hidden');
+        downloadBtn.disabled = false;
 
     } catch (error) {
-        log(`Error caught: ${error.message}`);
-        console.error('Main.js Error:', error);
+        console.error("Generation Error:", error);
         loadingOverlay.classList.add('hidden');
         downloadBtn.disabled = false;
-        errorDiv.textContent = `שגיאה: ${error.message}`;
+        errorDiv.textContent = error.message;
         errorDiv.classList.remove('hidden');
     }
 });
