@@ -1,16 +1,36 @@
 import { GeminiService } from './src/gemini-service.js';
-toast.textContent = message;
-toast.style.position = 'fixed';
-toast.style.bottom = '20px';
-toast.style.right = '20px';
-toast.style.background = '#d4af37';
-toast.style.color = '#000';
-toast.style.padding = '10px 20px';
-toast.style.borderRadius = '5px';
-toast.style.zIndex = '10000';
-toast.style.fontWeight = 'bold';
-document.body.appendChild(toast);
-setTimeout(() => toast.remove(), duration);
+import { CardRenderer } from './src/card-renderer.js';
+import { OFFICIAL_ITEMS, ITEM_STATS } from './src/dnd-data.js';
+
+console.log("Main.js: Imports done");
+
+window.debugLog = [];
+function log(msg) {
+    console.log(msg);
+    window.debugLog.push(msg);
+    const debugDiv = document.getElementById('debug-log');
+    if (debugDiv) {
+        const line = document.createElement('div');
+        line.textContent = msg;
+        debugDiv.appendChild(line);
+    }
+}
+
+// Toast Notification
+function showToast(message, duration = 3000) {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.right = '20px';
+    toast.style.background = '#d4af37';
+    toast.style.color = '#000';
+    toast.style.padding = '10px 20px';
+    toast.style.borderRadius = '5px';
+    toast.style.zIndex = '10000';
+    toast.style.fontWeight = 'bold';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), duration);
 }
 
 showToast("המערכת מוכנה! (JS Loaded)", 5000);
