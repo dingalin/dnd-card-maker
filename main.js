@@ -73,7 +73,7 @@ function getDefaultFontSize(target) {
     return defaults[target] || 24;
 }
 
-function updateLayout() {
+async function updateLayout() {
     if (!currentCardData) return;
 
     const nameOffset = parseInt(document.getElementById('name-offset').value) || 0;
@@ -100,7 +100,7 @@ function updateLayout() {
     // Save offsets to current data
     currentCardData.offsets = offsets;
 
-    renderer.render(currentCardData, offsets);
+    await renderer.render(currentCardData, offsets);
 }
 
 function populateEditor(data) {
@@ -463,11 +463,17 @@ form.addEventListener('submit', async (e) => {
         }
 
         populateEditor(currentCardData);
-        updateLayout();
+        console.log("About to await updateLayout()...");
+        await updateLayout();
+        console.log("updateLayout() completed, hiding overlay...");
+        console.log("Overlay element:", loadingOverlay);
+        console.log("Overlay classes before:", loadingOverlay.classList.toString());
         loadingOverlay.classList.add('hidden');
+        console.log("Overlay classes after:", loadingOverlay.classList.toString());
         if (regenerateControls) regenerateControls.classList.remove('hidden');
         if (contentEditor) contentEditor.classList.remove('hidden');
         downloadBtn.disabled = false;
+        console.log("Generation complete!");
 
     } catch (error) {
         console.error("Generation Error:", error);

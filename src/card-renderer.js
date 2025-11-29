@@ -7,7 +7,7 @@ export class CardRenderer {
         }
         this.ctx = this.canvas.getContext('2d');
         this.template = new Image();
-        this.template.src = '/assets/card-template.png';
+        this.template.src = 'public/assets/card-template.png';
         this.fontsLoaded = false;
 
         // Wait for fonts
