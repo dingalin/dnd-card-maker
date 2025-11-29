@@ -1,5 +1,5 @@
 
-export class CardRenderer {
+class CardRenderer {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         if (!this.canvas) {
@@ -7,7 +7,13 @@ export class CardRenderer {
         }
         this.ctx = this.canvas.getContext('2d');
         this.template = new Image();
-        this.template.src = 'public/assets/card-template.png';
+        // Try Vite path first (root relative)
+        this.template.src = 'assets/card-template.png';
+        this.template.onerror = () => {
+            console.log("CardRenderer: Failed to load template from assets/, trying public/assets/...");
+            // Fallback to file protocol path
+            this.template.src = 'public/assets/card-template.png';
+        };
         this.fontsLoaded = false;
 
         // Wait for fonts

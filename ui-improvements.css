@@ -23,20 +23,6 @@
 
 .section-title {
     font-weight: 600;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.chevron {
-    transition: transform 0.3s ease;
-    font-size: 0.75rem;
-    opacity: 0.7;
-}
-
-.section-collapsed .chevron {
-    transform: rotate(-90deg);
 }
 
 .section-content {
@@ -81,6 +67,11 @@
     box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
 }
 
+.btn-primary-hero:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(212, 175, 55, 0.2);
+}
+
 .btn-primary-hero .icon {
     font-size: 1.5rem;
     margin-left: 0.5rem;
@@ -109,6 +100,10 @@
 .btn-secondary-small:hover {
     background: rgba(212, 175, 55, 0.1);
     border-color: var(--accent-color);
+}
+
+.btn-secondary-small:active {
+    transform: scale(0.98);
 }
 
 /* Update regenerate group to use grid */
@@ -142,6 +137,906 @@
     margin-bottom: 0;
 }
 
-shrink-0 {
+.shrink-0 {
     flex-shrink: 0;
+}
+
+/* === UI Improvements - Phase 2 === */
+
+/* Enhanced Glassmorphism */
+.glass-panel {
+    background: rgba(30, 30, 30, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Input Glow Effects */
+input:focus,
+select:focus,
+textarea:focus {
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    border-color: var(--accent-color);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background: rgba(30, 30, 30, 0.95);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border-right: 4px solid var(--accent-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 250px;
+    animation: slideIn 0.3s ease-out forwards;
+    backdrop-filter: blur(5px);
+}
+
+.toast.error {
+    border-right-color: #ff4444;
+}
+
+.toast.success {
+    border-right-color: #00C851;
+}
+
+.toast.info {
+    border-right-color: #33b5e5;
+}
+
+.toast-icon {
+    font-size: 1.2rem;
+}
+
+.toast-message {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+}
+
+/* 3D Tilt Effect */
+.canvas-container {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    position: relative;
+    /* Ensure container is relative for absolute children */
+}
+
+#card-canvas {
+    transition: transform 0.1s ease-out;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    /* Match card radius */
+}
+
+/* Slider Bubbles */
+.slider-container {
+    position: relative;
+    width: 100%;
+}
+
+.slider-bubble {
+    position: absolute;
+    background: var(--accent-color);
+    color: #000;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    top: -25px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.slider-bubble.visible {
+    opacity: 1;
+}
+
+/* Empty State */
+.empty-state {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 10;
+    border-radius: 20px;
+    text-align: center;
+    transition: opacity 0.5s ease;
+}
+
+.empty-content {
+    color: #fff;
+    max-width: 80%;
+}
+
+.empty-content .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+    animation: float 3s ease-in-out infinite;
+}
+
+.empty-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+}
+
+.empty-content p {
+    color: #aaa;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Skeleton Loading */
+.skeleton-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    z-index: 20;
+    border-radius: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.skeleton-overlay.hidden {
+    display: none;
+}
+
+.skeleton-block {
+    background: #2a2a2a;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-block::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0,
+            rgba(255, 255, 255, 0.05) 20%,
+            rgba(255, 255, 255, 0.1) 60%,
+            rgba(255, 255, 255, 0));
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Specific Skeleton Shapes */
+.skeleton-image {
+    height: 300px;
+    width: 80%;
+    margin: 40px auto 20px;
+    border-radius: 8px;
+}
+
+.skeleton-title {
+    height: 40px;
+    width: 60%;
+    margin: 0 auto;
+}
+
+.skeleton-text {
+    height: 16px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.skeleton-text.short {
+    width: 40%;
+}
+
+/* --- Phase 4: Desktop Workbench Layout --- */
+
+.desktop-layout {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #2a2a2a 0%, #111 100%);
+}
+
+/* Center Stage */
+.preview-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 80px;
+    /* Space for toolbar */
+    z-index: 1;
+}
+
+.window-header {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    /* Indicates draggable */
+    user-select: none;
+}
+
+.window-title {
+    font-family: var(--font-display);
+    color: var(--accent-color);
+    font-size: 1.2rem;
+}
+
+.window-close-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 0.5rem;
+}
+
+.window-close-btn:hover {
+    color: white;
+}
+
+.window-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    padding: 0.5rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+}
+
+.toolbar-btn {
+    background: transparent;
+    border: none;
+    color: #ccc;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateY(-5px);
+}
+
+.toolbar-btn .icon {
+    font-size: 1.5rem;
+}
+
+.toolbar-btn .label {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Adjustments for window content */
+.window-content h2 {
+    display: none;
+    /* Hide original h2 as we have window header */
+}
+
+/* --- Phase 3: Visual Polish & Presets --- */
+
+/* Quick Presets */
+.quick-presets {
+    margin-bottom: 1.5rem;
+}
+
+.presets-grid {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+}
+
+.preset-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.preset-btn:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.preset-btn img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Texture & Background Polish */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.4;
+}
+
+/* Ornate Borders for Glass Panels */
+.glass-panel {
+    position: relative;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    /* Subtle gold border */
+}
+
+.glass-panel::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 1px solid transparent;
+    border-radius: 18px;
+    background:
+        linear-gradient(to right, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) top,
+        linear-gradient(to right, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) bottom,
+        linear-gradient(to bottom, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) left,
+        linear-gradient(to bottom, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) right;
+    background-size: 100% 2px, 100% 2px, 2px 100%, 2px 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Typography Update */
+.sidebar-start h2,
+.sidebar-end h2 {
+    font-family: var(--font-display) !important;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Floating Window Styles */
+.floating-window {
+    position: absolute;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    width: 400px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+
+.floating-window.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.95);
+}
+
+/* Main Toolbar (Relocated to Header) */
+.window-header {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    /* Indicates draggable */
+    user-select: none;
+}
+
+.window-title {
+    font-family: var(--font-display);
+    color: var(--accent-color);
+    font-size: 1.2rem;
+}
+
+.window-close-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 0.5rem;
+}
+
+.window-close-btn:hover {
+    color: white;
+}
+
+.window-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    padding: 0.5rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+}
+
+.toolbar-btn {
+    background: transparent;
+    border: none;
+    color: #ccc;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateY(-5px);
+}
+
+.toolbar-btn .icon {
+    font-size: 1.5rem;
+}
+
+.toolbar-btn .label {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Adjustments for window content */
+.window-content h2 {
+    display: none;
+    /* Hide original h2 as we have window header */
+}
+
+/* --- Phase 3: Visual Polish & Presets --- */
+
+/* Quick Presets */
+.quick-presets {
+    margin-bottom: 1.5rem;
+}
+
+.presets-grid {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+}
+
+.preset-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.preset-btn:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.preset-btn img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Texture & Background Polish */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.4;
+}
+
+/* Ornate Borders for Glass Panels */
+.glass-panel {
+    position: relative;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    /* Subtle gold border */
+}
+
+.glass-panel::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 1px solid transparent;
+    border-radius: 18px;
+    background:
+        linear-gradient(to right, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) top,
+        linear-gradient(to right, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) bottom,
+        linear-gradient(to bottom, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) left,
+        linear-gradient(to bottom, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) right;
+    background-size: 100% 2px, 100% 2px, 2px 100%, 2px 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Typography Update */
+.sidebar-start h2,
+.sidebar-end h2 {
+    font-family: var(--font-display) !important;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Floating Window Styles */
+.floating-window {
+    position: absolute;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    width: 400px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+
+.floating-window.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.95);
+}
+
+/* Main Toolbar (Relocated to Header) */
+.window-header {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    /* Indicates draggable */
+    user-select: none;
+}
+
+.window-title {
+    font-family: var(--font-display);
+    color: var(--accent-color);
+    font-size: 1.2rem;
+}
+
+.window-close-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 0.5rem;
+}
+
+.window-close-btn:hover {
+    color: white;
+}
+
+.window-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    padding: 0.5rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+}
+
+.toolbar-btn {
+    background: transparent;
+    border: none;
+    color: #ccc;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateY(-5px);
+}
+
+.toolbar-btn .icon {
+    font-size: 1.5rem;
+}
+
+.toolbar-btn .label {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Adjustments for window content */
+.window-content h2 {
+    display: none;
+    /* Hide original h2 as we have window header */
+}
+
+/* --- Phase 3: Visual Polish & Presets --- */
+
+/* Quick Presets */
+.quick-presets {
+    margin-bottom: 1.5rem;
+}
+
+.presets-grid {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+}
+
+.preset-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.preset-btn:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.preset-btn img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Texture & Background Polish */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.4;
+}
+
+/* Ornate Borders for Glass Panels */
+.glass-panel {
+    position: relative;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    /* Subtle gold border */
+}
+
+.glass-panel::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 1px solid transparent;
+    border-radius: 18px;
+    background:
+        linear-gradient(to right, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) top,
+        linear-gradient(to right, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) bottom,
+        linear-gradient(to bottom, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) left,
+        linear-gradient(to bottom, var(--accent-color), transparent 20%, transparent 80%, var(--accent-color)) right;
+    background-size: 100% 2px, 100% 2px, 2px 100%, 2px 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Typography Update */
+.sidebar-start h2,
+.sidebar-end h2 {
+    font-family: var(--font-display) !important;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Floating Window Styles */
+.floating-window {
+    position: absolute;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    width: 400px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+
+.floating-window.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.95);
+}
+
+/* Main Toolbar (Relocated to Header) */
+.main-header {
+    position: relative;
+    padding: 1rem;
+}
+
+.main-toolbar {
+    position: absolute;
+    top: 50%;
+    right: 10rem !important;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem;
+    background: rgba(30, 30, 30, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    z-index: 1000;
 }

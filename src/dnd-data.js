@@ -1,4 +1,4 @@
-export const OFFICIAL_ITEMS = {
+const OFFICIAL_ITEMS = {
     weapon: {
         "Simple Melee": [
             "Club (אלה)",
@@ -105,7 +105,7 @@ export const OFFICIAL_ITEMS = {
     }
 };
 
-export const ITEM_STATS = {
+const ITEM_STATS = {
     // Simple Melee
     "Club (אלה)": { damage: "1d4", damageType: "bludgeoning" },
     "Dagger (פגיון)": { damage: "1d4", damageType: "piercing" },
