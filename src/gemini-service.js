@@ -23,19 +23,39 @@ class GeminiService {
 
     // Helper method to call through Worker
     async callViaWorker(action, data) {
-        const response = await fetch(WORKER_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                password: this.password,
-                action: action,
-                data: data
-            })
-        });
+        let response;
+        try {
+            response = await fetch(WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    password: this.password,
+                    action: action,
+                    data: data
+                })
+            });
+        } catch (networkError) {
+            console.error("Worker Network Error:", networkError);
+            throw new Error(`Connection Failed. Is the Worker URL correct? (${WORKER_URL})`);
+        }
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Worker request failed');
+            if (response.status === 401) {
+                throw new Error("Incorrect Password (401). Please check your key.");
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const error = await response.json();
+                throw new Error(error.error || `Worker Error ${response.status}`);
+            } else {
+                const text = await response.text();
+                // Check if it looks like a Cloudflare Access page
+                if (text.includes('Access')) {
+                    throw new Error(`Cloudflare Access Blocked (Status ${response.status}). Check Settings.`);
+                }
+                throw new Error(`Worker Error ${response.status}: ${text.substring(0, 50)}...`);
+            }
         }
 
         return response.json();
@@ -166,6 +186,20 @@ class GeminiService {
                 }
 
                 data = await response.json();
+            }
+
+            if (data.error) {
+                console.error("Gemini API Error (via Worker):", data.error);
+                throw new Error(`Gemini Error: ${data.error.message || JSON.stringify(data.error)}`);
+            }
+
+            if (!data.candidates || !data.candidates[0]) {
+                console.error("Gemini Unexpected Response:", data);
+                // Check for safety ratings blocking
+                if (data.promptFeedback) {
+                    throw new Error(`Blocked by Safety Filters: ${JSON.stringify(data.promptFeedback)}`);
+                }
+                throw new Error("No candidates returned from Gemini. See console for full response.");
             }
 
             const text = data.candidates[0].content.parts[0].text;

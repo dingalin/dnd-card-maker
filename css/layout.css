@@ -57,6 +57,19 @@ body::before {
     margin-top: 1.5rem;
 }
 
+/* Desktop Main Grid Layout */
+.main-layout {
+    display: grid;
+    grid-template-columns: 350px 1fr 350px;
+    gap: 2rem;
+    height: calc(100vh - 80px);
+    /* Subtract header height */
+    padding: 0 2rem 2rem 2rem;
+    max-width: 1920px;
+    margin: 0 auto;
+    align-items: start;
+}
+
 .secondary-actions-grid {
     display: flex;
     gap: 0.5rem;

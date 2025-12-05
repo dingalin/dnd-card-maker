@@ -11,7 +11,16 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&family=Cinzel:wght@400..900&family=Frank+Ruhl+Libre:wght@300..900&family=Heebo:wght@100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
     rel="stylesheet">
-  <!-- All CSS is imported via main.js for proper Vite bundling -->
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components/buttons.css">
+  <link rel="stylesheet" href="./css/components/panels.css">
+  <link rel="stylesheet" href="./css/components/toast.css">
+  <link rel="stylesheet" href="./css/components/scroll-menu.css">
+  <link rel="stylesheet" href="./css/components/forms.css">
+  <link rel="stylesheet" href="./ui-improvements.css">
 </head>
 
 <body>
@@ -36,35 +45,7 @@
     </main>
   </div>
 
-  <!-- Sticky Note Summary - Fixed Position -->
-  <div id="sticky-note" class="sticky-note">
-    <div class="note-pin"></div>
-    <h3>🗡️ פרטי חפץ</h3>
-    <div class="note-content">
-      <div class="note-row">
-        <span class="note-label">רמה:</span>
-        <span id="note-level">1-4</span>
-      </div>
-      <div class="note-row">
-        <span class="note-label">סוג:</span>
-        <span id="note-type">נשק</span>
-      </div>
-      <div class="note-row">
-        <span class="note-label">חפץ:</span>
-        <span id="note-subtype">-</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script type="module" src="src/dnd-data.js"></script>
-  <script type="module" src="src/gemini-service.js"></script>
-  <script type="module" src="src/card-renderer.js"></script>
-  <script type="module" src="component-loader.js"></script>
-
-  <script type="module" src="navigation-manager.js"></script>
-  <script type="module" src="ui-helpers.js"></script>
-  <!-- result-manager.js removed -->
+  <!-- Scripts - main.js is the single entry point for Vite -->
   <script type="module" src="./main.js"></script>
 </body>
 

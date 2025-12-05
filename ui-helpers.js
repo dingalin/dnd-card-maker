@@ -8,7 +8,11 @@ function initUI() {
 
     if (apiKeyInput && apiKeyIndicator) {
         // Check initial state
-        if (apiKeyInput.value.trim() || localStorage.getItem('gemini_api_key')) {
+        const savedKey = localStorage.getItem('gemini_api_key');
+        if (savedKey) {
+            apiKeyInput.value = savedKey;
+            apiKeyIndicator.classList.add('active');
+        } else if (apiKeyInput.value.trim()) {
             apiKeyIndicator.classList.add('active');
         }
 

@@ -18,18 +18,46 @@ class CardRenderer {
         }
         this.ctx = this.canvas.getContext('2d');
         this.template = new Image();
-        // Use BASE_PATH for asset loading
-        this.template.src = BASE_PATH + 'assets/card-template.png';
-        this.template.onerror = () => {
-            console.log("CardRenderer: Failed to load template from assets/, trying public/assets/...");
-            // Fallback to public path with BASE_PATH
-            this.template.src = BASE_PATH + 'public/assets/card-template.png';
-        };
+        this.templateLoaded = false;
         this.fontsLoaded = false;
+
+        // Create a promise that resolves when template is loaded
+        this.templateReady = this._loadTemplate();
 
         // Wait for fonts
         document.fonts.ready.then(() => {
             this.fontsLoaded = true;
+        });
+    }
+
+    async _loadTemplate() {
+        const primaryPath = BASE_PATH + 'assets/card-template.png';
+        const fallbackPath = BASE_PATH + 'public/assets/card-template.png';
+
+        console.log("CardRenderer: Attempting to load template from:", primaryPath);
+
+        try {
+            await this._loadImage(this.template, primaryPath);
+            console.log("CardRenderer: Template loaded successfully from primary path");
+            this.templateLoaded = true;
+        } catch (e) {
+            console.log("CardRenderer: Failed to load from primary path, trying fallback...");
+            try {
+                await this._loadImage(this.template, fallbackPath);
+                console.log("CardRenderer: Template loaded successfully from fallback path");
+                this.templateLoaded = true;
+            } catch (e2) {
+                console.error("CardRenderer: Failed to load template from both paths!", e2);
+                this.templateLoaded = false;
+            }
+        }
+    }
+
+    _loadImage(img, src) {
+        return new Promise((resolve, reject) => {
+            img.onload = () => resolve();
+            img.onerror = (e) => reject(e);
+            img.src = src;
         });
     }
 
@@ -77,11 +105,10 @@ class CardRenderer {
         };
 
         // Ensure template is loaded
-        if (!this.template.complete) {
-            console.log("CardRenderer: Waiting for template...");
-            await new Promise(resolve => {
-                this.template.onload = resolve;
-            });
+        await this.templateReady;
+        if (!this.templateLoaded) {
+            console.error("CardRenderer: Template failed to load, cannot render");
+            return;
         }
 
         // Clear canvas
