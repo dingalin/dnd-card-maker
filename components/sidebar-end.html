@@ -1,0 +1,327 @@
+<aside class="sidebar-end glass-panel">
+    <h2>עריכה ועיצוב</h2>
+
+    <!-- Stone Menu Navigation -->
+    <div class="stone-menu">
+        <!-- Edit Content Button -->
+        <div class="stone-btn" data-target="edit-content">
+            <div class="btn-content">
+                <span class="icon">📝</span>
+                <span class="label">עריכת תוכן</span>
+            </div>
+        </div>
+
+        <!-- Text Design Button -->
+        <div class="stone-btn" data-target="text-design">
+            <div class="btn-content">
+                <span class="icon">🎨</span>
+                <span class="label">עיצוב טקסט</span>
+            </div>
+        </div>
+
+        <!-- Image Tuning Button -->
+        <div class="stone-btn" data-target="image-tuning">
+            <div class="btn-content">
+                <span class="icon">🖼️</span>
+                <span class="label">כיוונון תמונה</span>
+            </div>
+        </div>
+
+        <!-- Card Background Button -->
+        <div class="stone-btn" data-target="card-background">
+            <div class="btn-content">
+                <span class="icon">🎴</span>
+                <span class="label">רקע הקלף</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll Content Area (Hidden by default, revealed by buttons) -->
+    <div id="sidebar-end-scroll-area" class="scroll-container scroll-container-left">
+
+        <!-- 1. Edit Content Section -->
+        <div id="edit-content" class="scroll-section hidden">
+            <h3>עריכת תוכן</h3>
+            <div id="content-editor" class="space-y-4">
+
+                <!-- Rarity -->
+                <div class="control-group">
+                    <label for="edit-rarity" class="text-sm font-medium text-gray-300 mb-1 block">נדירות</label>
+                    <div class="flex gap-2 items-center mb-2">
+                        <input type="text" id="edit-rarity"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                data-target="raritySize">-</button>
+                            <span class="font-value text-xs w-8 text-center text-white"
+                                id="raritySize-display">24px</span>
+                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                data-target="raritySize">+</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="rarity-offset" class="text-xs text-gray-400">מיקום:</label>
+                        <input type="range" id="rarity-offset" min="-100" max="100" value="0" class="flex-1">
+                    </div>
+                </div>
+
+                <!-- Type -->
+                <div class="control-group">
+                    <label for="edit-type" class="text-sm font-medium text-gray-300 mb-1 block">סוג</label>
+                    <div class="flex gap-2 items-center mb-2">
+                        <input type="text" id="edit-type"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                data-target="typeSize">-</button>
+                            <span class="font-value text-xs w-8 text-center text-white"
+                                id="typeSize-display">24px</span>
+                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                data-target="typeSize">+</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="type-offset" class="text-xs text-gray-400">מיקום:</label>
+                        <input type="range" id="type-offset" min="-100" max="100" value="0" class="flex-1">
+                    </div>
+                </div>
+
+                <!-- Name -->
+                <div class="control-group">
+                    <label for="edit-name" class="text-sm font-medium text-gray-300 mb-1 block">שם החפץ</label>
+                    <div class="flex gap-2 items-center mb-2">
+                        <input type="text" id="edit-name"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                data-target="nameSize">-</button>
+                            <span class="font-value text-xs w-8 text-center text-white"
+                                id="nameSize-display">60px</span>
+                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                data-target="nameSize">+</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="name-offset" class="text-xs text-gray-400">מיקום:</label>
+                        <input type="range" id="name-offset" min="-100" max="100" value="0" class="flex-1">
+                    </div>
+                </div>
+
+                <!-- Ability Name -->
+                <div class="control-group">
+                    <label for="edit-ability-name" class="text-sm font-medium text-gray-300 mb-1 block">שם יכולת</label>
+                    <div class="flex gap-2 items-center mb-2">
+                        <input type="text" id="edit-ability-name"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                data-target="abilityNameSize">-</button>
+                            <span class="font-value text-xs w-8 text-center text-white"
+                                id="abilityNameSize-display">28px</span>
+                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                data-target="abilityNameSize">+</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="ability-offset" class="text-xs text-gray-400">מיקום:</label>
+                        <input type="range" id="ability-offset" min="-150" max="150" value="0" class="flex-1">
+                    </div>
+                </div>
+
+                <!-- Ability Desc -->
+                <div class="control-group">
+                    <label for="edit-ability-desc" class="text-sm font-medium text-gray-300 mb-1 block">תיאור
+                        יכולת</label>
+                    <div class="flex gap-2 items-start mb-2">
+                        <textarea id="edit-ability-desc" rows="3"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
+                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0 mt-1">
+                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                data-target="abilityDescSize">-</button>
+                            <span class="font-value text-xs w-8 text-center text-white"
+                                id="abilityDescSize-display">24px</span>
+                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                data-target="abilityDescSize">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fluff -->
+                <div class="control-group">
+                    <label for="edit-desc" class="text-sm font-medium text-gray-300 mb-1 block">תיאור כללי
+                        (פלאף)</label>
+                    <div class="flex gap-2 items-start mb-2">
+                        <textarea id="edit-desc" rows="3"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
+                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0 mt-1">
+                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                data-target="descSize">-</button>
+                            <span class="font-value text-xs w-8 text-center text-white"
+                                id="descSize-display">22px</span>
+                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                data-target="descSize">+</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="fluff-offset" class="text-xs text-gray-400">מרווח:</label>
+                        <input type="range" id="fluff-offset" min="0" max="100" value="20" class="flex-1">
+                    </div>
+                </div>
+
+                <!-- Gold -->
+                <div class="control-group">
+                    <label for="edit-gold" class="text-sm font-medium text-gray-300 mb-1 block">מחיר (זהב)</label>
+                    <div class="flex gap-2 items-center mb-2">
+                        <input type="text" id="edit-gold" value="400"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                data-target="goldSize">-</button>
+                            <span class="font-value text-xs w-8 text-center text-white"
+                                id="goldSize-display">24px</span>
+                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                data-target="goldSize">+</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="gold-offset" class="text-xs text-gray-400">מיקום:</label>
+                        <input type="range" id="gold-offset" min="-100" max="100" value="0" class="flex-1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Text Design Section -->
+        <div id="text-design" class="scroll-section hidden">
+            <h3>עיצוב טקסט</h3>
+            <div class="control-group">
+                <label for="font-family-select">גופן</label>
+                <select id="font-family-select">
+                    <option value="Heebo">Heebo (רגיל)</option>
+                    <option value="Rubik">Rubik (עגול)</option>
+                    <option value="Frank Ruhl Libre">Frank Ruhl (ספרותי)</option>
+                    <option value="Assistant">Assistant (נקי)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 3. Image Tuning Section -->
+        <div id="image-tuning" class="scroll-section hidden">
+            <h3>כיוונון תמונה</h3>
+            <div class="layout-controls space-y-4">
+                <!-- Image Offset -->
+                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <label for="image-offset" class="block text-sm font-bold mb-2" style="color: #fbbf24;">מיקום
+                        תמונה</label>
+                    <input type="range" id="image-offset" min="-150" max="150" value="0" class="w-full">
+                </div>
+
+                <!-- Zoom -->
+                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <label for="image-scale" class="block text-sm font-bold mb-2"
+                        style="color: #fbbf24; display: flex; justify-content: space-between;">
+                        <span>זום (Zoom)</span>
+                        <span id="image-scale-val">1.0</span>
+                    </label>
+                    <input type="range" id="image-scale" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full">
+                </div>
+
+                <!-- Rotation -->
+                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <label for="image-rotation" class="block text-sm font-bold mb-2"
+                        style="color: #fbbf24; display: flex; justify-content: space-between;">
+                        <span>סיבוב (Rotation)</span>
+                        <span id="image-rotation-val">0°</span>
+                    </label>
+                    <input type="range" id="image-rotation" min="-180" max="180" step="5" value="0" class="w-full">
+                </div>
+
+                <!-- Fade (Vignette) -->
+                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <label for="image-fade" class="block text-sm font-bold mb-2"
+                        style="color: #fbbf24; display: flex; justify-content: space-between;">
+                        <span>עמעום מסגרת (Fade)</span>
+                        <span id="image-fade-val">0</span>
+                    </label>
+                    <input type="range" id="image-fade" min="0" max="100" value="0" class="w-full">
+                </div>
+
+                <!-- Shadow (Drop Shadow) -->
+                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <label for="image-shadow" class="block text-sm font-bold mb-2"
+                        style="color: #fbbf24; display: flex; justify-content: space-between;">
+                        <span>הצללה (Shadow)</span>
+                        <span id="image-shadow-val">0</span>
+                    </label>
+                    <input type="range" id="image-shadow" min="0" max="100" value="0" class="w-full">
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Card Background Section -->
+        <div id="card-background" class="scroll-section hidden">
+            <h3>רקע הקלף</h3>
+            <div class="control-group">
+                <label for="bg-theme-select">נושא הרקע</label>
+                <select id="bg-theme-select"
+                    class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white mb-3">
+                    <option value="Fire">אש (Fire)</option>
+                    <option value="Nature">טבע (Nature)</option>
+                    <option value="Arcane">קסם (Arcane)</option>
+                    <option value="Divine">קדושה (Divine)</option>
+                    <option value="Necrotic">מוות (Necrotic)</option>
+                    <option value="Industrial">תעשייתי (Industrial)</option>
+                    <option value="Iron">ברזל (Iron)</option>
+                    <option value="Old Scroll">מגילה (Scroll)</option>
+                    <option value="Elemental">יסודות (Elemental)</option>
+                </select>
+                <button id="generate-bg-btn" class="btn-primary w-full mb-2">צור רקע</button>
+                <button id="reset-bg-btn" class="btn-secondary w-full">חזור לברירת מחדל</button>
+
+                <!-- Ready-made Backgrounds -->
+                <button id="ready-made-bg-btn" class="btn-secondary w-full mt-2"
+                    style="border-color: #d4af37; color: #d4af37;">
+                    <span class="icon">🖼️</span> רקעים מוכנים
+                </button>
+            </div>
+
+            <!-- Background Controls -->
+            <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700 mt-2">
+                <label for="bg-scale" class="block text-sm font-bold mb-2"
+                    style="color: #fbbf24; display: flex; justify-content: space-between;">
+                    <span>גודל רקע (Scale)</span>
+                    <span id="bg-scale-val">1.0</span>
+                </label>
+                <input type="range" id="bg-scale" min="1.0" max="2.0" step="0.1" value="1.0" class="w-full">
+            </div>
+        </div>
+        <div class="card-actions" style="margin-top: 1.5rem;">
+            <button id="download-btn" class="btn-secondary" disabled>הורד קלף</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Background Selection Modal (Hidden by default) -->
+    <div id="bg-selection-modal" class="hidden"
+        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80vw; max-width: 900px; height: 80vh; background: rgba(20, 20, 20, 0.95); border: 2px solid #d4af37; border-radius: 12px; z-index: 2000; display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.8);">
+        <div class="modal-header"
+            style="padding: 1rem; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; color: #d4af37; font-family: var(--font-display);">בחר רקע מוכן</h3>
+            <button id="close-bg-modal"
+                style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+
+        <div class="modal-body" style="flex: 1; overflow-y: auto; padding: 1rem;">
+            <!-- Categories/Themes -->
+            <div id="bg-themes-container" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                <!-- Theme buttons injected here -->
+            </div>
+
+            <!-- Grid Display -->
+            <div id="bg-grid-display"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                <!-- Sliced images injected here -->
+            </div>
+        </div>
+    </div>
+</aside>

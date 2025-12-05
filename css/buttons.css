@@ -1,0 +1,180 @@
+/* === Buttons === */
+
+/* Primary Action Button (Stone Style) */
+.btn-primary {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d4af37;
+    background: url('../../assets/textures/stone_slab.png');
+    background-size: cover;
+    border: 2px solid #5a5a5a;
+    border-bottom: 4px solid #3a3a3a;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.1s;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+}
+
+.btn-primary:active {
+    transform: translateY(2px);
+    border-bottom: 2px solid #3a3a3a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-primary:active::before {
+    width: 300px;
+    height: 300px;
+    transition: 0s;
+}
+
+/* Secondary Button */
+.regenerate-grid .btn-secondary {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #5a5a5a;
+    color: #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Surprise Button */
+.btn-surprise {
+    height: 100%;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('../../assets/textures/stone_slab.png');
+    background-size: cover;
+    border: 2px solid #5a5a5a;
+    border-bottom: 4px solid #3a3a3a;
+    border-radius: 4px;
+    color: #d4af37;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.btn-surprise:active {
+    transform: translateY(2px);
+    border-bottom: 2px solid #3a3a3a;
+}
+
+/* Preset Button */
+.preset-btn {
+    position: relative;
+    background: url('../../assets/textures/stone_slab.png');
+    background-size: cover;
+    border: 1px solid #5a5a5a;
+    border-radius: 4px;
+    padding: 0.5rem;
+    cursor: pointer;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.preset-btn img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Stone Button (Menu) */
+.stone-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: url('../../assets/textures/stone_slab.png');
+    background-size: cover;
+    border: 2px solid #5a5a5a;
+    border-bottom: 4px solid #3a3a3a;
+    border-radius: 4px;
+    color: #d4af37;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    user-select: none;
+}
+
+.stone-btn:active,
+.stone-btn.active {
+    transform: translateY(2px);
+    border-bottom: 2px solid #3a3a3a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    border-color: #d4af37;
+}
+
+.stone-btn .icon {
+    font-size: 1.2rem;
+}
+
+.stone-btn .btn-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stone-btn .label {
+    font-size: 0.95rem;
+}
+
+.stone-btn .selected-value {
+    font-size: 0.85rem;
+    color: #aaa;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-right: auto;
+}
+
+/* Container for the buttons */
+.stone-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+}

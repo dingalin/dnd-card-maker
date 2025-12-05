@@ -1,0 +1,255 @@
+<aside class="sidebar-start glass-panel">
+    <h2>יצירת חפץ</h2>
+    <form id="generator-form">
+
+        <!-- Stone Menu Navigation -->
+        <div class="stone-menu">
+            <!-- API Key Button -->
+            <div class="stone-btn" data-target="api-content">
+                <div class="btn-content">
+                    <span class="icon">🔑</span>
+                    <span class="label">מפתח API</span>
+                </div>
+                <span class="status-indicator" id="api-key-indicator"></span>
+            </div>
+
+            <!-- Level Button -->
+            <div class="stone-btn" data-target="level-content">
+                <div class="btn-content">
+                    <span class="icon">📊</span>
+                    <span class="label">רמה</span>
+                </div>
+                <span class="selected-value" id="level-display-btn">1-4</span>
+            </div>
+
+            <!-- Type Button -->
+            <div class="stone-btn" data-target="type-content">
+                <div class="btn-content">
+                    <span class="icon">⚔️</span>
+                    <span class="label">סוג ופרטים</span>
+                </div>
+                <span class="selected-value" id="type-display-btn">נשק</span>
+            </div>
+
+            <!-- Ability Button -->
+            <div class="stone-btn" data-target="ability-content">
+                <div class="btn-content">
+                    <span class="icon">✨</span>
+                    <span class="label">יכולת / נושא</span>
+                </div>
+            </div>
+
+            <!-- Visuals Button -->
+            <div class="stone-btn" data-target="visuals-content">
+                <div class="btn-content">
+                    <span class="icon">🎨</span>
+                    <span class="label">מראה וסגנון</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Content Area -->
+        <div id="sidebar-scroll-area" class="scroll-container">
+
+            <!-- 1. API Key Section -->
+            <div id="api-content" class="scroll-section hidden">
+                <h3>הגדרות חיבור</h3>
+                <div class="api-key-section">
+                    <label for="api-key">מפתח API (Google Gemini)</label>
+                    <input type="password" id="api-key" placeholder="הדבק מפתח כאן..." />
+                    <p class="help-text">נדרש כדי ליצור תוכן.</p>
+                </div>
+                <div class="api-key-section" style="margin-top: 1rem;">
+                    <label for="getimg-api-key">מפתח API / סיסמה (Getimg.ai)</label>
+                    <input type="password" id="getimg-api-key" placeholder="הדבק מפתח או סיסמה..." />
+                    <p class="help-text">אופציונלי: עבור מודלים איכותיים יותר.</p>
+                </div>
+            </div>
+
+            <!-- 2. Level Section -->
+            <div id="level-content" class="scroll-section hidden">
+                <h3>רמת החפץ</h3>
+                <div class="form-group">
+                    <label for="item-level">בחר רמה:</label>
+                    <select id="item-level" name="level">
+                        <option value="1-4">1-4 (נפוץ)</option>
+                        <option value="5-10">5-10 (לא נפוץ)</option>
+                        <option value="11-16">11-16 (נדיר)</option>
+                        <option value="17+">17+ (אגדי)</option>
+                    </select>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="attunement">
+                    <label for="attunement">דורש התכווננות? (Requires Attunement)</label>
+                </div>
+            </div>
+
+            <!-- 3. Type & Details Section -->
+            <div id="type-content" class="scroll-section hidden">
+                <h3>סוג ופרטים</h3>
+
+                <!-- Type Selection -->
+                <div class="form-group">
+                    <label for="item-type">סוג חפץ ראשי</label>
+                    <select id="item-type">
+                        <option value="weapon">נשק (Weapon)</option>
+                        <option value="armor">שריון (Armor)</option>
+                        <option value="wondrous">חפץ פלא (Wondrous Item)</option>
+                        <option value="potion">שיקוי (Potion)</option>
+                        <option value="ring">טבעת (Ring)</option>
+                        <option value="scroll">מגילה (Scroll)</option>
+                        <option value="staff">מטה (Staff)</option>
+                        <option value="wand">שרביט (Wand)</option>
+                    </select>
+                </div>
+
+                <!-- Subtype (Dynamic) -->
+                <div class="form-group hidden" id="subtype-container">
+                    <label for="item-subtype">חפץ ספציפי</label>
+                    <select id="item-subtype" name="subtype">
+                        <option value="">-- בחר חפץ --</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic Fields Container -->
+                <div id="dynamic-fields" class="dynamic-fields">
+                    <!-- Weapon Fields -->
+                    <div id="weapon-fields" class="hidden">
+                        <div class="form-group">
+                            <label for="weapon-damage">נזק (Damage)</label>
+                            <input type="text" id="weapon-damage" placeholder="e.g. 1d8">
+                        </div>
+                        <div class="form-group">
+                            <label for="damage-type">סוג נזק (Damage Type)</label>
+                            <select id="damage-type">
+                                <option value="slashing">חותך (Slashing)</option>
+                                <option value="piercing">דוקר (Piercing)</option>
+                                <option value="bludgeoning">מוחץ (Bludgeoning)</option>
+                                <option value="fire">אש (Fire)</option>
+                                <option value="cold">קור (Cold)</option>
+                                <option value="lightning">ברק (Lightning)</option>
+                                <option value="necrotic">נקרוטי (Necrotic)</option>
+                                <option value="radiant">קורן (Radiant)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Armor Fields -->
+                    <div id="armor-fields" class="hidden">
+                        <div class="form-group">
+                            <label for="armor-class">דירוג שריון (AC)</label>
+                            <input type="number" id="armor-class" placeholder="e.g. 15">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Ability / Theme Section -->
+            <div id="ability-content" class="scroll-section hidden">
+                <h3>יכולת או נושא</h3>
+                <div class="form-group">
+                    <label for="item-ability">תאר את היכולת או הנושא של החפץ:</label>
+                    <input type="text" id="item-ability" name="ability" placeholder="לדוגמה: להב אש, טבעת היעלמות..." />
+                    <p class="help-text">הבינה המלאכותית תשתמש בזה כהשראה.</p>
+                </div>
+            </div>
+
+            <!-- 5. Visuals Section -->
+            <div id="visuals-content" class="scroll-section hidden">
+                <h3>מראה וסגנון</h3>
+                <div class="form-group">
+                    <label for="image-model">מודל תמונה</label>
+                    <select id="image-model">
+                        <option value="flux">FLUX (Default)</option>
+                        <option value="flux-pro">FLUX Pro (High Quality)</option>
+                        <option value="flux-realism">FLUX Realism</option>
+                        <option value="turbo">Turbo (Fast)</option>
+                        <option value="seedream">Seedream (Experimental)</option>
+                        <option value="midjourney">Midjourney Style</option>
+                        <option value="getimg-flux">Getimg: FLUX Schnell (Cheap)</option>
+                        <option value="getimg-seedream">Getimg: Seedream (Quality)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="image-style">סגנון ציור</label>
+                    <select id="image-style">
+                        <option value="realistic">ריאליסטי (Realistic)</option>
+                        <option value="watercolor">צבעי מים וקו (Watercolor & Line Art)</option>
+                        <option value="oil">ציור שמן (Oil Painting)</option>
+                        <option value="sketch">רישום עיפרון (Pencil Sketch)</option>
+                        <option value="dark_fantasy">פנטזיה אפלה (Dark Fantasy)</option>
+                        <option value="anime">אנימה (Anime)</option>
+                        <option value="woodcut">תחריט עץ (Woodcut)</option>
+                        <option value="pixel">פיקסל ארט (Pixel Art)</option>
+                        <option value="simple_icon">אייקון פשוט (Simple Icon)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="image-style-option">סגנון תמונה (עיבוד)</label>
+                    <select id="image-style-option">
+                        <option value="natural">רקע טבעי (Natural)</option>
+                        <option value="no-background">בלי רקע (No BG)</option>
+                        <option value="square-frame">מסגרת מרובעת (Square)</option>
+                        <option value="round-frame">מסגרת עגולה (Round)</option>
+                        <option value="colored-background">רקע בצבע (Color)</option>
+                    </select>
+                </div>
+
+                <!-- Color Palette (Hidden by default) -->
+                <div id="image-color-picker-container" class="form-group hidden">
+                    <label>בחר צבע רקע:</label>
+                    <div id="color-palette" class="color-palette-grid">
+                        <!-- Colors will be injected by JS -->
+                    </div>
+                    <input type="hidden" id="image-bg-color" value="White">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons-container">
+            <button type="submit" id="generate-btn" class="btn-create" data-tooltip="צור חפץ קסום חדש!">
+                <span class="icon">✨</span> צור חפץ
+            </button>
+
+            <div class="secondary-actions-grid">
+                <button type="button" id="surprise-btn" class="btn-surprise">
+                    <span class="icon">🎲</span> הפתע אותי
+                </button>
+
+                <!-- Regenerate Controls (Hidden by default) -->
+                <div id="regenerate-controls" class="regenerate-grid hidden">
+                    <button type="button" id="regen-image-btn" class="btn-secondary small-btn" title="צור תמונה חדשה">
+                        <span class="icon">🎨</span> מראה
+                    </button>
+                    <button type="button" id="regen-stats-btn" class="btn-secondary small-btn" title="צור תכונות חדשות">
+                        <span class="icon">📝</span> תכונות
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="error-message" class="error-message hidden"></div>
+    </form>
+
+    <!-- Sticky Note Summary -->
+    <div id="sticky-note" class="sticky-note">
+        <div class="note-pin"></div>
+        <h3>🗡️ פרטי חפץ</h3>
+        <div class="note-content">
+            <div class="note-row">
+                <span class="note-label">רמה:</span>
+                <span id="note-level">1-4</span>
+            </div>
+            <div class="note-row">
+                <span class="note-label">סוג:</span>
+                <span id="note-type">נשק</span>
+            </div>
+            <div class="note-row">
+                <span class="note-label">חפץ:</span>
+                <span id="note-subtype">-</span>
+            </div>
+        </div>
+    </div>
+</aside>

@@ -1,0 +1,60 @@
+<section class="preview-panel">
+    <!-- Fullscreen Button -->
+    <button id="fullscreen-btn" class="fullscreen-btn" title="מסך מלא (F)">
+        <span class="icon">⛶</span>
+    </button>
+
+    <div class="canvas-container">
+        <canvas id="card-canvas" width="600" height="840"></canvas>
+
+        <!-- Enhanced Loading Overlay with Progress Steps -->
+        <div id="loading-overlay" class="hidden">
+            <div class="loading-content">
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="step" data-step="1">
+                        <div class="step-icon">💭</div>
+                        <div class="step-label">רעיון</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" data-step="2">
+                        <div class="step-icon">✍️</div>
+                        <div class="step-label">תיאור</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" data-step="3">
+                        <div class="step-icon">🎨</div>
+                        <div class="step-label">ציור</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" data-step="4">
+                        <div class="step-icon">✨</div>
+                        <div class="step-label">סיום</div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+
+                <p id="loading-text">מתחיל...</p>
+                <button id="cancel-btn" class="cancel-btn">ביטול</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Fullscreen Modal -->
+<div id="fullscreen-modal" class="fullscreen-modal hidden">
+    <button id="close-fullscreen-btn" class="close-fullscreen-btn">✕</button>
+    <div class="fullscreen-canvas-container">
+        <canvas id="fullscreen-canvas"></canvas>
+    </div>
+    <div class="zoom-controls">
+        <button id="zoom-out-btn" class="zoom-btn">−</button>
+        <span id="zoom-level">100%</span>
+        <button id="zoom-in-btn" class="zoom-btn">+</button>
+        <button id="zoom-reset-btn" class="zoom-btn">↻</button>
+    </div>
+</div>

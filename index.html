@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+  <title>מחולל קלפי D&D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&family=Cinzel:wght@400..900&family=Frank+Ruhl+Libre:wght@300..900&family=Heebo:wght@100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet">
+  <!-- Modular CSS -->
+  <!-- UI Improvements (Phase 1 & 2) -->
+  <script type="module" crossorigin src="/dnd-card-maker/assets/index-HXFwe6Q2.js"></script>
+  <link rel="stylesheet" crossorigin href="/dnd-card-maker/assets/index-DJ87vK5b.css">
+</head>
+
+<body>
+  <div id="app">
+    <!-- Header Component -->
+    <div id="header-placeholder"></div>
+
+    <!-- Navigation Scroll Menu (Hidden by default) -->
+    <div id="scroll-content-area" class="scroll-content-area">
+      <!-- Dynamic content loaded here -->
+    </div>
+
+    <main class="main-layout">
+      <!-- Right Sidebar: Generation Form -->
+      <div id="sidebar-start-placeholder"></div>
+
+      <!-- Center: Card Preview -->
+      <div id="preview-placeholder"></div>
+
+      <!-- Left Sidebar: Edit & Design -->
+      <div id="sidebar-end-placeholder"></div>
+    </main>
+  </div>
+
+  <!-- Sticky Note Summary - Fixed Position -->
+  <div id="sticky-note" class="sticky-note">
+    <div class="note-pin"></div>
+    <h3>🗡️ פרטי חפץ</h3>
+    <div class="note-content">
+      <div class="note-row">
+        <span class="note-label">רמה:</span>
+        <span id="note-level">1-4</span>
+      </div>
+      <div class="note-row">
+        <span class="note-label">סוג:</span>
+        <span id="note-type">נשק</span>
+      </div>
+      <div class="note-row">
+        <span class="note-label">חפץ:</span>
+        <span id="note-subtype">-</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+
+  <!-- result-manager.js removed -->
+</body>
+
+</html>

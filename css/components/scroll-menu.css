@@ -1,0 +1,116 @@
+/* === Scroll Menu === */
+
+/* The Scroll Container (Content Area) */
+.scroll-container {
+    position: absolute;
+    top: 0;
+    left: auto !important;
+    right: 105% !important;
+    /* Push to the left (towards center) */
+    width: 320px;
+    background-color: #f4e4bc;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+    border: 8px solid transparent;
+    border-image: url('../../assets/textures/stone_slab.png') 30 round;
+    border-radius: 2px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    padding: 1.5rem;
+    z-index: 100;
+    display: none;
+    color: #2c1810;
+    direction: rtl;
+    /* Default for Right Sidebar (opens Left) -> Scrollbar on Left */
+
+    /* Fix for overflow */
+    max-height: 70vh;
+    /* Reduced to ensure it fits */
+    overflow-y: auto !important;
+    /* Force scroll */
+    pointer-events: auto;
+    /* Ensure clickable/scrollable */
+    scrollbar-width: thin;
+    scrollbar-color: #8b4513 transparent;
+}
+
+/* Custom Scrollbar for Webkit */
+.scroll-container::-webkit-scrollbar {
+    width: 8px;
+    /* Slightly wider for visibility */
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background-color: #8b4513;
+    border-radius: 4px;
+    border: 1px solid #f4e4bc;
+}
+
+/* When active, show it */
+.scroll-container.active {
+    display: block;
+    animation: unroll 0.4s ease-out;
+}
+
+@keyframes unroll {
+    from {
+        opacity: 0;
+        transform: scaleY(0);
+        transform-origin: top;
+    }
+
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+        transform-origin: top;
+    }
+}
+
+/* Scroll Options List */
+.scroll-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.scroll-option {
+    background: none;
+    border: none;
+    text-align: right;
+    font-family: 'Frank Ruhl Libre', serif;
+    /* Handwritten feel */
+    font-size: 1.2rem;
+    color: #4a3b2a;
+    /* Ink color */
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.scroll-option:hover {
+    color: #8b0000;
+    /* Dark red ink on hover */
+    padding-right: 1rem;
+    /* Slight movement */
+    background: rgba(139, 69, 19, 0.1);
+    border-radius: 4px;
+}
+
+.scroll-option.selected {
+    color: #8b0000;
+    font-weight: bold;
+    border-bottom: 2px solid #8b0000;
+    padding-right: 1rem;
+}
+
+/* Override for Left Sidebar (opens to the Right) */
+.scroll-container-left {
+    left: 105% !important;
+    right: auto !important;
+}
