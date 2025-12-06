@@ -50,7 +50,10 @@ export class EditorController {
             'edit-image-rotation': 'imageRotation',
             'image-fade': 'imageFade',
             'image-shadow': 'imageShadow',
-            'bg-scale': 'backgroundScale'
+            'bg-scale': 'backgroundScale',
+            'name-width': 'nameWidth',
+            'ability-width': 'abilityWidth',
+            'fluff-width': 'fluffWidth'
         };
 
         Object.keys(sliders).forEach(id => {
@@ -59,6 +62,12 @@ export class EditorController {
                 slider.addEventListener('input', (e) => {
                     let val = parseFloat(e.target.value);
                     if (id === 'ability-offset') val += 530;
+
+                    // DEBUG: Log width slider changes
+                    if (id.includes('width')) {
+                        console.log(`Slider ${id} changed to ${val}`);
+                    }
+
                     this.state.updateOffset(sliders[id], val);
                     this.state.saveCurrentCard(); // Auto-save
 
@@ -74,6 +83,8 @@ export class EditorController {
                         if (display) display.textContent = val;
                     }
                 });
+            } else {
+                console.warn(`EditorController: Slider element "${id}" not found`);
             }
         });
     }
@@ -94,6 +105,30 @@ export class EditorController {
                 const action = btn.classList.contains('font-increase') ? 1 : -1;
                 this.state.updateFontSize(target, action);
             });
+        });
+
+        // Font Style Checkboxes (Bold/Italic)
+        const styleMap = [
+            'name', 'type', 'rarity', 'abilityName', 'abilityDesc', 'desc', 'gold'
+        ];
+        styleMap.forEach(key => {
+            const boldId = `style-bold-${key}`;
+            const italicId = `style-italic-${key}`;
+            const boldCb = document.getElementById(boldId);
+            const italicCb = document.getElementById(italicId);
+
+            if (boldCb) {
+                boldCb.addEventListener('change', (e) => {
+                    this.state.updateFontStyle(`${key}Bold`, e.target.checked);
+                    this.state.saveCurrentCard();
+                });
+            }
+            if (italicCb) {
+                italicCb.addEventListener('change', (e) => {
+                    this.state.updateFontStyle(`${key}Italic`, e.target.checked);
+                    this.state.saveCurrentCard();
+                });
+            }
         });
 
         // Image Style Options (Color Picker Toggle)

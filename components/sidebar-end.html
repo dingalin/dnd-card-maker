@@ -58,14 +58,22 @@
                             <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
                                 data-target="raritySize">+</button>
                         </div>
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                <input type="checkbox" id="style-bold-rarity"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs font-bold text-gray-400">B</span>
+                            </label>
+                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                <input type="checkbox" id="style-italic-rarity"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs italic text-gray-400">I</span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label for="rarity-offset" class="text-xs text-gray-400">מיקום:</label>
-                        <input type="range" id="rarity-offset" min="-100" max="100" value="0" class="flex-1">
-                    </div>
+                    <label for="rarity-offset" class="text-xs text-gray-400">מיקום:</label>
+                    <input type="range" id="rarity-offset" min="-100" max="100" value="0" class="flex-1">
                 </div>
-
-                <!-- Type -->
                 <div class="control-group">
                     <label for="edit-type" class="text-sm font-medium text-gray-300 mb-1 block">סוג</label>
                     <div class="flex gap-2 items-center mb-2">
@@ -79,11 +87,21 @@
                             <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
                                 data-target="typeSize">+</button>
                         </div>
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                <input type="checkbox" id="style-bold-type"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs font-bold text-gray-400">B</span>
+                            </label>
+                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                <input type="checkbox" id="style-italic-type"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs italic text-gray-400">I</span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label for="type-offset" class="text-xs text-gray-400">מיקום:</label>
-                        <input type="range" id="type-offset" min="-100" max="100" value="0" class="flex-1">
-                    </div>
+                    <label for="type-offset" class="text-xs text-gray-400">מיקום:</label>
+                    <input type="range" id="type-offset" min="-100" max="100" value="0" class="flex-1">
                 </div>
 
                 <!-- Name -->
@@ -100,11 +118,25 @@
                             <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
                                 data-target="nameSize">+</button>
                         </div>
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                <input type="checkbox" id="style-bold-name"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs font-bold text-gray-400">B</span>
+                            </label>
+                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                <input type="checkbox" id="style-italic-name"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs italic text-gray-400">I</span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label for="name-offset" class="text-xs text-gray-400">מיקום:</label>
-                        <input type="range" id="name-offset" min="-100" max="100" value="0" class="flex-1">
-                    </div>
+                    <label for="name-offset" class="text-xs text-gray-400">מיקום:</label>
+                    <input type="range" id="name-offset" min="-100" max="100" value="0" class="flex-1">
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                    <label for="name-width" class="text-xs text-gray-400">רוחב:</label>
+                    <input type="range" id="name-width" min="100" max="800" value="500" class="flex-1">
                 </div>
 
                 <!-- Ability Name -->
@@ -120,6 +152,18 @@
                                 id="abilityNameSize-display">28px</span>
                             <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
                                 data-target="abilityNameSize">+</button>
+                        </div>
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                <input type="checkbox" id="style-bold-abilityName"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs font-bold text-gray-400">B</span>
+                            </label>
+                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                <input type="checkbox" id="style-italic-abilityName"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs italic text-gray-400">I</span>
+                            </label>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
@@ -143,6 +187,22 @@
                             <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
                                 data-target="abilityDescSize">+</button>
                         </div>
+                        <div class="flex flex-col gap-1 shrink-0 mt-1">
+                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                <input type="checkbox" id="style-bold-abilityDesc"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs font-bold text-gray-400">B</span>
+                            </label>
+                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                <input type="checkbox" id="style-italic-abilityDesc"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs italic text-gray-400">I</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <label for="ability-width" class="text-xs text-gray-400">רוחב טקסט:</label>
+                        <input type="range" id="ability-width" min="100" max="800" value="500" class="flex-1">
                     </div>
                 </div>
 
@@ -161,11 +221,25 @@
                             <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
                                 data-target="descSize">+</button>
                         </div>
+                        <div class="flex flex-col gap-1 shrink-0 mt-1">
+                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                <input type="checkbox" id="style-bold-desc"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs font-bold text-gray-400">B</span>
+                            </label>
+                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                <input type="checkbox" id="style-italic-desc"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs italic text-gray-400">I</span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label for="fluff-offset" class="text-xs text-gray-400">מרווח:</label>
-                        <input type="range" id="fluff-offset" min="0" max="100" value="20" class="flex-1">
-                    </div>
+                    <label for="fluff-offset" class="text-xs text-gray-400">מרווח:</label>
+                    <input type="range" id="fluff-offset" min="0" max="100" value="20" class="flex-1">
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                    <label for="fluff-width" class="text-xs text-gray-400">רוחב:</label>
+                    <input type="range" id="fluff-width" min="100" max="800" value="500" class="flex-1">
                 </div>
 
                 <!-- Gold -->
@@ -182,11 +256,21 @@
                             <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
                                 data-target="goldSize">+</button>
                         </div>
+                        <div class="flex flex-col gap-1 shrink-0">
+                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                <input type="checkbox" id="style-bold-gold"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs font-bold text-gray-400">B</span>
+                            </label>
+                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                <input type="checkbox" id="style-italic-gold"
+                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                <span class="text-xs italic text-gray-400">I</span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label for="gold-offset" class="text-xs text-gray-400">מיקום:</label>
-                        <input type="range" id="gold-offset" min="-100" max="100" value="0" class="flex-1">
-                    </div>
+                    <label for="gold-offset" class="text-xs text-gray-400">מיקום:</label>
+                    <input type="range" id="gold-offset" min="-100" max="100" value="0" class="flex-1">
                 </div>
             </div>
         </div>

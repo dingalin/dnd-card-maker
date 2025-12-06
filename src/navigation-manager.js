@@ -139,7 +139,10 @@ if (typeof window !== 'undefined') {
 
     let isNavInitialized = false;
 
-    const initNav = () => {
+    const initNav = async () => {
+        // Wait for next tick/frame to ensure DOM updates are painted/ready
+        await new Promise(r => setTimeout(r, 50));
+
         console.log("NavigationManager: initNav called");
         if (isNavInitialized) return;
         isNavInitialized = true;

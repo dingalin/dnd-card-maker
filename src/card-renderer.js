@@ -125,7 +125,15 @@ class CardRenderer {
             fluffPadding: fluffPadding,
             fontSize: fontSize,
             fontFamily: fontFamily,
-            fontSizes: options.fontSizes
+            fontSizes: options.fontSizes,
+            fontStyles: options.fontStyles,
+            // Widths
+            nameWidth: Number(options.nameWidth) || 500,
+            typeWidth: Number(options.typeWidth) || 500,
+            rarityWidth: Number(options.rarityWidth) || 500,
+            abilityWidth: Number(options.abilityWidth) || 500,
+            fluffWidth: Number(options.fluffWidth) || 500,
+            goldWidth: Number(options.goldWidth) || 500
         };
 
         // Ensure template is loaded
@@ -461,9 +469,10 @@ class CardRenderer {
 
     drawText(data, offsets) {
         console.log("CardRenderer: drawText called", { data, offsets });
+        console.log(`DEBUG: Widths - Name: ${offsets.nameWidth}, Ability: ${offsets.abilityWidth}, Fluff: ${offsets.fluffWidth}`);
         const ctx = this.ctx;
         const width = this.canvas.width;
-        const maxWidth = 500; // Approximate width for text wrapping
+        // const maxWidth = 500; // REMOVED: Now using per-element width
 
         const defaultSizes = {
             nameSize: 48,
@@ -476,56 +485,130 @@ class CardRenderer {
         };
         const sizes = { ...defaultSizes, ...(offsets.fontSizes || {}) };
 
+        // Helper to construct font string
+        const getFont = (prefix, size) => {
+            const styles = offsets.fontStyles || {};
+            const bold = styles[`${prefix}Bold`] ? 'bold ' : '';
+            const italic = styles[`${prefix}Italic`] ? 'italic ' : '';
+            // If neither, result is empty string, which is valid (defaults to normal)
+            return `${italic}${bold}${size}px "${offsets.fontFamily}"`;
+        };
+
         // Name
-        ctx.font = `bold ${sizes.nameSize}px "${offsets.fontFamily}"`;
+        ctx.font = getFont('name', sizes.nameSize);
         ctx.fillStyle = '#2c1810';
         ctx.textAlign = 'center';
-        ctx.fillText(data.name, width / 2, 160 + offsets.name);
+        ctx.fillText(data.name, width / 2, 160 + offsets.name, Number(offsets.nameWidth || 500));
 
         // Type
-        ctx.font = `${sizes.typeSize}px "${offsets.fontFamily}"`;
+        ctx.font = getFont('type', sizes.typeSize);
         let typeText = `${data.typeHe}`;
         if (data.weaponDamage) typeText += ` • ${data.weaponDamage} ${data.damageType || ''}`;
         if (data.armorClass) typeText += ` • AC ${data.armorClass}`;
-        ctx.fillText(typeText, width / 2, 105 + offsets.type);
+        ctx.fillText(typeText, width / 2, 105 + offsets.type, Number(offsets.typeWidth || 500));
 
         // Rarity
-        ctx.font = `${sizes.raritySize}px "${offsets.fontFamily}"`;
+        ctx.font = getFont('rarity', sizes.raritySize);
         // Default rarityY is 135, plus slider offset
         const rarityY = 135 + offsets.rarity;
-        ctx.fillText(data.rarityHe, width / 2, rarityY);
+        ctx.fillText(data.rarityHe, width / 2, rarityY, offsets.rarityWidth);
 
         // Description Block
         let currentY = offsets.abilityY; // Use passed offset
 
         // Ability Name
         if (data.abilityName) {
-            ctx.font = `bold ${sizes.abilityNameSize}px "${offsets.fontFamily}"`;
-            ctx.fillText(`${data.abilityName}:`, width / 2, currentY);
+            ctx.font = getFont('abilityName', sizes.abilityNameSize);
+            ctx.fillText(`${data.abilityName}:`, width / 2, currentY, Number(offsets.abilityWidth || 500));
             currentY += sizes.abilityNameSize * 1.2;
         }
 
         // Ability Description
         if (data.abilityDesc) {
-            ctx.font = `${sizes.abilityDescSize}px "${offsets.fontFamily}"`;
-            currentY = this.wrapTextCentered(data.abilityDesc, width / 2, currentY, maxWidth, sizes.abilityDescSize * 1.2);
+            ctx.font = getFont('abilityDesc', sizes.abilityDescSize);
+            currentY = this.wrapTextCentered(data.abilityDesc, width / 2, currentY, Number(offsets.abilityWidth || 500), sizes.abilityDescSize * 1.2);
         }
 
         // Add Fluff Padding
-        currentY += offsets.fluffPadding;
+        currentY += Number(offsets.fluffPadding || 0);
 
         // Fluff Description
         if (data.description) {
-            ctx.font = `italic ${sizes.descSize}px "${offsets.fontFamily}"`;
+            ctx.font = getFont('desc', sizes.descSize);
             ctx.fillStyle = '#5a4a3a';
-            this.wrapTextCentered(data.description, width / 2, currentY, maxWidth, sizes.descSize * 1.2);
+            this.wrapTextCentered(data.description, width / 2, currentY, Number(offsets.fluffWidth || 500), sizes.descSize * 1.2);
         }
 
-        // Footer - Gold value
+        // Footer - Gold value (Gold Coin Icon & Stroke)
         const goldValue = data.gold || '400';
-        ctx.font = `bold ${sizes.goldSize}px Cinzel`;
+        const goldStyles = offsets.fontStyles || {};
+        const goldBold = goldStyles.goldBold ? 'bold ' : '';
+        const goldItalic = goldStyles.goldItalic ? 'italic ' : '';
+        ctx.font = `${goldItalic}${goldBold}${sizes.goldSize}px Cinzel`; // Cinzel is better for numbers
+
+        // Measure text for centering
+        const metrics = ctx.measureText(goldValue);
+        const iconSize = sizes.goldSize * 1.5; // Icon larger than text
+        const spacing = 10;
+        const totalW = metrics.width + iconSize + spacing;
+
+        // Center Group
+        const startX = (width - totalW) / 2;
+        const textX = startX + iconSize + spacing + (metrics.width / 2); // Text is usually center aligned in drawText
+
+        const goldY = 780 + offsets.gold;
+
+        // Draw Icon
+        this.drawGoldIcon(ctx, startX + iconSize / 2, goldY - (sizes.goldSize * 0.4), iconSize);
+
+        // Draw Text with Stroke
         ctx.fillStyle = '#d4af37';
-        ctx.fillText(goldValue, width / 2, 780 + offsets.gold);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#000000';
+        ctx.strokeText(goldValue, textX, goldY);
+        ctx.fillText(goldValue, textX, goldY);
+        // Reset stroke styles
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'transparent';
+    }
+
+    drawGoldIcon(ctx, x, y, size) {
+        ctx.save();
+        const r = size / 2;
+
+        // 1. Outer Ring
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        const grad = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
+        grad.addColorStop(0, '#f9d976');
+        grad.addColorStop(1, '#b06604'); // Dark gold
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#5a3a00';
+        ctx.stroke();
+
+        // 2. Inner Circle (Inset)
+        ctx.beginPath();
+        ctx.arc(x, y, r * 0.75, 0, Math.PI * 2);
+        ctx.strokeStyle = '#fbecc2'; // Highlight ring
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 3. Center Symbol (Removed for generic fantasy coin)
+        // ctx.fillStyle = '#6e4303';
+        // ctx.font = `bold ${size * 0.5}px Arial`;
+        // ctx.textAlign = 'center';
+        // ctx.textBaseline = 'middle';
+        // ctx.fillText('₪', x, y + 1); 
+
+        // 4. Shiny Highlight
+        ctx.beginPath();
+        ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.fill();
+
+        ctx.restore();
     }
 
     wrapTextCentered(text, x, y, maxWidth, lineHeight) {

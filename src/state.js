@@ -28,12 +28,27 @@ class StateManager {
                     imageRotation: 0,
                     imageFade: 0,
                     imageShadow: 0,
-                    backgroundScale: 1.0
+                    backgroundScale: 1.0,
+                    nameWidth: 500,
+                    typeWidth: 500,
+                    rarityWidth: 500,
+                    abilityWidth: 500,
+                    fluffWidth: 500,
+                    goldWidth: 500
                 },
                 style: {
                     fontFamily: 'Heebo',
                     imageStyle: 'natural',
                     imageColor: '#ffffff'
+                },
+                fontStyles: {
+                    nameBold: true, nameItalic: false,
+                    typeBold: false, typeItalic: false,
+                    rarityBold: false, rarityItalic: false,
+                    abilityNameBold: true, abilityNameItalic: false,
+                    abilityDescBold: false, abilityDescItalic: false,
+                    descBold: false, descItalic: true, // Fluff default italic
+                    goldBold: true, goldItalic: false
                 }
             },
             lastContext: null // Store the last selected image/background URL
@@ -123,6 +138,17 @@ class StateManager {
     updateStyle(key, value) {
         this.state.settings.style[key] = value;
         this.notify(`settings.style.${key}`);
+    }
+
+    /**
+     * Update font style (bold/italic)
+     * @param {string} key - e.g., 'nameBold'
+     * @param {boolean} value 
+     */
+    updateFontStyle(key, value) {
+        if (!this.state.settings.fontStyles) this.state.settings.fontStyles = {};
+        this.state.settings.fontStyles[key] = value;
+        this.notify(`settings.fontStyles.${key}`);
     }
 
     /**

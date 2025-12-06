@@ -30,6 +30,9 @@ async function initApp() {
     // 1. Initialize Renderer
     let renderer;
     try {
+        // Wait for next tick to ensure DOM is updated after componentsLoaded
+        await new Promise(resolve => setTimeout(resolve, 50));
+
         const canvas = document.getElementById('card-canvas');
         if (!canvas) throw new Error("Card canvas element not found");
 

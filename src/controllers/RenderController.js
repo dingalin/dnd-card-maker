@@ -81,6 +81,7 @@ export class RenderController {
             this.render(state);
         } else if (changedKey.startsWith('settings.')) {
             // Slider/Style update
+            // console.log(`[RenderController] Settings update: ${changedKey}`); 
             this.render(state);
             this.updateSettingsUI(state.settings);
         }
@@ -105,7 +106,8 @@ export class RenderController {
             fontSizes: state.settings.fontSizes,
             fontFamily: state.settings.style.fontFamily,
             imageStyle: state.settings.style.imageStyle,
-            imageColor: state.settings.style.imageColor
+            imageColor: state.settings.style.imageColor,
+            fontStyles: state.settings.fontStyles
         };
 
         if (window.previewManager) {
@@ -216,6 +218,11 @@ export class RenderController {
             setSlider('ability-offset', settings.offsets.abilityY);
             setSlider('fluff-offset', settings.offsets.fluffPadding);
             setSlider('gold-offset', settings.offsets.gold);
+
+            // Sync Width Sliders
+            setSlider('name-width', settings.offsets.nameWidth);
+            setSlider('ability-width', settings.offsets.abilityWidth);
+            setSlider('fluff-width', settings.offsets.fluffWidth);
         }
 
         // Update Font Size Displays
@@ -223,6 +230,28 @@ export class RenderController {
             for (const [key, value] of Object.entries(settings.fontSizes)) {
                 const display = document.getElementById(`${key}-display`);
                 if (display) display.textContent = `${value}px`;
+            }
+        }
+
+        // Update Font Styles (Bold/Italic Checkboxes)
+        if (settings.fontStyles) {
+            for (const [key, value] of Object.entries(settings.fontStyles)) {
+                // key e.g. 'nameBold' -> id 'style-bold-name'
+                let type = '';
+                let base = '';
+                if (key.endsWith('Bold')) {
+                    type = 'bold';
+                    base = key.replace('Bold', '');
+                } else if (key.endsWith('Italic')) {
+                    type = 'italic';
+                    base = key.replace('Italic', '');
+                }
+
+                if (type && base) {
+                    const id = `style-${type}-${base}`;
+                    const cb = document.getElementById(id);
+                    if (cb) cb.checked = !!value;
+                }
             }
         }
     }
