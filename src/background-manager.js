@@ -4,14 +4,7 @@
  */
 
 // Detect base path for GitHub Pages or local development
-const getBasePath = () => {
-    const path = window.location.pathname;
-    if (path.includes('/dnd-card-maker/')) {
-        return '/dnd-card-maker/';
-    }
-    return '/';
-};
-const BASE_PATH = getBasePath();
+const BASE_PATH = import.meta.env.BASE_URL;
 
 export class BackgroundManager {
     constructor(renderer) {
