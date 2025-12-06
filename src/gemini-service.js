@@ -512,30 +512,50 @@ class GeminiService {
             // 2. Try GetImg if Key is available
             if (getImgApiKey) {
                 console.log("GeminiService: Trying GetImg fallback...");
+
+                // Proxy Check
+                const useWorkersForGetImg = !getImgApiKey.startsWith('key-');
+
                 try {
-                    const endpoint = 'https://api.getimg.ai/v1/flux-schnell/text-to-image';
-                    const body = {
+                    let endpoint = 'https://api.getimg.ai/v1/flux-schnell/text-to-image';
+                    let body = {
                         prompt: prompt,
                         response_format: 'b64',
                         width: 512,
                         height: 768
                     };
 
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${getImgApiKey}`,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(body)
-                    });
+                    if (useWorkersForGetImg) {
+                        console.log("GeminiService: Using Worker for Background (Proxy Mode)");
+                        const data = await this.callViaWorker('getimg-generate', body);
 
-                    if (!response.ok) throw new Error(`GetImg failed: ${response.status}`);
-                    const data = await response.json();
-                    const imageUrl = `data:image/jpeg;base64,${data.image}`;
-                    const blob = await (await fetch(imageUrl)).blob();
-                    return URL.createObjectURL(blob);
+                        if (data.image) {
+                            const imageUrl = `data:image/jpeg;base64,${data.image}`;
+                            const blob = await (await fetch(imageUrl)).blob();
+                            return URL.createObjectURL(blob);
+                        } else if (data.error) {
+                            throw new Error(data.error);
+                        } else {
+                            throw new Error("Worker (BG) did not return an image");
+                        }
+                    } else {
+                        // Direct Call
+                        const response = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${getImgApiKey}`,
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(body)
+                        });
+
+                        if (!response.ok) throw new Error(`GetImg failed: ${response.status}`);
+                        const data = await response.json();
+                        const imageUrl = `data:image/jpeg;base64,${data.image}`;
+                        const blob = await (await fetch(imageUrl)).blob();
+                        return URL.createObjectURL(blob);
+                    }
 
                 } catch (getImgError) {
                     console.warn("Background GetImg fallback failed:", getImgError);
