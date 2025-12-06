@@ -78,6 +78,15 @@ async function initApp() {
         });
         // Initial Render for empty state
         renderer.render(stateManager.getState().cardData, stateManager.getState().settings.offsets);
+
+        // --- Fix: Force re-render after delay (Handle GitHub Pages font loading) ---
+        setTimeout(() => {
+            console.log("Force re-draw for GitHub Pages");
+            renderer.render(stateManager.getState().cardData, stateManager.getState().settings.offsets);
+        }, 500);
+
+        // Expose as requested for debugging
+        window.CardRenderer = renderer;
     } else {
         showToast("📂 קלף אחרון נטען!", 'info');
         // If we loaded a card, we should show the editor UI
