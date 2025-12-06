@@ -31,8 +31,9 @@ class CardRenderer {
     }
 
     async _loadTemplate() {
-        const primaryPath = BASE_PATH + 'assets/card-template.png';
-        const fallbackPath = BASE_PATH + 'public/assets/card-template.png';
+        // Use relative paths which are safer for both GitHub Pages and Localhost
+        const primaryPath = './assets/card-template.png';
+        const fallbackPath = './public/assets/card-template.png';
 
         console.log("CardRenderer: Attempting to load template from:", primaryPath);
 
