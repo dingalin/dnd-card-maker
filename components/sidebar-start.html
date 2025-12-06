@@ -158,6 +158,13 @@
             <div id="visuals-content" class="scroll-section hidden">
                 <h3>מראה וסגנון</h3>
                 <div class="form-group">
+                    <label for="custom-visual-prompt">תיאור ויזואלי ידני (אופציונלי)</label>
+                    <textarea id="custom-visual-prompt" rows="3"
+                        placeholder="תאר את החפץ באנגלית כדי לעקוף את התיאור האוטומטי... (למשל: A glowing blue sword with runes)"></textarea>
+                    <p class="help-text">השאיר ריק כדי שה-AI יחליט לבד.</p>
+                </div>
+
+                <div class="form-group">
                     <label for="image-model">מודל תמונה</label>
                     <select id="image-model">
                         <option value="flux">FLUX (Default)</option>

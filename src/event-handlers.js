@@ -1,6 +1,6 @@
 import { stateManager } from './state.js';
 import GeminiService from './gemini-service.js';
-import { showToast } from '../ui-helpers.js';
+import { initUI, showToast, initWindowManager } from './ui-helpers.js';
 import { getRarityFromLevel } from './utils.js';
 import { previewManager } from './preview-manager.js';
 
@@ -268,6 +268,13 @@ export function setupEventListeners() {
                     if (ac) itemDetails.armorClass = ac;
                 }
 
+                // Override with Custom Prompt if provided
+                const customPromptInput = document.getElementById('custom-visual-prompt');
+                if (customPromptInput && customPromptInput.value.trim()) {
+                    console.log("Using Custom Visual Prompt:", customPromptInput.value.trim());
+                    itemDetails.visualPrompt = customPromptInput.value.trim();
+                }
+
                 // Step 3: Generate Image
                 previewManager.updateProgress(3, 60, 'מצייר את החפץ...');
                 const model = imageModelSelect ? imageModelSelect.value : 'flux';
@@ -326,87 +333,6 @@ export function setupEventListeners() {
         });
     }
 
-    // Download Buttons
-    // Download Buttons
-    const handleDownload = async () => {
-        const canvas = document.getElementById('card-canvas');
-        if (!canvas) return;
-
-        try {
-            // Quality set to 0.95
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-
-            // Check for modern Save File Picker API (Chrome/Edge)
-            if (window.showSaveFilePicker) {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: `dnd-item-${Date.now()}.jpg`,
-                    types: [{
-                        description: 'JPG Image',
-                        accept: { 'image/jpeg': ['.jpg'] },
-                    }],
-                });
-
-                // Convert DataURL to Blob
-                const res = await fetch(dataUrl);
-                const blob = await res.blob();
-
-                // Write to file
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-                showToast('הקובץ נשמר בהצלחה!', 'success');
-            } else {
-                // Fallback for Firefox/others: standard download link (Downloads folder)
-                const link = document.createElement('a');
-                link.download = `dnd-item-${Date.now()}.jpg`;
-                link.href = dataUrl;
-                link.click();
-            }
-        } catch (err) {
-            // User cancelled picker or error
-            if (err.name !== 'AbortError') {
-                console.error('Download failed:', err);
-                showToast('שגיאה בשמירת הקובץ', 'error');
-            }
-        }
-    };
-
-    if (downloadBtn) downloadBtn.addEventListener('click', handleDownload);
-    if (downloadBtnToolbar) downloadBtnToolbar.addEventListener('click', handleDownload);
-
-    // Surprise Me
-    if (surpriseBtn) {
-        surpriseBtn.addEventListener('click', () => {
-            const types = Object.keys(window.OFFICIAL_ITEMS || {});
-            if (types.length === 0) return;
-
-            const randomType = types[Math.floor(Math.random() * types.length)];
-            const typeSelect = document.getElementById('item-type');
-            // typeSelect is hidden input now, need to handle custom UI
-            if (typeSelect) {
-                typeSelect.value = randomType;
-                // Trigger click on corresponding option
-                const option = document.querySelector(`.scroll-option[data-value="${randomType}"]`);
-                if (option) option.click();
-            }
-
-            const categories = window.OFFICIAL_ITEMS[randomType];
-            const allSubtypes = [];
-            for (const category in categories) {
-                allSubtypes.push(...categories[category]);
-            }
-            const randomSubtype = allSubtypes[Math.floor(Math.random() * allSubtypes.length)];
-            const subtypeSelect = document.getElementById('item-subtype');
-            if (subtypeSelect) subtypeSelect.value = randomSubtype;
-
-            const levels = ['1-4', '5-10', '11-16', '17+'];
-            document.getElementById('item-level').value = levels[Math.floor(Math.random() * levels.length)];
-            document.getElementById('item-ability').value = '';
-
-            form.dispatchEvent(new Event('submit'));
-        });
-    }
-
     // Regenerate Image (Mirror)
     if (regenImageBtn) {
         regenImageBtn.addEventListener('click', async () => {
@@ -431,14 +357,22 @@ export function setupEventListeners() {
                 const styleOption = document.getElementById('image-style-option')?.value || 'natural';
                 const userColor = document.getElementById('image-bg-color')?.value || '#ffffff';
 
+                // CHECK FOR CUSTOM PROMPT
+                const customPromptInput = document.getElementById('custom-visual-prompt');
+                let visualPrompt = currentState.cardData.visualPrompt;
+                if (customPromptInput && customPromptInput.value.trim()) {
+                    console.log("Regenerating with Custom Visual Prompt:", customPromptInput.value.trim());
+                    visualPrompt = customPromptInput.value.trim();
+                }
+
                 let imageUrl;
                 if (model.startsWith('getimg-')) {
                     let getImgKey = getImgApiKeyInput ? getImgApiKeyInput.value.trim() : '';
 
                     if (!getImgKey) throw new Error("Missing GetImg API Key");
-                    imageUrl = await gemini.generateImageGetImg(currentState.cardData.visualPrompt, model, style, getImgKey, styleOption, userColor);
+                    imageUrl = await gemini.generateImageGetImg(visualPrompt, model, style, getImgKey, styleOption, userColor);
                 } else {
-                    imageUrl = await gemini.generateItemImage(currentState.cardData.visualPrompt, model, style, styleOption, userColor);
+                    imageUrl = await gemini.generateItemImage(visualPrompt, model, style, styleOption, userColor);
                 }
 
                 const newCardData = {

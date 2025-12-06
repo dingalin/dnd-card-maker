@@ -113,7 +113,7 @@ class GeminiService {
         "weaponDamage": "Damage dice (e.g. 1d8) if weapon, else null",
         "damageType": "Damage type (Hebrew) if weapon, else null",
         "armorClass": "AC value (number) if armor, else null",
-        "visualPrompt": "A highly detailed English description of the item for an image generator. Focus on visual details, materials, lighting, and style. The object should be centered. No text in image."
+        "visualPrompt": "A SHORT, CONCISE English description (max 15 words) of the item for image generation. Focus ONLY on the main object's appearance. No background descriptions."
       }
     `;
 
@@ -250,7 +250,7 @@ class GeminiService {
         const safePrompt = visualPrompt.substring(0, 150).replace(/[^a-zA-Z0-9, ]/g, '');
 
         // Construct final prompt
-        const enhancedPrompt = encodeURIComponent(`${styleKeywords}, ${safePrompt}, ${backgroundPrompt}, medieval fantasy style, D&D equipment, 8k`);        // Construct URL based on selected model
+        const enhancedPrompt = encodeURIComponent(`${styleKeywords}, ${safePrompt}, ${backgroundPrompt}, 8k`);        // Construct URL based on selected model
         let modelParam = `model=${model}`;
 
         const imageUrl = `https://image.pollinations.ai/prompt/${enhancedPrompt}?width=512&height=512&${modelParam}&seed=${Math.floor(Math.random() * 10000)}`;
@@ -375,7 +375,7 @@ class GeminiService {
             backgroundPrompt = `solid ${userColor} background`;
         }
 
-        const finalPrompt = `${styleKeywords}, ${visualPrompt}, ${backgroundPrompt}, fantasy item, d&d, 8k`.replace(/^, /, '');
+        const finalPrompt = `${styleKeywords}, ${visualPrompt}, ${backgroundPrompt}, 8k`.replace(/^, /, '');
 
         let endpoint = 'https://api.getimg.ai/v1/flux-schnell/text-to-image';
         let body = {

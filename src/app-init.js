@@ -2,7 +2,7 @@ import CardRenderer from './card-renderer.js';
 import UIManager from './ui-manager.js';
 import { stateManager } from './state.js';
 import { setupEventListeners } from './event-handlers.js';
-import { initUI, showToast, initWindowManager } from '../ui-helpers.js';
+import { initUI, showToast, initWindowManager } from './ui-helpers.js';
 import { BackgroundManager } from './background-manager.js';
 import { previewManager } from './preview-manager.js';
 import './dnd-data.js'; // Ensure data is loaded

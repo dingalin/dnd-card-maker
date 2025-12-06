@@ -10,10 +10,6 @@ export default defineConfig({
         viteStaticCopy({
             targets: [
                 { src: 'components/*', dest: 'components' },
-                { src: 'ui-improvements.css', dest: '.' },
-                { src: 'component-loader.js', dest: '.' },
-                { src: 'navigation-manager.js', dest: '.' },
-                { src: 'ui-helpers.js', dest: '.' },
                 { src: 'css/**/*', dest: 'css' }
             ]
         })
