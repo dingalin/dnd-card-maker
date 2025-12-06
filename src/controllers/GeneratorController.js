@@ -1,4 +1,4 @@
-import { getRarityFromLevel } from '../utils.js';
+import { getRarityFromLevel, blobToBase64 } from '../utils.js';
 import GeminiService from '../gemini-service.js';
 
 export class GeneratorController {
@@ -116,10 +116,17 @@ export class GeneratorController {
             const imageUrl = await this.generateImage(itemDetails.visualPrompt);
 
             // 5. Save & Render
+            // Convert Blob URL to Base64 for persistence
+            let persistentImageUrl = imageUrl;
+            if (imageUrl.startsWith('blob:')) {
+                this.preview.updateProgress(3, 80, 'שומר תמונה...');
+                persistentImageUrl = await blobToBase64(imageUrl);
+            }
+
             const newCardData = {
                 ...itemDetails,
                 gold: itemDetails.gold || '1000',
-                imageUrl: imageUrl,
+                imageUrl: persistentImageUrl,
                 originalParams: { level, type, subtype: finalSubtype, rarity, ability }
             };
 
@@ -161,9 +168,15 @@ export class GeneratorController {
 
             const imageUrl = await this.generateImage(prompt);
 
+            // Convert to Base64 for persistence
+            let persistentImageUrl = imageUrl;
+            if (imageUrl.startsWith('blob:')) {
+                persistentImageUrl = await blobToBase64(imageUrl);
+            }
+
             const newCardData = {
                 ...currentState.cardData,
-                imageUrl: imageUrl
+                imageUrl: persistentImageUrl
             };
 
             this.state.setCardData(newCardData);
@@ -234,11 +247,20 @@ export class GeneratorController {
 
             const bgUrl = await this.gemini.generateCardBackground(theme, getImgKey);
 
-            if (window.cardRenderer) {
-                await window.cardRenderer.setTemplate(bgUrl);
-                this.state.notify('cardData');
+            // Convert to Base64 for persistence
+            let persistentBgUrl = bgUrl;
+            if (bgUrl.startsWith('blob:')) {
+                persistentBgUrl = await blobToBase64(bgUrl);
             }
-            this.ui.showToast('רקע חדש נוצר!', 'success');
+
+            // Save to state so it persists in history
+            this.state.updateStyle('cardBackgroundUrl', persistentBgUrl);
+            if (window.cardRenderer) {
+                // Ensure renderer updates immediately
+                await window.cardRenderer.setTemplate(persistentBgUrl);
+            }
+
+            this.ui.showToast('רקע חדש נוצר ונשמר!', 'success');
         } catch (error) {
             this.ui.showToast('שגיאה ביצירת רקע', 'error');
         } finally {

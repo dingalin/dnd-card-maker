@@ -10,13 +10,71 @@ export class RenderController {
         this.state.subscribe((state, changedKey) => {
             this.handleStateChange(state, changedKey);
         });
+
+        this.setupDownloadListener();
+    }
+
+    setupDownloadListener() {
+        // Validation: Check if button exists
+        const btn = document.getElementById('download-btn');
+        if (btn) {
+            console.log("✅ Download button found in DOM");
+        } else {
+            console.warn("⚠️ Download button NOT found in DOM at init");
+        }
+
+        // Use Delegation for robustness
+        // Use Delegation for robustness
+        document.addEventListener('click', (e) => {
+            // Download Button
+            const downloadBtn = e.target.closest('#download-btn');
+            if (downloadBtn && !downloadBtn.disabled) {
+                console.log("🖱️ Download button clicked");
+                e.preventDefault();
+                let cardName = this.state.getState().cardData?.name || 'card';
+                cardName = cardName.replace(/[^a-zA-Z0-9\u0590-\u05FF\-_ ]/g, "").trim();
+                if (!cardName) cardName = "dnd_card";
+                this.renderer.downloadCard(cardName).then(() => {
+                    if (window.uiManager) window.uiManager.showToast(`התהליך הסתיים!`, 'info');
+                });
+            }
+
+            // Save to Gallery Button
+            const galleryBtn = e.target.closest('#save-gallery-btn');
+            if (galleryBtn && !galleryBtn.disabled) {
+                console.log("🖱️ Save to Gallery button clicked");
+                e.preventDefault();
+
+                // Generate Thumbnail from Canvas
+                const canvas = document.getElementById('card-canvas');
+                let thumbUrl = null;
+                if (canvas) {
+                    try {
+                        // Create a small thumbnail (e.g. 20% scale or fixed width)
+                        // We'll use the full canvas toDataURL but usually browsers handle it fine.
+                        // To save space, we can draw to a smaller canvas first.
+                        const thumbCanvas = document.createElement('canvas');
+                        const scale = 0.3; // 30% size
+                        thumbCanvas.width = canvas.width * scale;
+                        thumbCanvas.height = canvas.height * scale;
+                        const ctx = thumbCanvas.getContext('2d');
+                        ctx.drawImage(canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
+                        thumbUrl = thumbCanvas.toDataURL('image/jpeg', 0.8);
+                    } catch (err) {
+                        console.error("Failed to generate thumbnail:", err);
+                    }
+                }
+
+                this.state.saveToHistory(thumbUrl);
+                if (window.uiManager) window.uiManager.showToast('הקלף נשמר לגלריה בהצלחה!', 'success');
+            }
+        });
     }
 
     handleStateChange(state, changedKey) {
-        // If card data changed, update editor fields to match
         if (changedKey === 'cardData') {
             this.updateEditor(state.cardData);
-            this.render(state);
+            this.render(state); // Render updates buttons now
         } else if (changedKey.startsWith('cardData.')) {
             // Single field update (e.g. typing in editor), just render
             this.render(state);
@@ -27,8 +85,19 @@ export class RenderController {
         }
     }
 
+
+
     async render(state) {
         if (!state.cardData || !this.renderer) return;
+
+        // Check for background update
+        if (state.settings.style.cardBackgroundUrl &&
+            state.settings.style.cardBackgroundUrl !== this.currentBackgroundUrl) {
+
+            console.log("RenderController: Loading new background from state...");
+            await this.renderer.setTemplate(state.settings.style.cardBackgroundUrl);
+            this.currentBackgroundUrl = state.settings.style.cardBackgroundUrl;
+        }
 
         const renderOptions = {
             ...state.settings.offsets,
@@ -43,6 +112,17 @@ export class RenderController {
         }
 
         await this.renderer.render(state.cardData, renderOptions);
+
+        this.updateButtons(state.cardData);
+    }
+
+    updateButtons(cardData) {
+        const hasData = !!cardData;
+        const downBtn = document.getElementById('download-btn');
+        const galBtn = document.getElementById('save-gallery-btn');
+
+        if (downBtn) downBtn.disabled = !hasData;
+        if (galBtn) galBtn.disabled = !hasData;
     }
 
     updateEditor(data) {

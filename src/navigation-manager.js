@@ -60,6 +60,11 @@ class NavigationManager {
         const isMyButton = btn && scope.contains(btn);
 
         if (isMyButton) {
+            // Ignore buttons without a target (e.g., Gallery button which is handled separately)
+            if (!btn.dataset.target) {
+                return;
+            }
+
             console.log(`[Nav-${this.containerId}] Clicked button:`, btn.dataset.target);
             e.preventDefault();
             // We do NOT stop propagation, allowing other managers to close their menus if needed

@@ -1485,3 +1485,99 @@ body::before {
 .sticky-note {
   display: none !important;
 }
+
+/* History Gallery Styles */
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.history-item {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #555;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.history-item:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-color);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+}
+
+.history-preview {
+  width: 100%;
+  aspect-ratio: 63 / 88;
+  /* Standard Card Aspect Ratio */
+  background-size: cover;
+  /* Since aspect ratio matches, cover is fine, or contain to be safe */
+  background-position: center;
+  border-bottom: 1px solid #333;
+}
+
+.history-info {
+  padding: 0.5rem;
+}
+
+.history-name {
+  font-weight: bold;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-meta {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.history-actions {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.history-item:hover .history-actions {
+  opacity: 1;
+}
+
+.load-btn {
+  background: var(--accent-color);
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: rgba(255, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: red;
+}

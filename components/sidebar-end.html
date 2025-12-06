@@ -295,8 +295,13 @@
                 <input type="range" id="bg-scale" min="1.0" max="2.0" step="0.1" value="1.0" class="w-full">
             </div>
         </div>
-        <div class="card-actions" style="margin-top: 1.5rem;">
-            <button id="download-btn" class="btn-secondary" disabled>הורד קלף</button>
+        <div class="card-actions" style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+            <button id="save-gallery-btn" class="btn-primary" style="flex: 1;" disabled>
+                <span class="icon">💾</span> שמור לגלריה
+            </button>
+            <button id="download-btn" class="btn-secondary" style="flex: 1;" disabled>
+                <span class="icon">📥</span> הורד
+            </button>
         </div>
     </div>
 

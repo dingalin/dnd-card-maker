@@ -522,6 +522,61 @@ class CardRenderer {
         }
         this.ctx.fillText(line, x, y);
     }
+    async downloadCard(filename = 'card') {
+        try {
+            console.log(`CardRenderer: Starting save process for "${filename}"`);
+
+            // Ensure filename ends with .jpg
+            let finalName = filename.replace(/\.(png|jpg|jpeg)$/i, '');
+            finalName = `${finalName}.jpg`;
+
+            // 1. Modern Method: window.showSaveFilePicker (Allows user to choose folder)
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: finalName,
+                        types: [{
+                            description: 'JPG Image',
+                            accept: { 'image/jpeg': ['.jpg'] },
+                        }],
+                    });
+
+                    const blob = await new Promise(resolve => this.canvas.toBlob(resolve, 'image/jpeg', 0.9));
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    console.log(`Card saved via FilePicker: ${finalName}`);
+                    return; // Success, exit
+                } catch (err) {
+                    if (err.name === 'AbortError') {
+                        console.log('User cancelled save dialog');
+                        return;
+                    }
+                    console.warn('FilePicker failed, trying fallback:', err);
+                    // Fallthrough to fallback
+                }
+            }
+
+            // 2. Fallback Method: Classic <a> tag with Blob (Better for special chars than DataURL)
+            const blob = await new Promise(resolve => this.canvas.toBlob(resolve, 'image/jpeg', 0.9));
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.download = finalName;
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Cleanup
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+            console.log(`Card downloaded via fallback: ${finalName}`);
+
+        } catch (e) {
+            console.error("Download/Save failed:", e);
+            alert("שגיאה בשמירת הקובץ: " + e.message);
+        }
+    }
 }
 
 export default CardRenderer;

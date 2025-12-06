@@ -1,0 +1,26 @@
+<div id="gallery-window" class="floating-window hidden"
+    style="left: 50%; top: 50%; transform: translate(-50%, -50%); width: 800px; height: 600px; z-index: 2000;">
+    <div class="window-header"
+        style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-bottom: 2px solid #3a3a3a; background: rgba(0,0,0,0.3); cursor: grab;">
+        <h2 style="margin: 0; font-family: var(--font-display); color: var(--accent-color);">🏛️ היסטוריית חפצים</h2>
+        <button class="window-close-btn" data-target="gallery-window"
+            style="background: none; border: none; font-size: 1.5rem; color: #888; cursor: pointer;">&times;</button>
+    </div>
+
+    <div class="window-content" style="padding: 1rem; flex: 1; overflow-y: auto;">
+        <div id="history-grid" class="history-grid">
+            <!-- Items injected here by HistoryController -->
+            <div class="empty-message" style="text-align: center; color: #888; margin-top: 2rem;">
+                אין כרגע חפצים בהיסטוריה.
+                <br>
+                צור חפצים חדשים והם יופיעו כאן!
+            </div>
+        </div>
+    </div>
+
+    <div class="window-footer"
+        style="padding: 1rem; border-top: 1px solid #3a3a3a; display: flex; justify-content: flex-end;">
+        <button id="clear-history-btn" class="btn-secondary"
+            style="width: auto; padding: 0.5rem 1rem; color: #ff4444; border-color: #ff4444;">נקה היסטוריה</button>
+    </div>
+</div>

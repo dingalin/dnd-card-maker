@@ -9,7 +9,11 @@ export class UIManager {
             contentEditor: document.getElementById('content-editor'),
             errorDiv: document.getElementById('error-message'),
             toastContainer: document.getElementById('toast-container'),
-            stickyNote: document.getElementById('sticky-note')
+            stickyNote: document.getElementById('sticky-note'),
+            confirmModal: document.getElementById('confirmation-modal'),
+            confirmMessage: document.querySelector('#confirmation-modal .modal-message'),
+            confirmOkBtn: document.getElementById('confirm-ok-btn'),
+            confirmCancelBtn: document.getElementById('confirm-cancel-btn')
         };
     }
 
@@ -118,5 +122,32 @@ export class UIManager {
                 imageColorInput.value = 'White';
             }
         }
+    }
+
+    showConfirm(message, onConfirm) {
+        if (!this.elements.confirmModal) return;
+
+        this.elements.confirmMessage.textContent = message;
+        this.elements.confirmModal.classList.remove('hidden');
+
+        // Clean up old listeners to prevent multiple firings
+        const newOk = this.elements.confirmOkBtn.cloneNode(true);
+        const newCancel = this.elements.confirmCancelBtn.cloneNode(true);
+
+        this.elements.confirmOkBtn.parentNode.replaceChild(newOk, this.elements.confirmOkBtn);
+        this.elements.confirmCancelBtn.parentNode.replaceChild(newCancel, this.elements.confirmCancelBtn);
+
+        // Re-assign references
+        this.elements.confirmOkBtn = newOk;
+        this.elements.confirmCancelBtn = newCancel;
+
+        this.elements.confirmOkBtn.addEventListener('click', () => {
+            this.elements.confirmModal.classList.add('hidden');
+            onConfirm();
+        });
+
+        this.elements.confirmCancelBtn.addEventListener('click', () => {
+            this.elements.confirmModal.classList.add('hidden');
+        });
     }
 }

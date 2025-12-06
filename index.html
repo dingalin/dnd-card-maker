@@ -20,12 +20,16 @@
   <link rel="stylesheet" href="./css/components/toast.css">
   <link rel="stylesheet" href="./css/components/scroll-menu.css">
   <link rel="stylesheet" href="./css/components/forms.css">
+  <link rel="stylesheet" href="./css/components/modal.css">
 </head>
 
 <body>
   <div id="app">
     <!-- Header Component -->
     <div id="header-placeholder"></div>
+
+    <!-- Gallery Component -->
+    <div id="gallery-placeholder"></div>
 
     <!-- Navigation Scroll Menu (Hidden by default) -->
     <div id="scroll-content-area" class="scroll-content-area">
@@ -42,6 +46,18 @@
       <!-- Left Sidebar: Edit & Design -->
       <div id="sidebar-end-placeholder"></div>
     </main>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay hidden">
+      <div class="modal-content glass-panel">
+        <h3 class="modal-title">אישור פעולה</h3>
+        <p class="modal-message">האם אתה בטוח?</p>
+        <div class="modal-actions">
+          <button id="confirm-cancel-btn" class="btn-secondary">ביטול</button>
+          <button id="confirm-ok-btn" class="btn-primary">אישור</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Scripts - main.js is the single entry point for Vite -->

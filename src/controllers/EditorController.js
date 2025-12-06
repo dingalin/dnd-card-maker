@@ -27,6 +27,7 @@ export class EditorController {
             if (input) {
                 input.addEventListener('input', (e) => {
                     this.state.updateCardField(editInputs[id], e.target.value);
+                    this.state.saveCurrentCard(); // Auto-save
                 });
             }
         });
@@ -57,6 +58,7 @@ export class EditorController {
                     let val = parseFloat(e.target.value);
                     if (id === 'ability-offset') val += 530;
                     this.state.updateOffset(sliders[id], val);
+                    this.state.saveCurrentCard(); // Auto-save
 
                     // Update displays
                     if (id.includes('scale')) {

@@ -43,3 +43,24 @@ export function formatGold(gold) {
     if (isNaN(num)) return gold;
     return num.toLocaleString('he-IL');
 }
+
+/**
+ * Convert Blob URL to Base64 Data URL
+ * @param {string} blobUrl - The Blob URL
+ * @returns {Promise<string>} - Base64 Data URL
+ */
+export async function blobToBase64(blobUrl) {
+    try {
+        const response = await fetch(blobUrl);
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    } catch (e) {
+        console.error("Failed to convert blob to base64:", e);
+        return blobUrl; // Fallback
+    }
+}

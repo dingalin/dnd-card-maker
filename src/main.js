@@ -13,6 +13,7 @@ import { UIManager } from './ui/UIManager.js';
 import { EditorController } from './controllers/EditorController.js';
 import { GeneratorController } from './controllers/GeneratorController.js';
 import { RenderController } from './controllers/RenderController.js';
+import { HistoryController } from './controllers/HistoryController.js';
 
 // Legacy Init (for floating windows, bubbles)
 import { initUI, showToast, initWindowManager } from './ui-helpers.js';
@@ -53,6 +54,9 @@ async function initApp() {
 
     // Render: Handles State -> Canvas
     const renderController = new RenderController(stateManager, renderer);
+
+    // History: Handles Gallery
+    const historyController = new HistoryController(stateManager, uiManager);
 
     // 4. Initialize Background Manager
     window.backgroundManager = new BackgroundManager(renderer);

@@ -60,6 +60,11 @@ class StateManager {
      */
     notify(changedKey) {
         this.listeners.forEach(listener => listener(this.state, changedKey));
+
+        // Auto-save on meaningful changes
+        if (changedKey === 'cardData' || changedKey.startsWith('cardData.') || changedKey.startsWith('settings.')) {
+            this.saveCurrentCard();
+        }
     }
 
     /**
@@ -189,7 +194,11 @@ class StateManager {
     /**
      * Save current card to history (max 20 cards)
      */
-    saveToHistory() {
+    /**
+     * Save current card to history (max 20 cards)
+     * @param {string} thumbnail - Base64 data URL of the rendered card thumbnail
+     */
+    saveToHistory(thumbnail = null) {
         if (!this.state.cardData) return;
 
         const history = this.getHistory();
@@ -199,6 +208,7 @@ class StateManager {
             name: this.state.cardData.name || 'חפץ ללא שם',
             cardData: this.state.cardData,
             settings: this.state.settings,
+            thumbnail: thumbnail, // Save the full visual preview
             savedAt: new Date().toISOString()
         };
 
