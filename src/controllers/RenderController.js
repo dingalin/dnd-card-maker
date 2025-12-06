@@ -1,29 +1,48 @@
-import { stateManager } from './state.js';
-
-class UIManager {
-    constructor(renderer) {
+export class RenderController {
+    constructor(stateManager, renderer) {
+        this.state = stateManager;
         this.renderer = renderer;
         this.init();
     }
 
     init() {
         // Subscribe to state changes
-        stateManager.subscribe((state, changedKey) => {
+        this.state.subscribe((state, changedKey) => {
             this.handleStateChange(state, changedKey);
         });
     }
 
     handleStateChange(state, changedKey) {
+        // If card data changed, update editor fields to match
         if (changedKey === 'cardData') {
             this.updateEditor(state.cardData);
             this.render(state);
         } else if (changedKey.startsWith('cardData.')) {
-            // Single field update, just render
+            // Single field update (e.g. typing in editor), just render
             this.render(state);
         } else if (changedKey.startsWith('settings.')) {
+            // Slider/Style update
             this.render(state);
             this.updateSettingsUI(state.settings);
         }
+    }
+
+    async render(state) {
+        if (!state.cardData || !this.renderer) return;
+
+        const renderOptions = {
+            ...state.settings.offsets,
+            fontSizes: state.settings.fontSizes,
+            fontFamily: state.settings.style.fontFamily,
+            imageStyle: state.settings.style.imageStyle,
+            imageColor: state.settings.style.imageColor
+        };
+
+        if (window.previewManager) {
+            // Notify preview manager if needed (e.g. for zoom/pan updates)
+        }
+
+        await this.renderer.render(state.cardData, renderOptions);
     }
 
     updateEditor(data) {
@@ -49,10 +68,12 @@ class UIManager {
                 if (display) display.textContent = `${value}px`;
             }
         }
+
+        // Update Custom Prompt if it exists in state but not input? 
+        // Logic usually flows Input -> State, so we only update Input -> State here if we loaded a fresh card.
     }
 
     updateSettingsUI(settings) {
-        // Update slider displays if needed (most are handled by input event, but good for sync)
         if (settings.offsets) {
             const setDisplay = (id, val) => {
                 const el = document.getElementById(id);
@@ -62,6 +83,13 @@ class UIManager {
             setDisplay('edit-image-scale-val', settings.offsets.imageScale?.toFixed(1));
             setDisplay('image-rotation-val', `${settings.offsets.imageRotation}°`);
             setDisplay('edit-image-rotation-val', `${settings.offsets.imageRotation}°`);
+
+            // Sync sliders
+            const setSlider = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            };
+            // setSlider('image-scale', settings.offsets.imageScale); // Example
         }
 
         // Update Font Size Displays
@@ -72,25 +100,4 @@ class UIManager {
             }
         }
     }
-
-    async render(state) {
-        if (!state.cardData || !this.renderer) return;
-
-        // Combine state settings with cardData specific overrides if any
-        // (Logic from result-manager: cardData.offsets/fontSizes take precedence if they exist)
-        // In this new architecture, we should probably merge them in StateManager, 
-        // but for now let's use the centralized settings from state.
-
-        const renderOptions = {
-            ...state.settings.offsets,
-            fontSizes: state.settings.fontSizes,
-            fontFamily: state.settings.style.fontFamily,
-            imageStyle: state.settings.style.imageStyle,
-            imageColor: state.settings.style.imageColor
-        };
-
-        await this.renderer.render(state.cardData, renderOptions);
-    }
 }
-
-export default UIManager;
