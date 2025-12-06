@@ -14,6 +14,8 @@
 // Import assets to let Vite handle the path resolution
 // FIXED: Use public path with explicit BASE_URL for GitHub Pages compatibility
 const cardTemplateUrl = `${import.meta.env.BASE_URL}assets/card-template.png`;
+console.log("DEBUG: BASE_URL =", import.meta.env.BASE_URL);
+console.log("DEBUG: Constructed cardTemplateUrl =", cardTemplateUrl);
 
 class CardRenderer {
     constructor(canvasId) {
@@ -32,6 +34,7 @@ class CardRenderer {
         // Wait for fonts
         document.fonts.ready.then(() => {
             this.fontsLoaded = true;
+            console.log("DEBUG: Fonts loaded");
         });
     }
 
@@ -41,6 +44,7 @@ class CardRenderer {
         try {
             await this._loadImage(this.template, cardTemplateUrl);
             console.log("CardRenderer: Template loaded successfully");
+            console.log("DEBUG: Template dimensions:", this.template.naturalWidth, "x", this.template.naturalHeight);
 
             if (this.template.naturalWidth === 0) {
                 alert("CRITICAL: Template loaded but has 0 width. The file might be corrupted or empty.");
