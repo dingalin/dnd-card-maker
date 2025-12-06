@@ -11,7 +11,9 @@
 // const BASE_PATH = getBasePath();
 
 // Import assets to let Vite handle the path resolution
-import cardTemplateUrl from './assets/card-template.png';
+// Import assets to let Vite handle the path resolution
+// FIXED: Use public path with explicit BASE_URL for GitHub Pages compatibility
+const cardTemplateUrl = `${import.meta.env.BASE_URL}assets/card-template.png`;
 
 class CardRenderer {
     constructor(canvasId) {
