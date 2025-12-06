@@ -276,11 +276,10 @@
                     <option value="Elemental">יסודות (Elemental)</option>
                 </select>
                 <button id="generate-bg-btn" class="btn-primary w-full mb-2">צור רקע</button>
-                <button id="reset-bg-btn" class="btn-secondary w-full">חזור לברירת מחדל</button>
+                <button id="reset-bg-btn" class="btn-primary w-full">חזור לברירת מחדל</button>
 
                 <!-- Ready-made Backgrounds -->
-                <button id="ready-made-bg-btn" class="btn-secondary w-full mt-2"
-                    style="border-color: #d4af37; color: #d4af37;">
+                <button id="ready-made-bg-btn" class="btn-primary w-full mt-2">
                     <span class="icon">🖼️</span> רקעים מוכנים
                 </button>
             </div>
@@ -295,14 +294,18 @@
                 <input type="range" id="bg-scale" min="1.0" max="2.0" step="0.1" value="1.0" class="w-full">
             </div>
         </div>
-        <div class="card-actions" style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
-            <button id="save-gallery-btn" class="btn-primary" style="flex: 1;" disabled>
-                <span class="icon">💾</span> שמור לגלריה
-            </button>
-            <button id="download-btn" class="btn-secondary" style="flex: 1;" disabled>
-                <span class="icon">📥</span> הורד
-            </button>
-        </div>
+    </div>
+    </div>
+
+    <!-- Fixed Footer Actions -->
+    <div class="sidebar-actions-footer"
+        style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; display: flex; gap: 0.75rem; background: rgba(0,0,0,0.3);">
+        <button id="save-gallery-btn" class="btn-primary" style="flex: 1;" disabled>
+            <span class="icon">💾</span> שמור לגלריה
+        </button>
+        <button id="download-btn" class="btn-secondary" style="flex: 1;" disabled>
+            <span class="icon">📥</span> הורד
+        </button>
     </div>
 
     <!-- Background Selection Modal (Hidden by default) -->

@@ -1,14 +1,14 @@
-// Detect base path for GitHub Pages or local development
+// detect base path for github pages or local development
 /* 
  * NOTE: Base path logic is no longer needed for assets imported via Vite, 
  * but kept if needed for other dynamically constructed paths.
  */
-const getBasePath = () => {
-    const path = window.location.pathname;
-    if (path.includes('/dnd-card-maker/')) return '/dnd-card-maker/';
-    return '/';
-};
-const BASE_PATH = getBasePath();
+// const getBasePath = () => {
+//     const path = window.location.pathname;
+//     if (path.includes('/dnd-card-maker/')) return '/dnd-card-maker/';
+//     return '/';
+// };
+// const BASE_PATH = getBasePath();
 
 // Import assets to let Vite handle the path resolution
 import cardTemplateUrl from './assets/card-template.png';
