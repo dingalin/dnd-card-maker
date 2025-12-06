@@ -45,15 +45,44 @@ export class BackgroundManager {
                 if (e.target === this.modal) this.closeModal();
             });
         }
+
+        // Update position on resize
+        window.addEventListener('resize', () => {
+            if (this.modal && !this.modal.classList.contains('hidden')) {
+                this.updateModalPosition();
+            }
+        });
     }
 
     async openModal() {
         if (!this.modal) return;
+
+        this.updateModalPosition();
         this.modal.classList.remove('hidden');
 
         // Load images if not already loaded
         if (this.gridDisplay.children.length === 0) {
             await this.loadAllGrids();
+        }
+    }
+
+    updateModalPosition() {
+        const sidebar = document.querySelector('.sidebar-end');
+        if (sidebar && this.modal) {
+            const rect = sidebar.getBoundingClientRect();
+
+            // Apply sidebar dimensions and position to the modal
+            this.modal.style.top = `${rect.top}px`;
+            this.modal.style.left = `${rect.left}px`;
+
+            // Expand width significantly to allow 3 columns (approx 900px or wider)
+            // We clamp it to not overflow the window width too aggressively
+            const expandedWidth = Math.min(950, window.innerWidth - rect.left - 20);
+            this.modal.style.width = `${expandedWidth}px`;
+
+            this.modal.style.height = `${rect.height}px`;
+
+            // Match the sidebar's border radius if possible/needed, though CSS handles it
         }
     }
 
