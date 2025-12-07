@@ -25,10 +25,16 @@
     animation: modalPop 0.3s ease;
 }
 
-to {
-    transform: scale(1);
-    opacity: 1;
-}
+@keyframes modalPop {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* Fix for large content: Ensure modal doesn't overflow screen */
