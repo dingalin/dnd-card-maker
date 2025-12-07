@@ -18,26 +18,27 @@ export class PreviewManager {
     // ==================== Fullscreen ====================
 
     setupFullscreen() {
-        // const fullscreenBtn = document.getElementById('fullscreen-btn'); // Removed
+        console.log("🔍 Setting up Fullscreen/Zoom interactions...");
         const container = document.querySelector('.canvas-container');
-
-        // Button Click - Removed
-        /* if (fullscreenBtn) {
-            fullscreenBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent bubbling
-                this.openFullscreen();
-            });
-        } */
 
         // Click on container to toggle zoom
         if (container) {
-            container.addEventListener('click', () => {
+            console.log("✅ Canvas container found. Attaching click listener.");
+            container.addEventListener('click', (e) => {
+                console.log("🖱️ Canvas container clicked!");
+                // Prevent click if we are clicking a button inside (unlikely now, but good practice)
+                if (e.target.tagName === 'BUTTON') return;
+
                 if (container.classList.contains('expanded')) {
+                    console.log("📉 Closing fullscreen/zoom");
                     this.closeFullscreen();
                 } else {
+                    console.log("📈 Opening fullscreen/zoom");
                     this.openFullscreen();
                 }
             });
+        } else {
+            console.error("❌ Canvas container NOT found during setup!");
         }
 
         // Close on Escape key is handled in setupKeyboardShortcuts

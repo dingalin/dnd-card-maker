@@ -176,14 +176,18 @@ textarea:focus {
   left: 50%;
   transform: translate(-50%, -50%) scale(1.8);
   /* Scale approx 2x */
-  z-index: 9999;
-  box-shadow: 0 0 0 100vw rgba(0, 0, 0, 0.85);
-  /* Backdrop effect */
+  /* Scale approx 2x */
+  z-index: 99999;
+  /* Ultra high z-index */
+  box-shadow: 0 0 0 100vw rgba(0, 0, 0, 0.95);
+  /* Darker Backdrop */
   cursor: zoom-out;
   max-height: 90vh;
   /* Prevent overflow */
   width: auto;
 }
+
+/* Cache Buster: v1.0.1 - Fix Zoom */
 
 canvas {
   display: block;
