@@ -959,6 +959,7 @@ body::before {
   /* Ensure clickable/scrollable */
   scrollbar-width: thin;
   scrollbar-color: #8b4513 transparent;
+  z-index: 2100;
 }
 
 /* Custom Scrollbar for Webkit */

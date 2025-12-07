@@ -266,7 +266,7 @@ class GeminiService {
         const safePrompt = visualPrompt.substring(0, 150).replace(/[^a-zA-Z0-9, ]/g, '');
 
         // Construct final prompt
-        const enhancedPrompt = encodeURIComponent(`${styleKeywords}, ${safePrompt}, ${backgroundPrompt}, 8k`);
+        const enhancedPrompt = encodeURIComponent(`full shot, entire object visible, centered, ${styleKeywords}, ${safePrompt}, ${backgroundPrompt}, 8k`);
         console.log(`GeminiService DEBUG: Style=${style}, Option=${styleOption}, Color=${userColor}`);
         console.log(`GeminiService DEBUG: Background Prompt="${backgroundPrompt}"`);
         // Construct URL based on selected model
@@ -403,9 +403,11 @@ class GeminiService {
             backgroundPrompt = "white background";
         } else if (styleOption === 'colored-background') {
             backgroundPrompt = `natural environment background, ${colorName} tones, atmospheric lighting, ${colorName} color palette`;
+        } else if (styleOption === 'natural') {
+            backgroundPrompt = "natural environment background, atmospheric, context appropriate";
         }
 
-        const finalPrompt = `${styleKeywords}, ${visualPrompt}, ${backgroundPrompt}, 8k`.replace(/^, /, '');
+        const finalPrompt = `full shot, entire object visible, centered, ${styleKeywords}, ${visualPrompt}, ${backgroundPrompt}, 8k`.replace(/^, /, '');
         console.log(`GeminiService DEBUG (GetImg): Style=${style}, Option=${styleOption}, Color=${userColor}`);
         console.log(`GeminiService DEBUG (GetImg): Final Prompt="${finalPrompt}"`);
 

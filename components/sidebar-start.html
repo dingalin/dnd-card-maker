@@ -215,8 +215,23 @@
             </div>
         </div>
 
+
+
         <!-- Action Buttons -->
-        <div class="action-buttons-container">
+        <!-- Added z-index to ensure visibility over scroll menu -->
+        <div class="action-buttons-container" style="position: relative; z-index: 100;">
+
+            <!-- Visual Context Toggle (Moved here for visibility) -->
+            <div class="form-group checkbox-group"
+                style="margin-bottom: 1rem; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                <input type="checkbox" id="use-visual-context" checked>
+                <label for="use-visual-context"
+                    style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <span style="font-size: 1.2rem;">👁️</span>
+                    <span>התייחס למראה הקלף (Visual Context)</span>
+                </label>
+            </div>
+
             <button type="submit" id="generate-btn" class="btn-create" data-tooltip="צור חפץ קסום חדש!">
                 <span class="icon">✨</span> צור חפץ
             </button>

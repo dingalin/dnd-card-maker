@@ -32,6 +32,10 @@
     scrollbar-color: #8b4513 transparent;
 }
 
+.scroll-container.active {
+    display: block;
+}
+
 
 /* Override for Left Sidebar (opens to the Right) */
 .scroll-container-left {

@@ -76,9 +76,14 @@ export class GeneratorController {
             const rarity = getRarityFromLevel(level);
 
             // 1. Context
+            const useVisualContext = document.getElementById('use-visual-context')?.checked;
             const currentState = this.state.getState();
-            const contextImage = currentState.lastContext;
-            if (contextImage) this.preview.updateProgress(1, 15, 'מעבד תמונה...');
+            let contextImage = null;
+
+            if (useVisualContext) {
+                contextImage = currentState.lastContext;
+                if (contextImage) this.preview.updateProgress(1, 15, 'מעבד תמונה...');
+            }
 
             // 2. Random Subtype
             let finalSubtype = subtype;
@@ -224,7 +229,11 @@ export class GeneratorController {
             const subtype = getVal('note-subtype') || params.subtype || '';
             const rarity = getRarityFromLevel(level);
 
-            const itemDetails = await this.gemini.generateItemDetails(level, type, subtype, rarity, params.ability || '', currentState.lastContext);
+            // Check visual context toggle
+            const useVisualContext = document.getElementById('use-visual-context')?.checked;
+            const contextImage = useVisualContext ? currentState.lastContext : null;
+
+            const itemDetails = await this.gemini.generateItemDetails(level, type, subtype, rarity, params.ability || '', contextImage);
 
             const newCardData = {
                 ...itemDetails,
