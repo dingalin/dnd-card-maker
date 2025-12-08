@@ -54,10 +54,10 @@ export class RenderController {
                         // We'll use the full canvas toDataURL but usually browsers handle it fine.
                         // To save space, we can draw to a smaller canvas first.
                         const thumbCanvas = document.createElement('canvas');
-                        const scale = 0.3; // 30% size
+                        const scale = 0.6; // Higher resolution (60% size)
                         thumbCanvas.width = canvas.width * scale;
                         thumbCanvas.height = canvas.height * scale;
-                        const ctx = thumbCanvas.getContext('2d');
+                        const ctx = thumbCanvas.getContext('2d', { willReadFrequently: true });
                         ctx.drawImage(canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
                         thumbUrl = thumbCanvas.toDataURL('image/jpeg', 0.8);
                     } catch (err) {
@@ -92,31 +92,51 @@ export class RenderController {
     async render(state) {
         if (!state.cardData || !this.renderer) return;
 
-        // Check for background update
-        if (state.settings.style.cardBackgroundUrl &&
-            state.settings.style.cardBackgroundUrl !== this.currentBackgroundUrl) {
-
-            console.log("RenderController: Loading new background from state...");
-            await this.renderer.setTemplate(state.settings.style.cardBackgroundUrl);
-            this.currentBackgroundUrl = state.settings.style.cardBackgroundUrl;
+        // Render Lock: Prevent concurrent renders (fix for flickering/race conditions)
+        if (this.isRendering) {
+            this.pendingState = state; // Queue the latest state
+            return;
         }
 
-        const renderOptions = {
-            ...state.settings.offsets,
-            fontSizes: state.settings.fontSizes,
-            fontFamily: state.settings.style.fontFamily,
-            imageStyle: state.settings.style.imageStyle,
-            imageColor: state.settings.style.imageColor,
-            fontStyles: state.settings.fontStyles
-        };
+        this.isRendering = true;
 
-        if (window.previewManager) {
-            // Notify preview manager if needed (e.g. for zoom/pan updates)
+        try {
+            // Check for background update
+            if (state.settings.style.cardBackgroundUrl &&
+                state.settings.style.cardBackgroundUrl !== this.currentBackgroundUrl) {
+
+                console.log("RenderController: Loading new background from state...");
+                await this.renderer.setTemplate(state.settings.style.cardBackgroundUrl);
+                this.currentBackgroundUrl = state.settings.style.cardBackgroundUrl;
+            }
+
+            const renderOptions = {
+                ...state.settings.offsets,
+                fontSizes: state.settings.fontSizes,
+                fontFamily: state.settings.style.fontFamily,
+                imageStyle: state.settings.style.imageStyle,
+                imageColor: state.settings.style.imageColor,
+                fontStyles: state.settings.fontStyles
+            };
+
+            if (window.previewManager) {
+                // Notify preview manager if needed (e.g. for zoom/pan updates)
+            }
+
+            await this.renderer.render(state.cardData, renderOptions);
+            this.updateButtons(state.cardData);
+
+        } catch (e) {
+            console.error("RenderController: Error during render loop", e);
+        } finally {
+            this.isRendering = false;
+            // If a new state arrived while we were rendering, process it now
+            if (this.pendingState) {
+                const nextState = this.pendingState;
+                this.pendingState = null;
+                this.render(nextState);
+            }
         }
-
-        await this.renderer.render(state.cardData, renderOptions);
-
-        this.updateButtons(state.cardData);
     }
 
     updateButtons(cardData) {
@@ -252,6 +272,41 @@ export class RenderController {
                     const cb = document.getElementById(id);
                     if (cb) cb.checked = !!value;
                 }
+            }
+        }
+
+        // Sync Image Style & Color (Important for "Edit" restoration)
+        if (settings.style) {
+            const styleOption = document.getElementById('image-style-option');
+            if (styleOption && settings.style.imageStyle) {
+                styleOption.value = settings.style.imageStyle;
+                // Direct UI Update (Avoid dispatchEvent to prevent recursion)
+                const colorContainer = document.getElementById('image-color-picker-container');
+                if (colorContainer) {
+                    if (settings.style.imageStyle === 'colored-background') {
+                        colorContainer.classList.remove('hidden');
+                    } else {
+                        colorContainer.classList.add('hidden');
+                    }
+                }
+            }
+
+            const colorInput = document.getElementById('image-bg-color');
+            if (colorInput && settings.style.imageColor) {
+                colorInput.value = settings.style.imageColor;
+                // Update active swatch
+                const palette = document.getElementById('color-palette');
+                if (palette) {
+                    palette.querySelectorAll('.color-swatch').forEach(s => {
+                        if (s.dataset.value === settings.style.imageColor) s.classList.add('active');
+                        else s.classList.remove('active');
+                    });
+                }
+            }
+
+            const fontFamilySelect = document.getElementById('font-family-select');
+            if (fontFamilySelect && settings.style.fontFamily) {
+                fontFamilySelect.value = settings.style.fontFamily;
             }
         }
     }

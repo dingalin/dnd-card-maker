@@ -299,6 +299,12 @@ export class GeneratorController {
         const apiKey = this.getApiKey();
         if (!apiKey) return;
 
+        // 0. Random Background
+        if (window.backgroundManager) {
+            this.ui.showToast('בוחר רקע אקראי...', 'info');
+            await window.backgroundManager.pickRandomBackground();
+        }
+
         // 1. Random Level
         const levels = ['1-4', '5-10', '11-16', '17+'];
         const randomLevel = levels[Math.floor(Math.random() * levels.length)];

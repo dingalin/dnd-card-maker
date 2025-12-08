@@ -11,7 +11,7 @@
 // const BASE_PATH = getBasePath();
 
 // Import assets to let Vite handle the path resolution
-// Import assets to let Vite handle the path resolution
+
 // FIXED: Use public path with explicit BASE_URL for GitHub Pages compatibility
 const cardTemplateUrl = `${import.meta.env.BASE_URL}assets/card-template.png`;
 console.log("DEBUG: BASE_URL =", import.meta.env.BASE_URL);
@@ -23,10 +23,12 @@ class CardRenderer {
         if (!this.canvas) {
             throw new Error(`Canvas element with id "${canvasId}" not found`);
         }
-        this.ctx = this.canvas.getContext('2d');
+        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
         this.template = new Image();
         this.templateLoaded = false;
         this.fontsLoaded = false;
+        this.lastImageUrl = null;
+        this.lastImage = null;
 
         // Create a promise that resolves when template is loaded
         this.templateReady = this._loadTemplate();
@@ -67,6 +69,11 @@ class CardRenderer {
 
             if (this.template.naturalWidth === 0) {
                 alert("CRITICAL: Template loaded but has 0 width. The file might be corrupted or empty.");
+            } else {
+                // FIXED: Set canvas resolution to match template!
+                console.log(`CardRenderer: Setting canvas resolution to ${this.template.naturalWidth}x${this.template.naturalHeight}`);
+                this.canvas.width = this.template.naturalWidth;
+                this.canvas.height = this.template.naturalHeight;
             }
 
             this.templateLoaded = true;
@@ -221,19 +228,33 @@ class CardRenderer {
     }
 
     async drawItemImage(url, yOffset = 0, scale = 1.0, rotation = 0, style = 'natural', color = '#ffffff', fade = 0, shadow = 0) {
-        const img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.src = url;
-        try {
-            await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => reject(new Error(`Image load timed out: ${url}`)), 10000);
-                if (img.complete) { clearTimeout(timeout); resolve(); }
-                img.onload = () => { clearTimeout(timeout); resolve(); };
-                img.onerror = () => { clearTimeout(timeout); reject(new Error(`Failed to load image: ${url}`)); };
-            });
-        } catch (error) {
-            console.warn('Image load error, skipping image:', error);
-            return;
+        let img;
+
+        // 1. Check Cache
+        if (this.lastImageUrl === url && this.lastImage && this.lastImage.complete && this.lastImage.naturalWidth > 0) {
+            // Cache Hit
+            img = this.lastImage;
+        } else {
+            // Cache Miss - Load New
+            img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.src = url;
+            try {
+                await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => reject(new Error(`Image load timed out: ${url}`)), 10000);
+                    if (img.complete) { clearTimeout(timeout); resolve(); }
+                    img.onload = () => { clearTimeout(timeout); resolve(); };
+                    img.onerror = () => { clearTimeout(timeout); reject(new Error(`Failed to load image: ${url}`)); };
+                });
+
+                // Update Cache
+                this.lastImageUrl = url;
+                this.lastImage = img;
+
+            } catch (error) {
+                console.warn('Image load error, skipping image:', error);
+                return;
+            }
         }
 
         const maxW = 350;
@@ -255,7 +276,7 @@ class CardRenderer {
         const diag = Math.sqrt(w * w + h * h);
         tempCanvas.width = diag * 1.5;
         tempCanvas.height = diag * 1.5;
-        const tCtx = tempCanvas.getContext('2d');
+        const tCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
         const tCx = tempCanvas.width / 2;
         const tCy = tempCanvas.height / 2;
 
@@ -295,43 +316,40 @@ class CardRenderer {
         if (fade > 0) {
             tCtx.save();
             tCtx.globalCompositeOperation = 'destination-in';
-            // Create radial gradient for vignette
-            // The gradient should be opaque in center and transparent at edges
-            // Fade value 0-100 controls how tight the vignette is
 
             const halfMin = Math.min(w, h) / 2;
             const diag = Math.sqrt(w * w + h * h) / 2;
             const fadeFactor = fade / 100; // 0 to 1
 
-            // At max fade, outer radius should be inside the smallest edge to ensure transparency at borders
-            // Adjusted: Pull in further (0.85) for "stronger" cropping
-            const targetOuter = halfMin * 0.85;
-            const startOuter = diag * 1.1; // Start slightly larger than corners
+            const startOuter = diag * 1.5;
+            const endOuter = halfMin * 0.7; // Tighter circle at max fade
+            const outerRadius = startOuter - (startOuter - endOuter) * fadeFactor;
 
-            const outerRadius = startOuter - (startOuter - targetOuter) * fadeFactor;
+            const startInner = diag * 1.2;
+            const endInner = halfMin * 0.3; // Don't go to 0, keep a small clear hole even at max
+            const innerRadius = startInner - (startInner - endInner) * fadeFactor;
 
-            // Inner radius shrinks as fade increases
-            // Adjusted: Factor 0.5 (was 0.8) makes the transition zone NARROWER (less spread), creating a "focused" fade.
-            const innerRadius = outerRadius * (1 - fadeFactor * 0.5);
-
-            const gradient = tCtx.createRadialGradient(tCx, tCy, Math.max(0, innerRadius), tCx, tCy, outerRadius);
+            const gradient = tCtx.createRadialGradient(tCx, tCy, Math.max(0, innerRadius), tCx, tCy, Math.max(0, outerRadius));
             gradient.addColorStop(0, 'rgba(0, 0, 0, 1)'); // Fully visible
             gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Fully transparent
 
             tCtx.fillStyle = gradient;
             tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
             tCtx.restore();
-
         }
 
         // 4. Draw Temp Canvas onto Main Canvas with Shadow
         this.ctx.save();
 
+        // Reset shadow first (crucial fix for persistence)
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowColor = 'transparent';
+
         if (shadow > 0) {
-            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-            this.ctx.shadowBlur = shadow * 0.5; // Scale shadow blur
+            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.75)'; // Darker
+            this.ctx.shadowBlur = shadow * 0.6; // More blur
             this.ctx.shadowOffsetX = 0;
-            this.ctx.shadowOffsetY = shadow * 0.2;
+            this.ctx.shadowOffsetY = shadow * 0.25; // More vertical offset
         }
 
         // Draw the temp canvas centered on the target position
@@ -340,12 +358,13 @@ class CardRenderer {
         this.ctx.restore();
     }
 
+
     removeWhiteBackground(img) {
         console.log("CardRenderer: removeWhiteBackground called");
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
         canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         ctx.drawImage(img, 0, 0);
 
         let imageData;

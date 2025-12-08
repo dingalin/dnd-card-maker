@@ -1,0 +1,137 @@
+<div id="print-modal" class="fullscreen-modal hidden"
+    style="background: rgba(0,0,0,0.95); z-index: 5000; flex-direction: row; align-items: stretch;">
+
+    <!-- Sidebar Settings -->
+    <div class="print-settings-sidebar"
+        style="width: 320px; background: #1a1a1a; color: #e0e0e0; border-right: 1px solid #444; padding: 1.5rem; display: flex; flex-direction: column; overflow-y: auto;">
+        <h2 style="color: #d4af37; font-family: var(--font-display); margin-top: 0;">הגדרות הדפסה</h2>
+
+        <div class="form-group">
+            <label>רוחב קלף (מ"מ)</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="range" id="print-card-width-slider" min="20" max="100" value="63" style="flex: 1;">
+                <input type="number" id="print-card-width-input" value="63" style="width: 60px; text-align: center;">
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+            <input type="checkbox" id="print-lock-ratio" checked>
+            <label for="print-lock-ratio" style="margin: 0; font-weight: normal; font-size: 0.9rem;">נעל יחס
+                גובה-רוחב</label>
+        </div>
+
+        <div class="form-group">
+            <label>גובה קלף (מ"מ)</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="range" id="print-card-height-slider" min="30" max="150" value="88" style="flex: 1;">
+                <input type="number" id="print-card-height-input" value="88" style="width: 60px; text-align: center;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>מרווח בין קלפים (מ"מ)</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="range" id="print-gap-slider" min="0" max="20" value="2" step="1" style="flex: 1;">
+                <span id="print-gap-display" style="width: 40px; text-align: center;">2</span>
+            </div>
+        </div>
+
+        <!-- Paper Settings -->
+        <div class="form-group">
+            <label>גודל דף</label>
+            <select id="print-paper-size">
+                <option value="a4">A4 (210x297mm)</option>
+                <option value="letter">Letter (8.5x11")</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>כיוון דף</label>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn-secondary active" id="print-orient-p" style="flex: 1; margin: 0;">לאורך
+                    (Portrait)</button>
+                <button class="btn-secondary" id="print-orient-l" style="flex: 1; margin: 0;">לרוחב (Landscape)</button>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group">
+            <label>קנה מידה (זום)</label>
+            <input type="range" id="print-scale-slider" min="0.8" max="1.2" step="0.01" value="1.0">
+            <div style="text-align: center; color: #888; font-size: 0.8rem;" id="print-scale-display">100%</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group" style="background: #2a2a2a; padding: 0.5rem; border-radius: 4px;">
+            <label style="color: #ff9; font-size: 0.85rem;">תיקון כיול מדפסת (Calibration)</label>
+            <input type="range" id="print-calibration-slider" min="0.8" max="1.5" step="0.01" value="1.0">
+            <div style="text-align: center; color: #ff9; font-size: 0.8rem;" id="print-calibration-display">100%</div>
+            <div style="font-size: 0.7rem; color: #888; margin-top: 4px;">השתמש בזה אם הגודל בהדפסה לא תואם למציאות
+                (למשל: סרגל יצא קצר מדי).</div>
+        </div>
+
+        <div style="margin-top: auto;">
+            <div id="print-info"
+                style="background: #333; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.9rem;">
+                <!-- Info updated by JS -->
+                ...
+            </div>
+
+            <button id="do-print-btn" class="btn-primary" style="margin-bottom: 0.5rem;">🖨️ הדפס עכשיו</button>
+            <button id="cancel-print-btn" class="btn-secondary"
+                style="border-color: #ff4444; color: #ff4444;">ביטול</button>
+        </div>
+    </div>
+
+    <!-- Preview Area -->
+    <div class="print-preview-area"
+        style="flex: 1; background: #333; overflow: auto; display: flex; justify-content: center; align-items: start; padding: 2rem;">
+
+        <!-- The "Paper" -->
+        <div id="print-paper-preview"
+            style="background: white; width: 210mm; height: 297mm; box-shadow: 0 0 20px rgba(0,0,0,0.5); padding: 5mm; box-sizing: border-box; transform-origin: top center; transition: all 0.2s;">
+            <!-- Grid generated by JS -->
+            <div id="print-grid" style="display: grid; gap: 0; align-content: start; width: 100%; height: 100%;">
+                <!-- Cards injected here -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Print Styles - Only applied during print */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #print-section,
+        #print-section * {
+            visibility: visible;
+        }
+
+        #print-section {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        @page {
+            margin: 0;
+            size: auto;
+        }
+
+        /* Hide the modal UI itself during print */
+        #print-modal {
+            display: none !important;
+        }
+    }
+</style>

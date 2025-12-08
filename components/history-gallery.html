@@ -7,20 +7,70 @@
             style="background: none; border: none; font-size: 1.5rem; color: #888; cursor: pointer;">&times;</button>
     </div>
 
-    <div class="window-content" style="padding: 1rem; flex: 1; overflow-y: auto;">
-        <div id="history-grid" class="history-grid">
-            <!-- Items injected here by HistoryController -->
-            <div class="empty-message" style="text-align: center; color: #888; margin-top: 2rem;">
-                אין כרגע חפצים בהיסטוריה.
-                <br>
-                צור חפצים חדשים והם יופיעו כאן!
+    <div class="window-content" style="display: flex; padding: 0; flex: 1; overflow: hidden;">
+        <!-- Folders Sidebar -->
+        <div id="gallery-sidebar"
+            style="width: 200px; background: rgba(0,0,0,0.2); border-left: 1px solid #3a3a3a; display: flex; flex-direction: column;">
+            <div style="padding: 1rem; border-bottom: 1px solid #3a3a3a; font-weight: bold; color: #ccc;">תיקיות</div>
+            <div id="folder-list" style="flex: 1; overflow-y: auto; padding: 0.5rem;">
+                <!-- Injected via JS -->
+                <button class="folder-item active" data-id="all"
+                    style="width: 100%; text-align: right; padding: 0.5rem; background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; margin-bottom: 0.25rem; border-radius: 4px;">📂
+                    כל החפצים</button>
+            </div>
+            <div style="padding: 1rem; border-top: 1px solid #3a3a3a;">
+                <button id="add-folder-btn" class="btn-secondary" style="width: 100%; font-size: 0.8rem;">+ תיקייה
+                    חדשה</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="gallery-main"
+            style="flex: 1; display: flex; flex-direction: column; overflow: hidden; background: rgba(0,0,0,0.1);">
+            <!-- Action Bar -->
+            <div
+                style="padding: 0.5rem 1rem; border-bottom: 1px solid #3a3a3a; display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; color: #ccc; cursor: pointer;">
+                    <input type="checkbox" id="gallery-select-all-checkbox"> בחר הכל
+                </label>
+                <div id="current-folder-actions" class="hidden">
+                    <button id="delete-folder-btn"
+                        style="color: #ff6b6b; background: none; border: none; cursor: pointer;">🗑️ מחק תיקייה</button>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div id="history-grid" class="history-grid" style="flex: 1; overflow-y: auto; padding: 1rem;">
+                <!-- Items injected here by HistoryController -->
+                <div class="empty-message" style="text-align: center; color: #888; margin-top: 2rem;">
+                    טוען...
+                </div>
             </div>
         </div>
     </div>
 
     <div class="window-footer"
-        style="padding: 1rem; border-top: 1px solid #3a3a3a; display: flex; justify-content: flex-end;">
+        style="padding: 1rem; border-top: 1px solid #3a3a3a; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4);">
+
+        <!-- Bulk Actions Toolbar -->
+        <div id="selection-toolbar" class="hidden" style="display: flex; gap: 1rem; align-items: center;">
+            <span id="selection-count" style="color: #ccc; font-weight: bold;">0 נבחרו</span>
+            <button id="print-selected-btn" class="btn-primary"
+                style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🖨️</span> הדפס
+            </button>
+            <button id="move-selected-btn" class="btn-secondary"
+                style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                📂 העבר ל...
+            </button>
+            <button id="delete-selected-btn" class="btn-secondary"
+                style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem; color: #ff6b6b; border-color: #ff6b6b;">
+                מחק
+            </button>
+        </div>
+
         <button id="clear-history-btn" class="btn-secondary"
-            style="width: auto; padding: 0.5rem 1rem; color: #ff4444; border-color: #ff4444;">נקה היסטוריה</button>
+            style="width: auto; margin: 0; padding: 0.5rem 1rem; color: #aaa; border-color: #666; font-size: 0.9rem;">נקה
+            הכל</button>
     </div>
 </div>

@@ -7,6 +7,7 @@ import CardRenderer from './card-renderer.js';
 import { BackgroundManager } from './background-manager.js';
 import { stateManager } from './state.js';
 import { previewManager } from './preview-manager.js';
+import './printing/PrintManager.js';
 
 // New Architecture Imports
 import { UIManager } from './ui/UIManager.js';

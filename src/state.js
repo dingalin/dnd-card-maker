@@ -1,3 +1,5 @@
+import './storage/StorageManager.js';
+
 /**
  * StateManager - Centralized state management for the D&D Card Creator
  * Handles application state, data updates, and event subscriptions.
@@ -55,6 +57,9 @@ class StateManager {
         };
 
         this.listeners = [];
+
+        // Initialize DB
+        this.initStorage();
     }
 
     /**
@@ -220,63 +225,78 @@ class StateManager {
     /**
      * Save current card to history (max 20 cards)
      */
-    /**
-     * Save current card to history (max 20 cards)
-     * @param {string} thumbnail - Base64 data URL of the rendered card thumbnail
-     */
-    saveToHistory(thumbnail = null) {
-        if (!this.state.cardData) return;
+    // ==================== StorageManager Integration (IndexedDB) ====================
 
-        const history = this.getHistory();
+    /**
+     * Initialize Storage and Migrate if needed
+     */
+    async initStorage() {
+        if (!window.storageManager) return;
+
+        // Check if migration is needed (if localStorage has items but DB is empty-ish)
+        const localHistory = localStorage.getItem('dnd_card_history');
+        if (localHistory) {
+            try {
+                const items = JSON.parse(localHistory);
+                if (items.length > 0) {
+                    console.log(`📦 Migrating ${items.length} items from localStorage to IndexedDB...`);
+                    for (const item of items) {
+                        await window.storageManager.saveCard(item);
+                    }
+                    // Clear localStorage after successful migration
+                    localStorage.removeItem('dnd_card_history');
+                    console.log("✅ Migration complete. LocalStorage history cleared.");
+                }
+            } catch (e) {
+                console.error("Migration failed:", e);
+            }
+        }
+    }
+
+    /**
+     * Save current card to history (IndexedDB)
+     * @param {string} thumbnail - Base64 data URL
+     */
+    async saveToHistory(thumbnail = null) {
+        if (!this.state.cardData) return;
 
         const historyItem = {
             id: Date.now(),
             name: this.state.cardData.name || 'חפץ ללא שם',
             cardData: this.state.cardData,
             settings: this.state.settings,
-            thumbnail: thumbnail, // Save the full visual preview
+            thumbnail: thumbnail,
             savedAt: new Date().toISOString()
         };
 
-        // Add to beginning of array
-        history.unshift(historyItem);
-
-        // Keep only last 20 items
-        if (history.length > 20) {
-            history.pop();
-        }
-
-        localStorage.setItem('dnd_card_history', JSON.stringify(history));
-        console.log('📚 Card saved to history');
+        await window.storageManager.saveCard(historyItem);
+        // We no longer maintain a local array, we notify listeners that 'history' changed
+        // Consumers should call getHistory() which is now async or return a promise
+        this.notify('historyUpdated');
+        console.log('📚 Card saved to DB');
     }
 
     /**
-     * Get card history from localStorage
-     * @returns {Array} - Array of saved cards
+     * Get card history from DB
+     * @returns {Promise<Array>}
      */
-    getHistory() {
-        try {
-            const history = localStorage.getItem('dnd_card_history');
-            return history ? JSON.parse(history) : [];
-        } catch (e) {
-            console.error('Failed to load history:', e);
-            return [];
-        }
+    async getHistory() {
+        return await window.storageManager.getAllCards();
     }
 
     /**
      * Load a card from history by ID
      * @param {number} id - Card ID
-     * @returns {boolean} - Whether the card was loaded
+     * @returns {Promise<boolean>}
      */
-    loadFromHistory(id) {
-        const history = this.getHistory();
+    async loadFromHistory(id) {
+        // We need to fetch all or find specific. getAll is fine for now.
+        const history = await this.getHistory();
         const card = history.find(item => item.id === id);
 
         if (card) {
-            // Clear blob URLs as they don't survive page refresh
+            // Clear blob URLs
             if (card.cardData.imageUrl && card.cardData.imageUrl.startsWith('blob:')) {
-                console.log('📂 Clearing stale blob URL from history card');
                 card.cardData.imageUrl = null;
             }
 
@@ -285,28 +305,22 @@ class StateManager {
                 this.state.settings = { ...this.state.settings, ...card.settings };
             }
             this.notify('cardData');
-            console.log('📂 Card loaded from history:', card.name);
+            console.log('📂 Card loaded from DB:', card.name);
             return true;
         }
         return false;
     }
 
-    /**
-     * Delete a card from history
-     * @param {number} id - Card ID to delete
-     */
-    deleteFromHistory(id) {
-        const history = this.getHistory().filter(item => item.id !== id);
-        localStorage.setItem('dnd_card_history', JSON.stringify(history));
-        console.log('🗑️ Card deleted from history');
+    async deleteFromHistory(id) {
+        await window.storageManager.deleteCard(id);
+        this.notify('historyUpdated');
+        console.log('🗑️ Card deleted from DB');
     }
 
-    /**
-     * Clear all history
-     */
-    clearHistory() {
-        localStorage.removeItem('dnd_card_history');
-        console.log('🗑️ History cleared');
+    async clearHistory() {
+        await window.storageManager.clearAll();
+        this.notify('historyUpdated');
+        console.log('🗑️ DB History cleared');
     }
 
     /**

@@ -91,39 +91,61 @@ export class BackgroundManager {
     }
 
     async loadAllGrids() {
-        // Clear initial loading text only when the first batch is ready
+        // Return immediately if already populated
+        if (this.allSlices && this.allSlices.length > 0) return;
+
+        this.allSlices = []; // Reset
         let firstBatch = true;
 
         for (const imagePath of this.gridImages) {
             try {
-                // Determine if we need to clear "Loading..." text
-                if (firstBatch) {
+                if (firstBatch && this.gridDisplay) {
                     this.gridDisplay.innerHTML = '';
                     firstBatch = false;
                 }
 
-                // Show a mini loader or just process
                 console.log(`BackgroundManager: Processing ${imagePath}...`);
                 const slices = await this.sliceGrid(imagePath);
 
-                // Render this batch immediately
-                this.renderGrid(slices, true); // true = append
+                // Store in memory
+                this.allSlices.push(...slices);
+
+                // Render this batch
+                this.renderGrid(slices, true);
 
             } catch (error) {
                 console.error(`Failed to load grid ${imagePath}:`, error);
-                // If specific grid fails, continue to next
             }
         }
 
-        if (firstBatch) {
+        if (this.allSlices.length === 0 && this.gridDisplay) {
             this.gridDisplay.innerHTML = '<div style="color: #ff6b6b; grid-column: 1/-1; text-align: center;">שגיאה בטעינת הרקעים. בדוק קונסול.</div>';
         }
     }
 
-    renderGrid(slices, append = false) {
-        if (!append) this.gridDisplay.innerHTML = '';
+    async pickRandomBackground() {
+        // Ensure grids are loaded
+        if (!this.allSlices || this.allSlices.length === 0) {
+            console.log("🎲 Random Background: Loading grids first...");
+            await this.loadAllGrids();
+        }
 
-        slices.forEach((sliceUrl, index) => {
+        if (this.allSlices && this.allSlices.length > 0) {
+            const randomSlice = this.allSlices[Math.floor(Math.random() * this.allSlices.length)];
+            console.log("🎲 Random Background selected!");
+            this.selectBackground(randomSlice);
+            return randomSlice;
+        } else {
+            console.warn("⚠️ No backgrounds available for random selection.");
+            return null;
+        }
+    }
+
+    renderGrid(slices, append = false) {
+        if (!append && this.gridDisplay) this.gridDisplay.innerHTML = '';
+        if (!this.gridDisplay) return;
+
+        slices.forEach((sliceUrl) => {
             const div = document.createElement('div');
             div.className = 'bg-thumbnail';
             div.style.cursor = 'pointer';
@@ -133,7 +155,7 @@ export class BackgroundManager {
             div.style.transition = 'all 0.2s';
             div.style.position = 'relative';
             div.style.aspectRatio = '2/3'; // Card aspect ratio
-            div.style.animation = 'fadeIn 0.5s ease-out'; // Add nice fade in
+            div.style.animation = 'fadeIn 0.5s ease-out';
 
             const img = document.createElement('img');
             img.src = sliceUrl;
@@ -169,6 +191,10 @@ export class BackgroundManager {
             // Trigger re-render if needed
             if (window.stateManager) {
                 window.stateManager.setLastContext(url); // Store context
+
+                // NEW: Persist background in settings so it saves to history
+                window.stateManager.updateStyle('cardBackgroundUrl', url);
+
                 window.stateManager.notify('cardData');
             } else {
                 this.renderer.render({}, {});

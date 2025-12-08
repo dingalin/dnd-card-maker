@@ -51,6 +51,7 @@ class ComponentLoader {
         const components = [
             { id: 'header-placeholder', path: 'components/header.html' },
             { id: 'gallery-placeholder', path: 'components/history-gallery.html' },
+            { id: 'print-modal-placeholder', path: 'components/print-modal.html' },
             { id: 'scroll-content-area', path: 'components/scroll-menu.html' },
             { id: 'sidebar-start-placeholder', path: 'components/sidebar-start.html' },
             { id: 'preview-placeholder', path: 'components/preview-panel.html' },
