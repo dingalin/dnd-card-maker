@@ -1897,3 +1897,28 @@ body::before {
   color: #ff4444;
   border-color: #ff4444;
 }
+
+/* === Print Calibration Line === */
+.calibration-line {
+  /* Removed absolute positioning to prevent clipping when scaled */
+  margin-top: 10mm;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.calibration-line-marker {
+  width: 100mm;
+  height: 2px;
+  background: black;
+}
+
+.calibration-text {
+  font-family: sans-serif;
+  font-size: 8pt;
+  margin-top: 2mm;
+  color: black;
+}

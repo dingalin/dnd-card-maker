@@ -100,38 +100,3 @@
 
     </div>
 </div>
-
-<style>
-    /* Print Styles - Only applied during print */
-    @media print {
-        body * {
-            visibility: hidden;
-        }
-
-        #print-section,
-        #print-section * {
-            visibility: visible;
-        }
-
-        #print-section {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            margin: 0;
-            padding: 0;
-        }
-
-        @page {
-            margin: 0;
-            size: auto;
-        }
-
-        /* Hide the modal UI itself during print */
-        #print-modal {
-            display: none !important;
-        }
-    }
-</style>

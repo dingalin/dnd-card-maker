@@ -214,6 +214,18 @@ export class PrintManager {
             קלפים בדף: ${Math.min(this.cards.length, perPage)} / ${perPage} מקסימום<br>
             סה"כ דפים: ${totalPages}
         `;
+
+        // Ensure calibration line exists in preview
+        let calibration = paper.querySelector('.calibration-line');
+        if (!calibration) {
+            calibration = document.createElement('div');
+            calibration.className = 'calibration-line';
+            calibration.innerHTML = `
+                <div class="calibration-line-marker"></div>
+                <span class="calibration-text">10cm Calibration Scale (Answer to scaling)</span>
+            `;
+            paper.appendChild(calibration);
+        }
     }
     handlePrint() {
         console.log("🖨️ Preparing to print...");
@@ -245,44 +257,34 @@ export class PrintManager {
                 margin: 0;
             }
             @media print {
+                #app { display: none !important; }
                 html, body {
                     margin: 0;
                     padding: 0;
-                    width: ${pageWidth}mm !important;
-                    height: ${pageHeight}mm !important;
+                    width: 100% !important;
+                    height: auto !important;
+                    zoom: 1 !important;
+                    transform: none !important;
+                    background: white !important;
+                    background-image: none !important;
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
+                }
+                html::after, body::after {
+                    content: none !important;
+                    display: none !important;
+                    background: none !important;
                 }
                 #print-section {
                     position: absolute;
                     top: 0;
                     left: 0;
-                    width: ${pageWidth}mm; /* Explicit width */
-                    height: ${pageHeight}mm; /* Explicit height */
+                    width: 100%;
+                    height: auto;
                     padding: 5mm;
                     box-sizing: border-box;
                     overflow: hidden; /* Clip overflow to prevent resize triggering */
                     background: white;
-                }
-                .calibration-line {
-                    /* Removed absolute positioning to prevent clipping when scaled */
-                    margin-top: 10mm; 
-                    width: 100%;
-                    height: auto;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .calibration-line-marker {
-                    width: 100mm;
-                    height: 2px;
-                    background: black;
-                }
-                .calibration-text {
-                    font-family: sans-serif;
-                    font-size: 8pt;
-                    margin-top: 2mm;
                 }
             }
         `;
