@@ -66,12 +66,18 @@ class GeminiService {
 
         if (complexityMode === 'simple') {
             modeInstruction = `
-            MODE: SIMPLE & CLASSIC (D\&D 5e Standard)
-            - Focus on PASSIVE stat boosts (e.g., +1 bonus to hit/damage, +1 AC, +1 to saving throws).
-            - Abilities should be SIMPLE and straight-forward (e.g., "Deal extra 1d6 fire damage").
-            - Avoid complex active abilities, charges, or multi-step mechanics.
-            - Keep it elegant and effective, like a standard +1 Longsword or Ring of Protection.
-            - Quick Stats Example: "+1 להתקפה ולנזק", "+1 לדרג השריון", "תוספת 1d6 נזק אש".
+            MODE: EXTREMELY SIMPLE (Stats Only)
+            - STRICT PROHIBITION: Do NOT create summoning spells, complex active abilities, transformations, or multi-turn effects.
+            - The item MUST be practical and strictly mechanical.
+            - PERMITTED EFFECTS ONLY:
+              1. Flat bonuses (+1/+2/+3 to Hit/Damage/AC/Saves).
+              2. Extra damage dice (e.g. +1d6 Fire).
+              3. Advantage on specific checks (e.g. Advantage on Perception).
+              4. Resistance to one damage type.
+              5. One simple utility spell cast once per day (e.g. Light, Feather Fall).
+            - If I selected a Weapon, just give me a +1 Weapon with maybe 1d6 elemental damage.
+            - KEEP IT SHORT.
+            - Quick Stats Example: "+1 להתקפה ולנזק", "+1 לדרג השריון", "תוספת 1d6 נזק אש", "עמידות לאש".
             `;
         } else {
             modeInstruction = `
