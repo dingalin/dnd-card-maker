@@ -146,9 +146,13 @@ export class GeneratorController {
                 itemDetails.visualPrompt = customPrompt.value.trim();
             }
 
+            // Save the visual prompt that will be used (for regeneration later)
+            const finalVisualPrompt = itemDetails.visualPrompt || '';
+            console.log('Final visualPrompt to be saved:', finalVisualPrompt);
+
             // 4. Generate Image
             this.preview.updateProgress(3, 60, 'מצייר...');
-            const imageUrl = await this.generateImage(itemDetails.visualPrompt);
+            const imageUrl = await this.generateImage(finalVisualPrompt);
 
             // 5. Save & Render
             // Convert Blob URL to Base64 for persistence
@@ -162,11 +166,13 @@ export class GeneratorController {
                 ...itemDetails,
                 gold: itemDetails.gold || '1000',
                 imageUrl: persistentImageUrl,
+                visualPrompt: finalVisualPrompt, // EXPLICITLY save visualPrompt
                 originalParams: { level, type, subtype: finalSubtype, rarity, ability }
             };
 
-            this.state.setCardData(newCardData);
-            this.state.saveCurrentCard();
+            // Also save to state for easy access
+            this.state.setLastVisualPrompt(finalVisualPrompt);
+
             this.state.setCardData(newCardData);
             this.state.saveCurrentCard();
             // Auto-save removed: this.state.saveToHistory();
@@ -202,85 +208,24 @@ export class GeneratorController {
 
             // Custom Prompt Check
             const customPrompt = document.getElementById('custom-visual-prompt');
-            let prompt = currentState.cardData.visualPrompt;
 
-            // Use custom prompt if provided
+            // PRIORITY: Use custom prompt if provided, otherwise use EXACT original visualPrompt
+            let prompt = '';
             if (customPrompt && customPrompt.value.trim()) {
                 prompt = customPrompt.value.trim();
-            }
-
-            // Fallback: Build prompt from card data if visualPrompt is missing
-            if (!prompt || !prompt.trim()) {
-                const cd = currentState.cardData;
-
-                // Hebrew to English translations - comprehensive list
-                const translations = {
-                    // Item types
-                    'נשק': 'weapon', 'שריון': 'armor', 'שיקוי': 'potion', 'טבעת': 'ring',
-                    'מטה': 'rod', 'מקל': 'staff', 'שרביט': 'wand', 'מגילה': 'scroll',
-                    'פלאי': 'wondrous', 'חפץ פלאי': 'wondrous item', 'מגן': 'shield',
-                    'גרזן': 'axe', 'חרב': 'sword', 'קשת': 'bow', 'פגיון': 'dagger',
-                    'רומח': 'spear', 'פטיש': 'hammer', 'מגל': 'sickle', 'אלה': 'mace',
-                    'קרבי': 'martial', 'פשוט': 'simple', 'מורכב': 'complex',
-                    'קל': 'light', 'בינוני': 'medium', 'כבד': 'heavy',
-                    'יד': 'hand', 'ארוך': 'long', 'קצר': 'short', 'כפול': 'double',
-                    // Elements and damage types
-                    'אש': 'fire flames burning', 'קור': 'ice frost frozen', 'ברק': 'lightning electric',
-                    'רעל': 'poison venomous', 'חומצה': 'acid corrosive', 'נמק': 'necrotic dark decay',
-                    'זוהר': 'radiant holy glowing', 'כוח': 'force arcane', 'נפשי': 'psychic mind',
-                    'רעם': 'thunder storm', 'צל': 'shadow dark', 'אור': 'light bright',
-                    // Nature and themes
-                    'נוצה': 'feather', 'נוצת': 'feather of', 'שמים': 'sky heavens', 'השמים': 'the sky heavens',
-                    'ירח': 'moon lunar', 'שמש': 'sun solar', 'כוכב': 'star stellar', 'כוכבים': 'stars cosmic',
-                    'דרקון': 'dragon', 'נשר': 'eagle', 'זאב': 'wolf', 'נחש': 'serpent snake',
-                    'עכביש': 'spider', 'עקרב': 'scorpion', 'עורב': 'raven',
-                    // Materials
-                    'זהב': 'gold golden', 'כסף': 'silver', 'ברזל': 'iron', 'עץ': 'wood wooden',
-                    'אבן': 'stone', 'קריסטל': 'crystal', 'יהלום': 'diamond', 'אודם': 'ruby',
-                    'ספיר': 'sapphire', 'אמרלד': 'emerald', 'עצם': 'bone skeletal',
-                    // Abstract concepts
-                    'מוות': 'death deadly', 'חיים': 'life living', 'חושך': 'darkness', 'דם': 'blood bloody',
-                    'נשמה': 'soul spirit', 'לילה': 'night', 'יום': 'day', 'סער': 'storm tempest',
-                    'להב': 'blade', 'עוקץ': 'sting stinger', 'שן': 'fang tooth', 'טופר': 'claw talon'
-                };
-
-                // Function to translate Hebrew text to English
-                const translateToEnglish = (text) => {
-                    if (!text) return '';
-                    let result = String(text);
-                    // Sort by length (longest first) to avoid partial matches
-                    const sortedKeys = Object.keys(translations).sort((a, b) => b.length - a.length);
-                    for (const heb of sortedKeys) {
-                        result = result.replace(new RegExp(heb, 'g'), translations[heb]);
-                    }
-                    // Remove remaining Hebrew characters, special chars, and clean up
-                    result = result.replace(/[\u0590-\u05FF]/g, '')
-                        .replace(/[()[\]{}]/g, ' ')
-                        .replace(/DC\s*\d+/gi, '') // Remove "DC 18" etc
-                        .replace(/\d+d\d+/gi, '')  // Remove dice like "2d6"
-                        .replace(/[+\-]\d+/g, '')  // Remove +2, -1 etc
-                        .replace(/\s+/g, ' ')
-                        .trim();
-                    return result;
-                };
-
-                // Get item type (e.g., "axe hand martial")
-                const typeEn = translateToEnglish(cd.typeHe || cd.front?.type) || 'magic item';
-
-                // Get item NAME - this is the most descriptive part (e.g., "נוצת השמיים" = "Feather of the Sky")
-                const itemName = translateToEnglish(cd.name || cd.front?.title) || '';
-
-                // Get damage type for visual theme
-                const damageType = translateToEnglish(cd.damageType || cd.weaponDamage) || '';
-
-                // Build the prompt: Type + Name theme + Damage theme
-                const themeParts = [itemName, damageType].filter(p => p && p.length > 2);
-                const theme = themeParts.join(', ') || 'magical glowing enchanted';
-
-                prompt = `D&D fantasy ${typeEn}, ${theme}, detailed weapon, centered, dramatic lighting, 8k`;
-
-                console.log('GeminiService: Built fallback prompt:', prompt);
-                console.log('  - Type:', typeEn, '| Name theme:', itemName, '| Damage:', damageType);
+                console.log('Using custom prompt:', prompt);
+            } else if (currentState.cardData.visualPrompt) {
+                prompt = currentState.cardData.visualPrompt;
+                console.log('Using cardData.visualPrompt:', prompt);
+            } else if (currentState.lastVisualPrompt) {
+                // Fallback to state's lastVisualPrompt
+                prompt = currentState.lastVisualPrompt;
+                console.log('Using state.lastVisualPrompt:', prompt);
+            } else {
+                // No prompt available - show error
+                this.ui.showToast('אין פרומפט שמור - נסה ליצור חפץ חדש', 'warning');
+                if (btn) btn.disabled = false;
+                return;
             }
 
             const imageUrl = await this.generateImage(prompt);

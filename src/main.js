@@ -15,6 +15,9 @@ import { EditorController } from './controllers/EditorController.js';
 import { GeneratorController } from './controllers/GeneratorController.js';
 import { RenderController } from './controllers/RenderController.js';
 import { HistoryController } from './controllers/HistoryController.js';
+import { TabManager } from './controllers/TabManager.js';
+import { CharacterController } from './controllers/CharacterController.js';
+import { CardViewerService } from './services/CardViewerService.js';
 
 // Legacy Init (for floating windows, bubbles)
 import { initUI, showToast, initWindowManager } from './ui-helpers.js';
@@ -27,6 +30,9 @@ window.onerror = function (msg, url, line, col, error) {
 
 async function initApp() {
     console.log("🚀 Initializing D&D Card Creator (Professional Architecture v2)...");
+
+    // 0. Initialize Tab System
+    const tabManager = new TabManager();
 
     // 1. Initialize Renderer
     let renderer;
@@ -61,6 +67,7 @@ async function initApp() {
     // 2. Initialize Managers
     const uiManager = new UIManager();
     window.uiManager = uiManager;
+    window.stateManager = stateManager;
 
     // Init Preview Manager (after DOM ready)
     previewManager.init();
@@ -78,6 +85,11 @@ async function initApp() {
 
     // History: Handles Gallery
     const historyController = new HistoryController(stateManager, uiManager);
+
+    // Character: Handles Character Sheet
+    // Created early so it can receive equip events even before tab is visited
+    const characterController = new CharacterController();
+    window.characterController = characterController; // Expose globally for TabManager
 
     // 4. Initialize Background Manager
     window.backgroundManager = new BackgroundManager(renderer);

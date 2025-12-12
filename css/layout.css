@@ -156,3 +156,25 @@ body::before {
     display: flex;
     gap: 1rem;
 }
+
+/* Character Tab Layout */
+.character-layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    gap: 1.5rem;
+    height: calc(100vh - 80px);
+    padding: 0 2rem 2rem 2rem;
+    max-width: 1920px;
+    margin: 0 auto;
+    align-items: stretch;
+}
+
+/* Ensure sidebar scrolls in character mode */
+.character-layout .sidebar-start {
+    overflow-y: auto !important;
+    max-height: 100%;
+    padding-bottom: 2rem;
+    /* Custom Scrollbar for sidebar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.3);
+}

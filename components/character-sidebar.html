@@ -1,0 +1,68 @@
+<div class="sidebar-start glass-panel">
+    <h2>יצירת דמות</h2>
+
+    <form id="character-form" onsubmit="return false;">
+        <!-- Gender -->
+        <div class="form-group mb-2">
+            <select id="char-gender" class="glass-input">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <!-- Race -->
+        <div class="form-group mb-2">
+            <select id="char-race" class="glass-input">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <!-- Class -->
+        <div class="form-group mb-2">
+            <select id="char-class" class="glass-input">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <!-- Background -->
+        <div class="form-group mb-2">
+            <select id="char-background" class="glass-input">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <div class="divider my-2"></div>
+
+        <!-- Art Style -->
+        <div class="form-group mb-2">
+            <select id="char-art-style" class="glass-input">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <!-- Portrait Style -->
+        <div class="form-group mb-2">
+            <select id="char-style" class="glass-input">
+                <option value="portrait">תמונה: פנים (Portrait)</option>
+                <option value="full_body">תמונה: גוף מלא (Full Body)</option>
+            </select>
+        </div>
+
+        <!-- Pose -->
+        <div class="form-group mb-2">
+            <select id="char-pose" class="glass-input">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <!-- Action -->
+        <button type="submit" id="create-character-btn" class="btn-primary btn-shine">
+            <span class="icon">✨</span> צור דמות
+        </button>
+
+        <!-- Status -->
+        <div id="generation-status" class="status-message hidden">
+            <div class="spinner-small"></div>
+            <span>מייצר דמות...</span>
+        </div>
+    </form>
+</div>

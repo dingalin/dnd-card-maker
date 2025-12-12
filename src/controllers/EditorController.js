@@ -392,10 +392,8 @@ export class EditorController {
         let baseHorizontalWidths = null;
 
         // Elements with their default offset values (to determine direction from center)
-        // Negative values = top half (move down when compressing)
-        // Positive values = bottom half (move up when compressing)
-        // Value represents distance from vertical center - bigger = more movement
-        const verticalElements = {
+        // FRONT SIDE elements
+        const frontVerticalElements = {
             'rarity': -110,      // Top - moves down a lot
             'type': -50,         // Upper - moves down medium
             'name': -10,         // Upper-middle - moves down slightly
@@ -403,6 +401,13 @@ export class EditorController {
             'coreStats': 450,    // Lower area - moves up
             'stats': 550,        // Lower - moves up more
             'gold': 700          // Bottom - moves up most
+        };
+
+        // BACK SIDE elements
+        const backVerticalElements = {
+            'abilityName': 140,  // Top header
+            'mech': 220,         // Body text
+            'lore': 880          // Bottom lore
         };
 
         // Elements affected by horizontal compression (widths)
@@ -414,6 +419,9 @@ export class EditorController {
 
         // Capture base values when slider is first touched
         const captureBaseValues = () => {
+            // Select elements based on which side is being viewed
+            const verticalElements = this.isFlipped ? backVerticalElements : frontVerticalElements;
+
             if (!baseVerticalOffsets) {
                 baseVerticalOffsets = {};
                 Object.keys(verticalElements).forEach(key => {
@@ -433,6 +441,9 @@ export class EditorController {
             captureBaseValues();
             const sliderValue = parseFloat(e.target.value);
             if (marginYDisplay) marginYDisplay.textContent = sliderValue;
+
+            // Select elements based on which side is being viewed
+            const verticalElements = this.isFlipped ? backVerticalElements : frontVerticalElements;
 
             // Compression factor: 0 = no change, positive = compress towards center
             const compressionFactor = sliderValue / 100; // -1 to 1 range
@@ -479,6 +490,9 @@ export class EditorController {
 
             // Compression factor for width
             const compressionFactor = sliderValue / 100;
+
+            // Select elements based on which side is being viewed
+            const verticalElements = this.isFlipped ? backVerticalElements : frontVerticalElements;
 
             if (rafId) cancelAnimationFrame(rafId);
             rafId = requestAnimationFrame(() => {

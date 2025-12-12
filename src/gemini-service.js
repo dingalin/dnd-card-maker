@@ -94,8 +94,8 @@ class GeminiService {
       
       Parameters:
       - Level/Power: ${level}
-      - Main Type: ${type}
-      - Subtype/Specific Kind: ${subtype || 'Any appropriate for Main Type'}
+      - Main Type: ${subtype ? subtype : type} (Priority: ${subtype ? 'Strictly follow this subtype' : 'Follow Main Type'})
+      - Category: ${type}
       - Rarity: ${rarity}
       - Special Theme/Ability: ${ability || 'Random cool theme'}
       
@@ -126,8 +126,9 @@ class GeminiService {
       - If Type is 'Potion' (or contains 'Potion'), the item MUST be a consumable liquid in a bottle/vial.
       - If Type is 'Ring' (or contains 'Ring'), it MUST be a finger ring.
       - If Type is 'Scroll', it MUST be a parchment scroll.
-      - If Type is 'Wondrous Item', it can be anything, but respect the Subtype if provided.
-      - If the Type is 'Armor' or a specific armor type (e.g. 'Leather', 'Chain Mail', 'Plate'), you MUST create BODY ARMOR (Chest/Torso). Do NOT create gloves, boots, helmets, or shields unless the 'Special Theme' explicitly asks for them.
+      - If the Subtype is 'Helmet', 'Belt', 'Boots', 'Cloak', or 'Amulet', CREATE THAT SPECIFIC ITEM. Do not create a generic wondrous item.
+      - If Type is 'Wondrous Item' and no specific subtype is given, it can be anything.
+      - If the Type is 'Armor' (and not Shield/Helmet), you MUST create BODY ARMOR (Chest/Torso).
       - If the Type is 'Weapon', create a weapon.
 
       Return ONLY a JSON object with this exact structure (no markdown, just raw JSON):

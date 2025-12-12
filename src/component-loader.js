@@ -55,7 +55,10 @@ class ComponentLoader {
             { id: 'scroll-content-area', path: 'components/scroll-menu.html' },
             { id: 'sidebar-start-placeholder', path: 'components/sidebar-start.html' },
             { id: 'preview-placeholder', path: 'components/preview-panel.html' },
-            { id: 'sidebar-end-placeholder', path: 'components/sidebar-end.html' }
+            { id: 'sidebar-end-placeholder', path: 'components/sidebar-end.html' },
+            { id: 'character-sidebar-placeholder', path: 'components/character-sidebar.html' },
+            { id: 'character-sheet-placeholder', path: 'components/character-sheet.html' },
+            { id: 'equip-modal-placeholder', path: 'components/equip-modal.html' }
         ];
 
         try {

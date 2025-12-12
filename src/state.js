@@ -83,7 +83,8 @@ class StateManager {
                     textBackdropOpacity: 40
                 }
             },
-            lastContext: null
+            lastContext: null,
+            lastVisualPrompt: null // Store last used visual prompt for regeneration
         };
 
         this.listeners = [];
@@ -328,6 +329,16 @@ class StateManager {
     setLastContext(context) {
         this.state.lastContext = context;
         this.notify('lastContext');
+    }
+
+    /**
+     * Set the last visual prompt (for image regeneration)
+     * @param {string} prompt - The visual prompt used for image generation
+     */
+    setLastVisualPrompt(prompt) {
+        this.state.lastVisualPrompt = prompt;
+        console.log('💾 Saved lastVisualPrompt:', prompt?.substring(0, 50) + '...');
+        // No notify needed - this is just for internal use
     }
 
     /**

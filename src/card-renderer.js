@@ -826,15 +826,23 @@ class CardRenderer {
             statsText = statsText.replace(/\d+d\d+(\s*[+\-]\s*\d+)?/gi, '').trim();
             // Also remove common damage type words that would be redundant
             statsText = statsText.replace(/(מוחץ|דוקר|חותך|נזק|damage)/gi, '').trim();
-            // Clean up any double spaces
-            statsText = statsText.replace(/\s{2,}/g, ' ').trim();
+            // Clean up any double spaces (but preserve newlines!)
+            statsText = statsText.replace(/[^\S\n]{2,}/g, ' ');
         }
 
         if (statsText) {
             ctx.font = getFont('stats', sizes.statsSize);
             ctx.fillStyle = '#1a1a1a';
             const statsY = offsets.stats || 800;
-            drawStyledText(statsText, width / 2, statsY, Number(offsets.statsWidth || 500), 'stats');
+            const lineHeight = sizes.statsSize * 1.2; // Line spacing
+
+            // Split by newlines to support multiline text
+            const lines = statsText.split('\n');
+            lines.forEach((line, index) => {
+                if (line.trim()) {
+                    drawStyledText(line.trim(), width / 2, statsY + (index * lineHeight), Number(offsets.statsWidth || 500), 'stats');
+                }
+            });
         }
 
         // Footer - Gold value

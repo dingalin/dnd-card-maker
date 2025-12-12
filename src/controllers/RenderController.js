@@ -16,6 +16,7 @@ export class RenderController {
 
         this.setupDownloadListener();
         this.setupSplitViewControls(); // Setup Split View UI
+        this.setupEquipListener();     // Setup Equip UI
 
         // Listen for Flip Event
         document.addEventListener('card-flip', (e) => {
@@ -563,4 +564,78 @@ export class RenderController {
             }
         });
     }
+
+    setupEquipListener() {
+        // Event Delegation for Equip Button
+        document.addEventListener('click', async (e) => {
+            const equipBtn = e.target.closest('#equip-item-btn');
+            if (equipBtn) {
+                e.preventDefault();
+
+                const currentState = this.state.getState();
+                const cardData = currentState.cardData;
+
+                if (!cardData) {
+                    if (window.uiManager) window.uiManager.showToast('אין נתונים לקלף', 'error');
+                    return;
+                }
+
+                // Capture Canvas (Front Side)
+                const canvas = document.getElementById('card-canvas');
+                if (canvas) {
+                    try {
+                        // Create a high-quality snapshot of front
+                        const frontImageUrl = canvas.toDataURL('image/png', 1.0);
+
+                        // Capture back image - ENSURE it's rendered first!
+                        let backImageUrl = null;
+                        const backCanvasEl = document.getElementById('card-canvas-back');
+                        if (backCanvasEl && (cardData.back || cardData.abilityName || cardData.abilityDesc)) {
+                            try {
+                                // IMPORTANT: Render the back canvas explicitly before capturing
+                                // This ensures we have a proper image even if user didn't use split view
+                                if (this.backRenderer) {
+                                    const currentSettings = currentState.settings;
+                                    const style = currentSettings.style || {};
+                                    const backSettings = currentSettings.back || {};
+
+                                    await this.backRenderer.render(cardData, {
+                                        ...backSettings.offsets,
+                                        fontSizes: backSettings.fontSizes,
+                                        fontStyles: backSettings.fontStyles,
+                                        fontFamily: style.fontFamily || 'Heebo',
+                                        textOutlineEnabled: style.textOutlineEnabled || false,
+                                        textOutlineWidth: style.textOutlineWidth || 2,
+                                        textShadowEnabled: style.textShadowEnabled || false,
+                                        textShadowBlur: style.textShadowBlur || 4,
+                                    }, true); // Force render as BACK side
+
+                                    console.log('📸 Rendered back canvas before capture');
+                                }
+
+                                backImageUrl = backCanvasEl.toDataURL('image/png', 1.0);
+                                console.log('📸 Captured back image from back-canvas');
+                            } catch (e) {
+                                console.error('Could not capture back canvas:', e);
+                            }
+                        }
+
+                        // Dispatch Request for CharacterController to handle logic
+                        document.dispatchEvent(new CustomEvent('request-character-equip-item', {
+                            detail: {
+                                cardData: { ...cardData, capturedBackImage: backImageUrl },
+                                imageUrl: frontImageUrl,
+                                backImageUrl: backImageUrl
+                            }
+                        }));
+
+                    } catch (err) {
+                        console.error("Failed to capture card for equipment:", err);
+                        if (window.uiManager) window.uiManager.showToast('שגיאה ביצוא הקלף', 'error');
+                    }
+                }
+            }
+        });
+    }
 }
+

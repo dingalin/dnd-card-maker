@@ -22,6 +22,8 @@
   <link rel="stylesheet" href="./css/components/scroll-menu.css">
   <link rel="stylesheet" href="./css/components/forms.css">
   <link rel="stylesheet" href="./css/components/modal.css">
+  <link rel="stylesheet" href="./css/components/character-sheet.css">
+  <link rel="stylesheet" href="./css/components/card-viewer.css">
 
 </head>
 
@@ -36,21 +38,48 @@
     <!-- Print Modal Component -->
     <div id="print-modal-placeholder"></div>
 
+    <!-- Equip Modal Component -->
+    <div id="equip-modal-placeholder"></div>
+
     <!-- Navigation Scroll Menu (Hidden by default) -->
     <div id="scroll-content-area" class="scroll-content-area">
       <!-- Dynamic content loaded here -->
     </div>
 
-    <main class="main-layout">
-      <!-- Right Sidebar: Generation Form -->
-      <div id="sidebar-start-placeholder"></div>
+    <!-- Tabs Navigation -->
+    <nav class="main-nav glass-panel">
+      <button class="nav-tab active" data-tab="card-creator">
+        <span class="icon">🎴</span> יוצר קלפים
+      </button>
+      <button class="nav-tab" data-tab="character-sheet">
+        <span class="icon">👤</span> דף דמות
+      </button>
+    </nav>
 
-      <!-- Center: Card Preview -->
-      <div id="preview-placeholder"></div>
+    <!-- Tab 1: Card Creator -->
+    <div id="tab-card-creator" class="tab-content active">
+      <main class="main-layout">
+        <!-- Right Sidebar: Generation Form -->
+        <div id="sidebar-start-placeholder"></div>
 
-      <!-- Left Sidebar: Edit & Design -->
-      <div id="sidebar-end-placeholder"></div>
-    </main>
+        <!-- Center: Card Preview -->
+        <div id="preview-placeholder"></div>
+
+        <!-- Left Sidebar: Edit & Design -->
+        <div id="sidebar-end-placeholder"></div>
+      </main>
+    </div>
+
+    <!-- Tab 2: Character Sheet -->
+    <div id="tab-character-sheet" class="tab-content hidden">
+      <main class="character-layout">
+        <!-- Right Sidebar: Character Creator -->
+        <div id="character-sidebar-placeholder"></div>
+
+        <!-- Left: Character Sheet (Equipment Grid) -->
+        <div id="character-sheet-placeholder"></div>
+      </main>
+    </div>
 
     <!-- Custom Confirmation Modal -->
     <div id="confirmation-modal" class="modal-overlay hidden">

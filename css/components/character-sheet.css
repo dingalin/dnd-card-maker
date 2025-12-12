@@ -1,0 +1,239 @@
+.character-sheet-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-end;
+    /* Physical Left in RTL */
+    align-items: center;
+    padding: 0.5rem;
+    /* Minimal padding */
+    overflow: hidden;
+}
+
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 0.8rem;
+    gap: 0.8rem;
+    height: calc(100vh - 140px);
+    /* Explicit view height */
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+    aspect-ratio: 0.75;
+    background: url('../../assets/textures/parchment.jpg');
+    /* Fallback or procedural */
+    background-color: #f4e4bc;
+    padding: 1rem;
+    box-sizing: border-box;
+    /* IMPORTANT: Include padding in height calculation */
+    border-radius: 12px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+    border: 8px solid #4a3c31;
+    margin-left: 2rem;
+}
+
+.slot {
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px dashed #8b7355;
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 0;
+    /* Allow shrinking to fit grid row */
+    height: 100%;
+}
+
+.slot:hover {
+    background: rgba(255, 255, 255, 0.5);
+    border-color: #d4af37;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.slot-content {
+    flex: 1;
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.slot-label {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: #4a3c31;
+    font-weight: bold;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* Portrait - Spans 2x2 in the center */
+.character-portrait-slot {
+    grid-column: 2 / 4;
+    grid-row: 2 / 4;
+    background: rgba(0, 0, 0, 0.1);
+    border: 4px double #d4af37;
+    border-radius: 50% 50% 0 0 / 15% 15% 0 0;
+    /* Arch shape? Or just rect */
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.portrait-placeholder {
+    font-size: 4rem;
+    opacity: 0.3;
+    color: #4a3c31;
+}
+
+/* Specific Grid Placements if needed, but order in HTML + grid-auto-flow handles it mostly, 
+   EXCEPT the portrait pushes existing items differently. 
+   Explicit placement is safer. */
+
+/* Row 1: Ammo -> Helmet -> Necklace -> Ranged (RTL order) */
+.ammo-slot {
+    grid-row: 1;
+    grid-column: 1;
+}
+
+.helmet-slot {
+    grid-row: 1;
+    grid-column: 2;
+}
+
+.necklace-slot {
+    grid-row: 1;
+    grid-column: 3;
+}
+
+.ranged-slot {
+    grid-row: 1;
+    grid-column: 4;
+}
+
+/* Row 2: Armor(1) -> Portrait(2-3) -> Cape(4) */
+.armor-slot {
+    grid-row: 2;
+    grid-column: 1;
+}
+
+.cape-slot {
+    grid-row: 2;
+    grid-column: 4;
+}
+
+/* Row 3: MainHand(1) -> Portrait(2-3) -> OffHand(4) */
+.rhand-slot {
+    grid-row: 3;
+    grid-column: 1;
+}
+
+.lhand-slot {
+    grid-row: 3;
+    grid-column: 4;
+}
+
+/* Row 4: Direct flow */
+.ring1-slot {
+    grid-row: 4;
+    grid-column: 1;
+}
+
+.boots-slot {
+    grid-row: 4;
+    grid-column: 2;
+}
+
+.belt-slot {
+    grid-row: 4;
+    grid-column: 3;
+}
+
+.ring2-slot {
+    grid-row: 4;
+    grid-column: 4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 800px) {
+    .equipment-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+        gap: 0.5rem;
+    }
+
+    .character-portrait-slot {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        height: 200px;
+    }
+
+    /* Reset others to auto flow */
+    .slot {
+        grid-column: auto !important;
+        grid-row: auto !important;
+    }
+}
+
+/* Zoom Animation Styles */
+.zoomed-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+.zoomed-item-clone {
+    position: fixed;
+    z-index: 10000;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: zoom-out;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.2);
+    pointer-events: auto;
+}
+
+/* Zoom Action Buttons */
+.zoom-actions {
+    position: fixed;
+    z-index: 10001;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    pointer-events: auto;
+}
+
+.zoom-actions button {
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(135deg, #d4af37, #aa8c2c);
+    border: 2px solid #4a3c31;
+    border-radius: 8px;
+    color: #2b1d0e;
+    font-family: 'Rubik', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.zoom-actions button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+}
