@@ -43,7 +43,7 @@ export class GeneratorController {
     getApiKey() {
         const input = document.getElementById('api-key');
         if (!input || !input.value.trim()) {
-            this.ui.showToast('נא להזין מפתח API', 'warning');
+            this.ui.showToast(window.i18n?.t('toasts.enterApiKey') || 'Please enter API key', 'warning');
             return null;
         }
         const key = input.value.trim();
@@ -63,7 +63,7 @@ export class GeneratorController {
 
         this.gemini = new GeminiService(apiKey);
         this.ui.showLoading();
-        this.preview.updateProgress(0, 5, 'מתחיל...');
+        this.preview.updateProgress(0, 5, window.i18n?.t('preview.starting') || 'Starting...');
 
         try {
             const form = document.getElementById('generator-form');
@@ -92,7 +92,7 @@ export class GeneratorController {
 
             if (useVisualContext) {
                 contextImage = currentState.lastContext;
-                if (contextImage) this.preview.updateProgress(1, 15, 'מעבד תמונה...');
+                if (contextImage) this.preview.updateProgress(1, 15, window.i18n?.t('preview.processingImage') || 'Processing image...');
             }
 
             // 2. Random Subtype
@@ -109,11 +109,12 @@ export class GeneratorController {
             }
 
             // 3. Generate Text
-            this.preview.updateProgress(2, 30, 'כותב סיפור...');
-            const itemDetails = await this.gemini.generateItemDetails(level, type, finalSubtype, rarity, ability, contextImage, complexityMode);
+            this.preview.updateProgress(2, 30, window.i18n?.t('preview.writingStory') || 'Writing story...');
+            const locale = window.i18n?.getLocale() || 'he';
+            const itemDetails = await this.gemini.generateItemDetails(level, type, finalSubtype, rarity, ability, contextImage, complexityMode, locale);
 
             // --- CUSTOM TYPE FORMATTING & BACKFILL ---
-            this.enrichItemDetails(itemDetails, type, finalSubtype);
+            this.enrichItemDetails(itemDetails, type, finalSubtype, locale);
             // -------------------------------------
             // -------------------------------------
 
@@ -151,14 +152,14 @@ export class GeneratorController {
             console.log('Final visualPrompt to be saved:', finalVisualPrompt);
 
             // 4. Generate Image
-            this.preview.updateProgress(3, 60, 'מצייר...');
+            this.preview.updateProgress(3, 60, window.i18n?.t('preview.drawing') || 'Drawing...');
             const imageUrl = await this.generateImage(finalVisualPrompt);
 
             // 5. Save & Render
             // Convert Blob URL to Base64 for persistence
             let persistentImageUrl = imageUrl;
             if (imageUrl.startsWith('blob:')) {
-                this.preview.updateProgress(3, 80, 'שומר תמונה...');
+                this.preview.updateProgress(3, 80, window.i18n?.t('preview.savingImage') || 'Saving image...');
                 persistentImageUrl = await blobToBase64(imageUrl);
             }
 
@@ -181,7 +182,7 @@ export class GeneratorController {
             const saveBtn = document.getElementById('save-gallery-btn');
             if (saveBtn) saveBtn.disabled = false;
 
-            this.preview.updateProgress(4, 100, 'מוכן!');
+            this.preview.updateProgress(4, 100, window.i18n?.t('preview.ready') || 'Ready!');
             await new Promise(r => setTimeout(r, 500));
             this.ui.hideLoading();
             this.preview.resetProgress();
@@ -223,7 +224,7 @@ export class GeneratorController {
                 console.log('Using state.lastVisualPrompt:', prompt);
             } else {
                 // No prompt available - show error
-                this.ui.showToast('אין פרומפט שמור - נסה ליצור חפץ חדש', 'warning');
+                this.ui.showToast(window.i18n?.t('toasts.noPromptSaved') || 'No prompt saved', 'warning');
                 if (btn) btn.disabled = false;
                 return;
             }
@@ -247,11 +248,11 @@ export class GeneratorController {
             };
 
             this.state.setCardData(newCardData);
-            this.ui.showToast('תמונה חדשה נוצרה!', 'success');
+            this.ui.showToast(window.i18n?.t('toasts.newImageCreated') || 'New image created!', 'success');
 
         } catch (error) {
             console.error(error);
-            this.ui.showToast('שגיאה ביצירת תמונה', 'error');
+            this.ui.showToast(window.i18n?.t('toasts.errorCreatingImage') || 'Error creating image', 'error');
         } finally {
             if (btn) btn.disabled = false;
         }
@@ -295,7 +296,8 @@ export class GeneratorController {
             const useVisualContext = document.getElementById('use-visual-context')?.checked;
             const contextImage = useVisualContext ? currentState.lastContext : null;
 
-            const itemDetails = await this.gemini.generateItemDetails(level, type, subtype, rarity, params.ability || '', contextImage);
+            const locale = window.i18n?.getLocale() || 'he';
+            const itemDetails = await this.gemini.generateItemDetails(level, type, subtype, rarity, params.ability || '', contextImage, 'creative', locale);
 
             console.log("RegenerateStats: type=", type, "subtype=", subtype);
 
@@ -309,38 +311,57 @@ export class GeneratorController {
             };
 
             // Apply Enrichment (Formatting + Backfill)
-            this.enrichItemDetails(newCardData, type, subtype);
+            this.enrichItemDetails(newCardData, type, subtype, locale);
 
             this.state.setCardData(newCardData);
-            this.ui.showToast('תכונות חדשות נוצרו!', 'success');
+            this.ui.showToast(window.i18n?.t('toasts.newStatsCreated') || 'New stats created!', 'success');
         } catch (error) {
             console.error(error);
-            this.ui.showToast('שגיאה ביצירת תכונות', 'error');
+            this.ui.showToast(window.i18n?.t('toasts.errorCreatingStats') || 'Error creating stats', 'error');
         } finally {
             if (btn) btn.disabled = false;
         }
     }
 
-    enrichItemDetails(itemDetails, type, finalSubtype) {
+    enrichItemDetails(itemDetails, type, finalSubtype, locale = 'he') {
         if (!window.OFFICIAL_ITEMS) return;
 
+        const isHebrew = locale === 'he';
+
         try {
-            console.log(`Generator: Enriching details for ${type} / ${finalSubtype}`);
+            console.log(`Generator: Enriching details for ${type} / ${finalSubtype} (locale: ${locale})`);
             let specificType = "";
 
-            // Extract Hebrew Name from Subtype (format: "Longsword (חרב ארוכה)")
+            // Extract name from Subtype (format: "Longsword (חרב ארוכה)")
             if (finalSubtype && finalSubtype.includes('(')) {
                 const matches = finalSubtype.match(/\(([^)]+)\)/);
                 if (matches && matches[1]) {
                     specificType = matches[1].trim();
                 }
+                // For English, use the English name (before parentheses)
+                if (!isHebrew) {
+                    specificType = finalSubtype.split('(')[0].trim();
+                }
             } else if (finalSubtype) {
                 specificType = finalSubtype;
             }
 
+            // Translations for weapon/armor categories
+            const categoryTranslations = {
+                simple: { he: 'פשוט', en: 'Simple' },
+                martial: { he: 'קרבי', en: 'Martial' },
+                weapon: { he: 'נשק', en: 'Weapon' },
+                light: { he: 'קל', en: 'Light' },
+                medium: { he: 'בינוני', en: 'Medium' },
+                heavy: { he: 'כבד', en: 'Heavy' },
+                shield: { he: 'מגן', en: 'Shield' }
+            };
+
+            const t = (key) => categoryTranslations[key]?.[isHebrew ? 'he' : 'en'] || key;
+
             // -- WEAPONS --
             if (type === 'weapon' && window.OFFICIAL_ITEMS.weapon) {
-                let weaponPrefix = "נשק";
+                let weaponPrefix = t('weapon');
                 const cats = window.OFFICIAL_ITEMS.weapon;
 
                 // Check each category - look for the subtype in the category items
@@ -355,15 +376,14 @@ export class GeneratorController {
                 const isSimple = checkCategory("Simple Melee") || checkCategory("Simple Ranged");
                 const isMartial = checkCategory("Martial Melee") || checkCategory("Martial Ranged");
 
-                if (isSimple) weaponPrefix = "פשוט";
-                if (isMartial) weaponPrefix = "קרבי";
+                if (isSimple) weaponPrefix = t('simple');
+                if (isMartial) weaponPrefix = t('martial');
 
                 // Always set typeHe if we have specific type, otherwise use a better fallback
                 if (specificType) {
                     itemDetails.typeHe = `${specificType} (${weaponPrefix})`;
                 } else if (itemDetails.typeHe && itemDetails.typeHe.toLowerCase() === 'weapon') {
-                    // If AI returned "weapon" in English, at least translate it
-                    itemDetails.typeHe = `נשק ${weaponPrefix}`;
+                    itemDetails.typeHe = `${t('weapon')} ${weaponPrefix}`;
                 }
             }
 
@@ -372,14 +392,14 @@ export class GeneratorController {
                 let armorCategory = "";
                 const cats = window.OFFICIAL_ITEMS.armor;
 
-                if ((cats["Light Armor"] || []).some(x => x.includes(finalSubtype))) armorCategory = "קל";
-                else if ((cats["Medium Armor"] || []).some(x => x.includes(finalSubtype))) armorCategory = "בינוני";
-                else if ((cats["Heavy Armor"] || []).some(x => x.includes(finalSubtype))) armorCategory = "כבד";
-                else if ((cats["Shield"] || []).some(x => x.includes(finalSubtype))) armorCategory = "מגן";
+                if ((cats["Light Armor"] || []).some(x => x.includes(finalSubtype))) armorCategory = t('light');
+                else if ((cats["Medium Armor"] || []).some(x => x.includes(finalSubtype))) armorCategory = t('medium');
+                else if ((cats["Heavy Armor"] || []).some(x => x.includes(finalSubtype))) armorCategory = t('heavy');
+                else if ((cats["Shield"] || []).some(x => x.includes(finalSubtype))) armorCategory = t('shield');
 
                 if (specificType) {
-                    if (armorCategory === "מגן") {
-                        itemDetails.typeHe = "מגן";
+                    if (armorCategory === t('shield')) {
+                        itemDetails.typeHe = t('shield');
                     } else if (armorCategory) {
                         itemDetails.typeHe = `${specificType} (${armorCategory})`;
                     } else {
@@ -425,7 +445,10 @@ export class GeneratorController {
                     // ALWAYS use official damage/type for weapons - these are known values
                     // Only AI-generated bonus (e.g., "+1") should be preserved
                     if (type === 'weapon' && officialStats.damage) {
-                        const damageMap = { "bludgeoning": "מוחץ", "piercing": "דוקר", "slashing": "חותך" };
+                        // Locale-aware damage type mapping
+                        const damageMap = isHebrew
+                            ? { "bludgeoning": "מוחץ", "piercing": "דוקר", "slashing": "חותך" }
+                            : { "bludgeoning": "bludgeoning", "piercing": "piercing", "slashing": "slashing" };
                         const officialDamageType = damageMap[officialStats.damageType] || officialStats.damageType;
 
                         // Check if AI added a bonus (e.g., "+1", "+2")
@@ -450,17 +473,27 @@ export class GeneratorController {
 
                     // Build weapon properties from official data
                     if (type === 'weapon') {
+                        const propTranslations = {
+                            twoHanded: { he: 'דו-ידני', en: 'Two-Handed' },
+                            versatile: { he: 'רב-שימושי', en: 'Versatile' },
+                            finesse: { he: 'עדין', en: 'Finesse' },
+                            reach: { he: 'טווח', en: 'Reach' },
+                            thrown: { he: 'הטלה', en: 'Thrown' },
+                            light: { he: 'קל', en: 'Light' }
+                        };
+                        const tp = (key) => propTranslations[key]?.[isHebrew ? 'he' : 'en'] || key;
+
                         const props = [];
-                        if (officialStats.twoHanded) props.push('דו-ידני');
+                        if (officialStats.twoHanded) props.push(tp('twoHanded'));
                         if (officialStats.versatile) {
-                            props.push('רב-שימושי');
+                            props.push(tp('versatile'));
                             // Store the versatile (two-handed) damage for display
                             itemDetails.versatileDamage = officialStats.versatile;
                         }
-                        if (officialStats.finesse) props.push('עדין');
-                        if (officialStats.reach) props.push('טווח');
-                        if (officialStats.thrown) props.push('הטלה');
-                        if (officialStats.light) props.push('קל');
+                        if (officialStats.finesse) props.push(tp('finesse'));
+                        if (officialStats.reach) props.push(tp('reach'));
+                        if (officialStats.thrown) props.push(tp('thrown'));
+                        if (officialStats.light) props.push(tp('light'));
 
                         // Store properties for display
                         itemDetails.weaponProperties = props;
@@ -471,7 +504,7 @@ export class GeneratorController {
                 }
             }
 
-            // --- POST-PROCESSING: Translate any remaining English terms ---
+            // --- POST-PROCESSING: Translate damage types based on locale ---
             const damageTypeTranslations = {
                 "slashing": "חותך", "piercing": "דוקר", "bludgeoning": "מוחץ",
                 "fire": "אש", "cold": "קור", "lightning": "ברק", "poison": "רעל",
@@ -479,19 +512,29 @@ export class GeneratorController {
                 "psychic": "נפשי", "thunder": "רעם"
             };
 
-            // Helper function to clean damage string - translate and remove duplicates
+            // Helper function to clean damage string - translate or keep based on locale
             const cleanDamageString = (str) => {
                 if (!str) return str;
                 let result = str;
 
-                // First translate any remaining English to Hebrew
-                for (const [eng, heb] of Object.entries(damageTypeTranslations)) {
-                    result = result.replace(new RegExp(eng, 'gi'), heb);
-                }
-
-                // Remove duplicate Hebrew damage types (e.g., "חותך חותך" -> "חותך")
-                for (const heb of Object.values(damageTypeTranslations)) {
-                    result = result.replace(new RegExp(`${heb}\\s+${heb}`, 'g'), heb);
+                if (isHebrew) {
+                    // Translate English to Hebrew
+                    for (const [eng, heb] of Object.entries(damageTypeTranslations)) {
+                        result = result.replace(new RegExp(eng, 'gi'), heb);
+                    }
+                    // Remove duplicate Hebrew damage types (e.g., "חותך חותך" -> "חותך")
+                    for (const heb of Object.values(damageTypeTranslations)) {
+                        result = result.replace(new RegExp(`${heb}\\s+${heb}`, 'g'), heb);
+                    }
+                } else {
+                    // For English, translate Hebrew to English
+                    for (const [eng, heb] of Object.entries(damageTypeTranslations)) {
+                        result = result.replace(new RegExp(heb, 'g'), eng);
+                    }
+                    // Remove duplicate English damage types
+                    for (const eng of Object.keys(damageTypeTranslations)) {
+                        result = result.replace(new RegExp(`${eng}\\s+${eng}`, 'gi'), eng);
+                    }
                 }
 
                 // Clean up extra spaces
@@ -510,13 +553,14 @@ export class GeneratorController {
                 itemDetails.quickStats = cleanDamageString(itemDetails.quickStats);
             }
 
-            // Fix typeHe if it's in English
+            // Fix typeHe if it's in wrong language
             const typeTranslations = {
                 "weapon": "נשק", "armor": "שריון", "potion": "שיקוי", "ring": "טבעת",
                 "rod": "מטה", "staff": "מקל", "wand": "שרביט", "scroll": "מגילה",
                 "wondrous": "פלאי", "wondrous item": "חפץ פלאי"
             };
-            if (itemDetails.typeHe) {
+
+            if (itemDetails.typeHe && isHebrew) {
                 const lower = itemDetails.typeHe.toLowerCase();
                 if (typeTranslations[lower]) {
                     itemDetails.typeHe = typeTranslations[lower];
@@ -558,9 +602,9 @@ export class GeneratorController {
                 await window.cardRenderer.setTemplate(persistentBgUrl);
             }
 
-            this.ui.showToast('רקע חדש נוצר ונשמר!', 'success');
+            this.ui.showToast(window.i18n?.t('toasts.newBackgroundCreated') || 'New background created!', 'success');
         } catch (error) {
-            this.ui.showToast('שגיאה ביצירת רקע', 'error');
+            this.ui.showToast(window.i18n?.t('toasts.errorCreatingBackground') || 'Error creating background', 'error');
         } finally {
             if (btn) {
                 btn.disabled = false;
@@ -577,7 +621,7 @@ export class GeneratorController {
 
         // 0. Random Background
         if (window.backgroundManager) {
-            this.ui.showToast('בוחר רקע אקראי...', 'info');
+            this.ui.showToast(window.i18n?.t('toasts.selectingRandomBg') || 'Selecting random background...', 'info');
             await window.backgroundManager.pickRandomBackground();
         }
 
@@ -629,27 +673,51 @@ export class GeneratorController {
         if (typeSelect) typeSelect.value = randomType;
         if (levelSelect) levelSelect.value = randomLevel;
 
-        this.ui.showToast('מגריל חפץ בהפתעה...', 'info');
+        this.ui.showToast(window.i18n?.t('toasts.surpriseRolling') || 'Rolling surprise item...', 'info');
 
         // 5. Trigger Generation
         await this.onGenerate(e);
     }
 
     async generateImage(prompt) {
-        const model = document.getElementById('image-model')?.value || 'flux';
+        const model = document.getElementById('image-model')?.value || 'imagen3';
         const style = document.getElementById('image-style')?.value || 'realistic';
         const styleOption = document.getElementById('image-style-option')?.value || 'natural';
         const color = document.getElementById('image-bg-color')?.value || '#ffffff';
 
+        // Primary: Use Gemini Imagen 3 (for Kaggle competition - 100% Google AI)
+        if (model === 'imagen3' || model === 'flux') {
+            try {
+                console.log("🎨 Attempting Imagen 3 generation...");
+                return await this.gemini.generateImageImagen3(prompt, style, styleOption, color);
+            } catch (imagenError) {
+                console.warn("⚠️ Imagen 3 failed, falling back to GetImg:", imagenError.message);
+
+                // Fallback to GetImg if available
+                const fallbackKey = document.getElementById('getimg-api-key')?.value.trim()
+                    || localStorage.getItem('getimg_api_key');
+
+                if (fallbackKey) {
+                    console.log("🔄 Using GetImg as fallback...");
+                    return await this.gemini.generateImageGetImg(prompt, 'getimg-flux', style, fallbackKey, styleOption, color);
+                } else {
+                    throw imagenError; // No fallback available
+                }
+            }
+        }
+
+        // Legacy: Direct GetImg models
         if (model.startsWith('getimg-')) {
             const key = document.getElementById('getimg-api-key')?.value.trim();
-            if (!key) throw new Error("חסר מפתח GetImg API");
+            if (!key) throw new Error("Missing GetImg API key");
             localStorage.setItem('getimg_api_key', key);
             return await this.gemini.generateImageGetImg(prompt, model, style, key, styleOption, color);
-        } else {
-            return await this.gemini.generateItemImage(prompt, model, style, styleOption, color);
         }
+
+        // Default fallback
+        return await this.gemini.generateItemImage(prompt, model, style, styleOption, color);
     }
+
 
     /**
      * Auto-layout: Use smart algorithm to calculate optimal positioning
@@ -739,11 +807,11 @@ export class GeneratorController {
 
             this.state.saveCurrentCard();
 
-            this.ui.showToast(`✨ הכיוונון הושלם! (שטח פנוי: ${safeArea.width}x${safeArea.height})`, 'success');
+            this.ui.showToast(`${window.i18n?.t('toasts.autoLayoutComplete') || '✨ Auto layout complete!'} (${safeArea.width}x${safeArea.height})`, 'success');
 
         } catch (error) {
             console.error('Auto-layout error:', error);
-            this.ui.showToast('שגיאה בכיוונון: ' + error.message, 'error');
+            this.ui.showToast(`${window.i18n?.t('toasts.autoLayoutError') || 'Auto layout error'}: ${error.message}`, 'error');
         } finally {
             if (btn) {
                 btn.disabled = false;
@@ -758,13 +826,13 @@ export class GeneratorController {
     async onLassoTool() {
         const currentState = this.state.getState();
         if (!currentState.cardData) {
-            this.ui.showToast('אין קלף לניתוח', 'warning');
+            this.ui.showToast(window.i18n?.t('toasts.noCardToAnalyze') || 'No card to analyze', 'warning');
             return;
         }
 
         const canvas = document.getElementById('card-canvas');
         if (!canvas) {
-            this.ui.showToast('Canvas לא נמצא', 'error');
+            this.ui.showToast(window.i18n?.t('toasts.canvasNotFound') || 'Canvas not found', 'error');
             return;
         }
 
@@ -775,7 +843,7 @@ export class GeneratorController {
             // Get the EMPTY template image from the GLOBAL renderer
             const templateImg = window.cardRenderer?.template;
             if (!templateImg || !templateImg.complete || templateImg.naturalWidth === 0) {
-                this.ui.showToast('Template עדיין נטען, נסה שוב', 'warning');
+                this.ui.showToast(window.i18n?.t('toasts.templateStillLoading') || 'Template still loading, try again', 'warning');
                 console.error('Template check:', {
                     exists: !!templateImg,
                     complete: templateImg?.complete,
@@ -809,7 +877,7 @@ export class GeneratorController {
 
         } catch (error) {
             console.error('Lasso tool error:', error);
-            this.ui.showToast('שגיאה בפתיחת הכלי: ' + error.message, 'error');
+            this.ui.showToast(`${window.i18n?.t('toasts.toolOpenError') || 'Error opening tool'}: ${error.message}`, 'error');
         }
     }
 
@@ -853,11 +921,11 @@ export class GeneratorController {
             }
 
             this.state.saveCurrentCard();
-            this.ui.showToast(`✅ הוחל! (tolerance: ${safeArea.tolerance}%, שטח: ${safeArea.width}x${safeArea.height})`, 'success');
+            this.ui.showToast(`${window.i18n?.t('toasts.layoutApplied') || '✅ Layout applied!'} (${safeArea.width}x${safeArea.height})`, 'success');
 
         } catch (error) {
             console.error('Apply layout error:', error);
-            this.ui.showToast('שגיאה ביישום הפריסה: ' + error.message, 'error');
+            this.ui.showToast(`${window.i18n?.t('toasts.layoutApplyError') || 'Error applying layout'}: ${error.message}`, 'error');
         }
     }
 }

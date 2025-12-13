@@ -726,23 +726,42 @@ class CardRenderer {
 
         // --- QUICK STATS SECTION ---
 
-        // Helper function to translate any remaining English damage types
+        // Helper function to translate damage types based on locale
         const translateDamageTypes = (text) => {
             if (!text) return text;
-            const translations = {
+
+            const locale = window.i18n?.getLocale() || 'he';
+            const isHebrew = locale === 'he';
+
+            const damageTypes = {
                 "slashing": "חותך", "piercing": "דוקר", "bludgeoning": "מוחץ",
                 "fire": "אש", "cold": "קור", "lightning": "ברק", "poison": "רעל",
                 "acid": "חומצה", "necrotic": "נמק", "radiant": "זוהר", "force": "כוח",
                 "psychic": "נפשי", "thunder": "רעם"
             };
+
             let result = text;
-            for (const [eng, heb] of Object.entries(translations)) {
-                result = result.replace(new RegExp(eng, 'gi'), heb);
+
+            if (isHebrew) {
+                // Translate English to Hebrew
+                for (const [eng, heb] of Object.entries(damageTypes)) {
+                    result = result.replace(new RegExp(eng, 'gi'), heb);
+                }
+                // Remove duplicate Hebrew damage types
+                for (const heb of Object.values(damageTypes)) {
+                    result = result.replace(new RegExp(`${heb}\\s+${heb}`, 'g'), heb);
+                }
+            } else {
+                // Translate Hebrew to English
+                for (const [eng, heb] of Object.entries(damageTypes)) {
+                    result = result.replace(new RegExp(heb, 'g'), eng);
+                }
+                // Remove duplicate English damage types
+                for (const eng of Object.keys(damageTypes)) {
+                    result = result.replace(new RegExp(`${eng}\\s+${eng}`, 'gi'), eng);
+                }
             }
-            // Remove duplicate Hebrew damage types
-            for (const heb of Object.values(translations)) {
-                result = result.replace(new RegExp(`${heb}\\s+${heb}`, 'g'), heb);
-            }
+
             return result.replace(/\s{2,}/g, ' ').trim();
         };
 
@@ -775,7 +794,9 @@ class CardRenderer {
             }
         }
         if (data.armorClass && data.armorClass !== 'null' && data.armorClass !== null) {
-            coreStatsText = `${data.armorClass} דרג"ש`;
+            const locale = window.i18n?.getLocale() || 'he';
+            const acLabel = locale === 'he' ? 'דרג"ש' : 'AC';
+            coreStatsText = `${data.armorClass} ${acLabel}`;
         }
 
         // Clean up any English damage types and remove 'null' text
@@ -820,12 +841,17 @@ class CardRenderer {
 
         // Filter out damage dice patterns (e.g., "1d8", "2d6+3") since they're already shown in core stats
         if (statsText) {
-            // First translate any English damage types
+            const locale = window.i18n?.getLocale() || 'he';
+            // First translate damage types to match current locale
             statsText = translateDamageTypes(statsText);
             // Then remove dice patterns
             statsText = statsText.replace(/\d+d\d+(\s*[+\-]\s*\d+)?/gi, '').trim();
-            // Also remove common damage type words that would be redundant
-            statsText = statsText.replace(/(מוחץ|דוקר|חותך|נזק|damage)/gi, '').trim();
+            // Also remove common damage type words that would be redundant (locale-aware)
+            if (locale === 'he') {
+                statsText = statsText.replace(/(מוחץ|דוקר|חותך|נזק)/gi, '').trim();
+            } else {
+                statsText = statsText.replace(/(bludgeoning|piercing|slashing|damage)/gi, '').trim();
+            }
             // Clean up any double spaces (but preserve newlines!)
             statsText = statsText.replace(/[^\S\n]{2,}/g, ' ');
         }

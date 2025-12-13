@@ -17,7 +17,8 @@ export class UIManager {
         };
     }
 
-    showLoading(message = 'טוען...') {
+    showLoading(message = null) {
+        const loadingText = message || window.i18n?.t('toasts.loading') || 'Loading...';
         this.elements.loadingOverlay.classList.remove('hidden');
         if (this.elements.emptyState) this.elements.emptyState.classList.add('hidden');
         if (this.elements.skeletonOverlay) this.elements.skeletonOverlay.classList.remove('hidden');

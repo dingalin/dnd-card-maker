@@ -1,0 +1,313 @@
+{
+    "app": {
+        "title": "מחולל קלפי D&D",
+        "subtitle": "צור חפצים אגדיים למערכה שלך בעזרת בינה מלאכותית"
+    },
+    "nav": {
+        "gallery": "גלריה",
+        "about": "אודות",
+        "cardCreator": "יוצר קלפים",
+        "characterSheet": "דף דמות"
+    },
+    "modal": {
+        "confirmTitle": "אישור פעולה",
+        "confirmMessage": "האם אתה בטוח?",
+        "cancel": "ביטול",
+        "confirm": "אישור"
+    },
+    "sidebar": {
+        "createItem": "יצירת חפץ",
+        "apiKey": "מפתח API",
+        "level": "רמה",
+        "typeAndDetails": "סוג ופרטים",
+        "abilityTheme": "יכולת / נושא",
+        "visualsStyle": "מראה וסגנון"
+    },
+    "apiSection": {
+        "title": "הגדרות חיבור",
+        "geminiLabel": "מפתח API (Google Gemini)",
+        "geminiPlaceholder": "הדבק מפתח כאן...",
+        "geminiHelp": "נדרש כדי ליצור תוכן.",
+        "getimgLabel": "מפתח API / סיסמה (Getimg.ai)",
+        "getimgPlaceholder": "הדבק מפתח או סיסמה...",
+        "getimgHelp": "אופציונלי: עבור מודלים איכותיים יותר."
+    },
+    "levelSection": {
+        "title": "רמת החפץ",
+        "selectLabel": "בחר רמה:",
+        "level1_4": "1-4 (נפוץ)",
+        "level5_10": "5-10 (לא נפוץ)",
+        "level11_16": "11-16 (נדיר)",
+        "level17": "17+ (אגדי)",
+        "attunement": "דורש התכווננות? (Requires Attunement)"
+    },
+    "typeSection": {
+        "title": "סוג ופרטים",
+        "mainTypeLabel": "סוג חפץ ראשי",
+        "weapon": "נשק (Weapon)",
+        "armor": "שריון (Armor)",
+        "wondrous": "חפץ פלא (Wondrous Item)",
+        "potion": "שיקוי (Potion)",
+        "ring": "טבעת (Ring)",
+        "scroll": "מגילה (Scroll)",
+        "staff": "מטה (Staff)",
+        "wand": "שרביט (Wand)",
+        "subtypeLabel": "חפץ ספציפי",
+        "subtypePlaceholder": "-- בחר חפץ --",
+        "damageLabel": "נזק (Damage)",
+        "damageTypeLabel": "סוג נזק (Damage Type)",
+        "armorClassLabel": "דירוג שריון (AC)"
+    },
+    "damageTypes": {
+        "slashing": "חותך (Slashing)",
+        "piercing": "דוקר (Piercing)",
+        "bludgeoning": "מוחץ (Bludgeoning)",
+        "fire": "אש (Fire)",
+        "cold": "קור (Cold)",
+        "lightning": "ברק (Lightning)",
+        "necrotic": "נקרוטי (Necrotic)",
+        "radiant": "קורן (Radiant)"
+    },
+    "abilitySection": {
+        "title": "יכולת או נושא",
+        "descriptionLabel": "תאר את היכולת או הנושא של החפץ:",
+        "placeholder": "לדוגמה: להב אש, טבעת היעלמות...",
+        "help": "הבינה המלאכותית תשתמש בזה כהשראה."
+    },
+    "visualsSection": {
+        "title": "מראה וסגנון",
+        "customPromptLabel": "תיאור ויזואלי ידני (אופציונלי)",
+        "customPromptPlaceholder": "תאר את החפץ באנגלית כדי לעקוף את התיאור האוטומטי... (למשל: A glowing blue sword with runes)",
+        "customPromptHelp": "השאיר ריק כדי שה-AI יחליט לבד.",
+        "imageModelLabel": "מודל תמונה",
+        "imageStyleLabel": "סגנון ציור",
+        "imageProcessingLabel": "סגנון תמונה (עיבוד)",
+        "colorPickerLabel": "בחר צבע רקע:"
+    },
+    "imageStyles": {
+        "realistic": "ריאליסטי (Realistic)",
+        "watercolor": "צבעי מים וקו (Watercolor & Line Art)",
+        "oil": "ציור שמן (Oil Painting)",
+        "sketch": "רישום עיפרון (Pencil Sketch)",
+        "dark_fantasy": "פנטזיה אפלה (Dark Fantasy)",
+        "anime": "אנימה (Anime)",
+        "woodcut": "תחריט עץ (Woodcut)",
+        "pixel": "פיקסל ארט (Pixel Art)",
+        "simple_icon": "אייקון פשוט (Simple Icon)"
+    },
+    "imageProcessing": {
+        "natural": "רקע טבעי (Natural)",
+        "no_background": "בלי רקע (No BG)",
+        "square_frame": "מסגרת מרובעת (Square)",
+        "round_frame": "מסגרת עגולה (Round)",
+        "colored_background": "רקע בצבע (Color)"
+    },
+    "actions": {
+        "visualContext": "התייחס למראה הקלף (Visual Context)",
+        "simple": "פשוט",
+        "simpleTooltip": "חפץ עם פלוסים ונזק בסיסי",
+        "creative": "יצירתי",
+        "creativeTooltip": "חפץ עם מכניקה מיוחדת ומורכבת",
+        "surprise": "הפתע אותי",
+        "regenImage": "מראה",
+        "regenImageTooltip": "צור תמונה חדשה",
+        "regenStats": "תכונות",
+        "regenStatsTooltip": "צור תכונות חדשות"
+    },
+    "stickyNote": {
+        "title": "🗡️ פרטי חפץ",
+        "level": "רמה:",
+        "type": "סוג:",
+        "item": "חפץ:"
+    },
+    "editSidebar": {
+        "title": "עריכה ועיצוב",
+        "editContent": "עריכת תוכן",
+        "textDesign": "עיצוב טקסט",
+        "imageTuning": "כיוונון תמונה",
+        "cardBackground": "רקע הקלף"
+    },
+    "editContent": {
+        "frontSide": "צד קדמי",
+        "backSide": "צד אחורי",
+        "rarity": "1. נדירות",
+        "type": "2. סוג",
+        "name": "3. שם החפץ",
+        "coreStats": "4. נזק / דרג\"ש (מודגש)",
+        "coreStatsPlaceholder": "לדוגמה: 1d8 משופר",
+        "quickStats": "5. תיאור קצר",
+        "quickStatsPlaceholder": "לדוגמה: חרב זו זוהרת בחושך",
+        "gold": "6. מחיר (זהב)",
+        "position": "מיקום (גובה):",
+        "width": "רוחב:",
+        "bold": "מודגש",
+        "glow": "הילה",
+        "italic": "נטוי",
+        "shadow": "צל",
+        "abilityName": "שם יכולת",
+        "mechanics": "מכניקה",
+        "lore": "רקע וסיפור (לור)",
+        "textWidth": "רוחב טקסט:"
+    },
+    "textDesign": {
+        "title": "עיצוב טקסט",
+        "fontLabel": "גופן",
+        "fonts": {
+            "heebo": "Heebo (רגיל)",
+            "rubik": "Rubik (עגול)",
+            "frank": "Frank Ruhl (ספרותי)",
+            "assistant": "Assistant (נקי)"
+        }
+    },
+    "imageTuning": {
+        "title": "כיוונון תמונה",
+        "globalMargin": "🎯 כיווץ/הרחבה גלובלי",
+        "lockRatio": "🔗 נעילת יחס",
+        "verticalShrink": "↕️ כיווץ אנכי",
+        "horizontalShrink": "↔️ כיווץ אופקי",
+        "autoLayout": "✨ כיוונון אוטומטי",
+        "imagePosition": "מיקום תמונה",
+        "zoom": "זום (Zoom)",
+        "rotation": "סיבוב (Rotation)",
+        "fade": "עמעום מסגרת (Fade)",
+        "shadow": "הצללה (Shadow)"
+    },
+    "cardBackground": {
+        "title": "רקע הקלף",
+        "themeLabel": "נושא הרקע",
+        "themes": {
+            "fire": "אש (Fire)",
+            "nature": "טבע (Nature)",
+            "arcane": "קסם (Arcane)",
+            "divine": "קדושה (Divine)",
+            "necrotic": "מוות (Necrotic)",
+            "industrial": "תעשייתי (Industrial)",
+            "iron": "ברזל (Iron)",
+            "scroll": "מגילה (Scroll)",
+            "elemental": "יסודות (Elemental)"
+        },
+        "generate": "צור רקע",
+        "reset": "חזור לברירת מחדל",
+        "readyMade": "🖼️ רקעים מוכנים",
+        "scale": "גודל רקע (Scale)",
+        "selectTitle": "בחר רקע מוכן"
+    },
+    "footer": {
+        "saveToGallery": "💾 שמור לגלריה",
+        "download": "📥 הורד"
+    },
+    "preview": {
+        "loading": "מתחיל...",
+        "step1": "רעיון",
+        "step2": "תיאור",
+        "step3": "ציור",
+        "step4": "סיום",
+        "cancel": "ביטול",
+        "equipCharacter": "🗡️ צייד דמות",
+        "splitView": "📄|📄 פיצול",
+        "flip": "↻ הצג אחורה"
+    },
+    "gallery": {
+        "title": "🏛️ היסטוריית חפצים",
+        "folders": "תיקיות",
+        "allItems": "📂 כל החפצים",
+        "newFolder": "+ תיקייה חדשה",
+        "selectAll": "בחר הכל",
+        "deleteFolder": "🗑️ מחק תיקייה",
+        "loading": "טוען...",
+        "selected": "נבחרו",
+        "print": "🖨️ הדפס",
+        "moveTo": "📂 העבר ל...",
+        "delete": "מחק",
+        "clearAll": "נקה הכל"
+    },
+    "characterSheet": {
+        "ammo": "תחמושת",
+        "helmet": "קסדה",
+        "necklace": "שרשרת",
+        "ranged": "כלי ירייה",
+        "armor": "שריון",
+        "cape": "גלימה",
+        "mainhand": "יד ימין",
+        "offhand": "יד שמאל",
+        "ring": "טבעת",
+        "boots": "מגפיים",
+        "belt": "חגורה"
+    },
+    "equipModal": {
+        "title": "צייד דמות בחפץ",
+        "message": "לאיזו משבצת תרצה להכניס את הקלף הזה?",
+        "selectLabel": "בחר מיקום:",
+        "slots": {
+            "main_hand": "יד ימין (Main Hand)",
+            "off_hand": "יד שמאל (Off Hand)",
+            "armor": "שריון (Armor)",
+            "helmet": "קסדה (Helmet)",
+            "ring_1": "טבעת 1 (Ring)",
+            "ring_2": "טבעת 2 (Ring)",
+            "necklace": "שרשרת (Amulet)",
+            "cloak": "גלימה (Cloak)",
+            "boots": "מגפיים (Boots)",
+            "gloves": "כפפות (Gloves/Gauntlets)",
+            "belt": "חגורה (Belt)",
+            "ranged": "כלי ירייה (Ranged/Ammo)"
+        }
+    },
+    "printModal": {
+        "title": "הגדרות הדפסה",
+        "cardWidth": "רוחב קלף (מ\"מ)",
+        "lockRatio": "נעל יחס גובה-רוחב",
+        "cardHeight": "גובה קלף (מ\"מ)",
+        "gap": "מרווח בין קלפים (מ\"מ)",
+        "paperSize": "גודל דף",
+        "orientation": "כיוון דף",
+        "portrait": "לאורך (Portrait)",
+        "landscape": "לרוחב (Landscape)",
+        "scale": "קנה מידה (זום)",
+        "calibration": "תיקון כיול מדפסת (Calibration)",
+        "calibrationHelp": "השתמש בזה אם הגודל בהדפסה לא תואם למציאות (למשל: סרגל יצא קצר מדי).",
+        "status": "סטטוס דף:",
+        "paperSizeLabel": "גודל נייר:",
+        "cardsPerPage": "קלפים בדף:",
+        "totalPages": "סה\"כ דפים:",
+        "maximum": "מקסימום",
+        "printNow": "🖨️ הדפס עכשיו"
+    },
+    "toasts": {
+        "loadingError": "שגיאה בטעינת הקנבס",
+        "lastCardLoaded": "📂 קלף אחרון נטען!",
+        "loading": "טוען...",
+        "starting": "מתחיל...",
+        "itemLoaded": "החפץ נטען לעריכה",
+        "cardSaved": "הקלף נשמר לגלריה!",
+        "saveError": "שגיאה בשמירה",
+        "noCardId": "לא ניתן למחוק - אין מזהה קלף",
+        "deleteConfirm": "האם אתה בטוח שברצונך למחוק קלף זה?",
+        "cardDeleted": "הקלף נמחק בהצלחה",
+        "deleteError": "שגיאה במחיקה",
+        "noBackSide": "אין צד אחורי",
+        "unnamed": "חפץ ללא שם"
+    },
+    "cardViewer": {
+        "edit": "ערוך ✏️",
+        "flip": "הפוך קלף 🔄",
+        "save": "שמור לגלריה 💾",
+        "delete": "מחק 🗑️"
+    },
+    "defaults": {
+        "itemName": "שם החפץ",
+        "itemType": "סוג חפץ",
+        "rarity": "נדירות",
+        "quickStats": "2d6 נזק",
+        "abilityName": "שם יכולת",
+        "abilityDesc": "תיאור המכניקה יופיע כאן...",
+        "description": "סיפור הרקע (Lore) יופיע כאן..."
+    },
+    "characterSidebar": {
+        "title": "יצירת דמות",
+        "portraitFace": "תמונה: פנים (Portrait)",
+        "portraitFullBody": "תמונה: גוף מלא (Full Body)",
+        "createButton": "צור דמות",
+        "generatingStatus": "מייצר דמות..."
+    }
+}

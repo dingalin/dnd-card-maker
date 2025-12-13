@@ -135,7 +135,7 @@ class CardViewerServiceClass {
         if (this.currentCard.backImage) {
             backFace.innerHTML = `<img src="${this.currentCard.backImage}" alt="Card Back" />`;
         } else {
-            backFace.innerHTML = `<div class="no-back-message">אין צד אחורי</div>`;
+            backFace.innerHTML = `<div class="no-back-message">${window.i18n?.t('toasts.noBackSide') || 'אין צד אחורי'}</div>`;
         }
 
         cardContainer.appendChild(frontFace);
@@ -156,21 +156,21 @@ class CardViewerServiceClass {
 
         // Edit Button (only if cardData exists)
         if (this.currentCard.cardData) {
-            const editBtn = this._createButton('ערוך ✏️', 'primary', () => {
+            const editBtn = this._createButton(window.i18n?.t('cardViewer.edit') || 'ערוך ✏️', 'primary', () => {
                 this._handleEdit();
             });
             bar.appendChild(editBtn);
         }
 
         // Flip Button
-        const flipBtn = this._createButton('הפוך קלף 🔄', 'primary', () => {
+        const flipBtn = this._createButton(window.i18n?.t('cardViewer.flip') || 'הפוך קלף 🔄', 'primary', () => {
             this._handleFlip();
         });
         bar.appendChild(flipBtn);
 
         // Save Button (only if cardData exists)
         if (this.currentCard.cardData) {
-            const saveBtn = this._createButton('שמור לגלריה 💾', 'primary', () => {
+            const saveBtn = this._createButton(window.i18n?.t('cardViewer.save') || 'שמור לגלריה 💾', 'primary', () => {
                 this._handleSave();
             });
             bar.appendChild(saveBtn);
@@ -178,7 +178,7 @@ class CardViewerServiceClass {
 
         // Delete Button (only if cardData exists and has an ID)
         if (this.currentCard.cardData && this.currentCard.cardData.id) {
-            const deleteBtn = this._createButton('מחק 🗑️', 'secondary', () => {
+            const deleteBtn = this._createButton(window.i18n?.t('cardViewer.delete') || 'מחק 🗑️', 'secondary', () => {
                 this._handleDelete();
             });
             bar.appendChild(deleteBtn);
@@ -309,7 +309,7 @@ class CardViewerServiceClass {
             this.hide();
 
             if (window.uiManager) {
-                window.uiManager.showToast('החפץ נטען לעריכה', 'success');
+                window.uiManager.showToast(window.i18n?.t('toasts.itemLoaded') || 'החפץ נטען לעריכה', 'success');
             }
         }
     }
@@ -328,7 +328,7 @@ class CardViewerServiceClass {
                 thumbnail: this.currentCard.frontImage,
                 name: this.currentCard.cardData.name ||
                     this.currentCard.cardData.front?.title ||
-                    'חפץ ללא שם',
+                    window.i18n?.t('toasts.unnamed') || 'חפץ ללא שם',
                 savedAt: new Date().toISOString()
             };
 
@@ -337,18 +337,18 @@ class CardViewerServiceClass {
                 await window.storageManager.saveCard(saveData);
 
                 if (window.uiManager) {
-                    window.uiManager.showToast('הקלף נשמר לגלריה!', 'success');
+                    window.uiManager.showToast(window.i18n?.t('toasts.cardSaved') || 'הקלף נשמר לגלריה!', 'success');
                 }
             } else {
                 console.error('Storage manager not available');
                 if (window.uiManager) {
-                    window.uiManager.showToast('שגיאה בשמירה', 'error');
+                    window.uiManager.showToast(window.i18n?.t('toasts.saveError') || 'שגיאה בשמירה', 'error');
                 }
             }
         } catch (error) {
             console.error('Failed to save card:', error);
             if (window.uiManager) {
-                window.uiManager.showToast('שגיאה בשמירה', 'error');
+                window.uiManager.showToast(window.i18n?.t('toasts.saveError') || 'שגיאה בשמירה', 'error');
             }
         }
     }
@@ -359,7 +359,7 @@ class CardViewerServiceClass {
     async _handleDelete() {
         if (!this.currentCard?.cardData?.id) {
             if (window.uiManager) {
-                window.uiManager.showToast('לא ניתן למחוק - אין מזהה קלף', 'warning');
+                window.uiManager.showToast(window.i18n?.t('toasts.noCardId') || 'לא ניתן למחוק - אין מזהה קלף', 'warning');
             }
             return;
         }
@@ -374,12 +374,12 @@ class CardViewerServiceClass {
 
         // Confirm delete
         if (window.uiManager) {
-            window.uiManager.showConfirm('האם אתה בטוח שברצונך למחוק קלף זה?', async () => {
+            window.uiManager.showConfirm(window.i18n?.t('toasts.deleteConfirm') || 'האם אתה בטוח שברצונך למחוק קלף זה?', async () => {
                 try {
                     await window.stateManager.deleteFromHistory(cardId);
 
                     if (window.uiManager) {
-                        window.uiManager.showToast('הקלף נמחק בהצלחה', 'success');
+                        window.uiManager.showToast(window.i18n?.t('toasts.cardDeleted') || 'הקלף נמחק בהצלחה', 'success');
                     }
 
                     // Remove from character equipment slots if equipped (using uniqueId or cardName)
@@ -425,7 +425,7 @@ class CardViewerServiceClass {
                 } catch (e) {
                     console.error('Delete error:', e);
                     if (window.uiManager) {
-                        window.uiManager.showToast('שגיאה במחיקה', 'error');
+                        window.uiManager.showToast(window.i18n?.t('toasts.deleteError') || 'שגיאה במחיקה', 'error');
                     }
                 }
             });

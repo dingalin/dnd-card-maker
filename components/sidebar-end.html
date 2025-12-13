@@ -1,5 +1,5 @@
 <aside class="sidebar-end glass-panel">
-    <h2>עריכה ועיצוב</h2>
+    <h2 data-i18n="editSidebar.title">עריכה ועיצוב</h2>
 
     <!-- Stone Menu Navigation -->
     <div class="stone-menu">
@@ -7,7 +7,7 @@
         <div class="stone-btn" data-target="edit-content">
             <div class="btn-content">
                 <span class="icon">📝</span>
-                <span class="label">עריכת תוכן</span>
+                <span class="label" data-i18n="editSidebar.editContent">עריכת תוכן</span>
             </div>
         </div>
 
@@ -15,7 +15,7 @@
         <div class="stone-btn" data-target="text-design">
             <div class="btn-content">
                 <span class="icon">🎨</span>
-                <span class="label">עיצוב טקסט</span>
+                <span class="label" data-i18n="editSidebar.textDesign">עיצוב טקסט</span>
             </div>
         </div>
 
@@ -23,7 +23,7 @@
         <div class="stone-btn" data-target="image-tuning">
             <div class="btn-content">
                 <span class="icon">🖼️</span>
-                <span class="label">כיוונון תמונה</span>
+                <span class="label" data-i18n="editSidebar.imageTuning">כיוונון תמונה</span>
             </div>
         </div>
 
@@ -31,7 +31,7 @@
         <div class="stone-btn" data-target="card-background">
             <div class="btn-content">
                 <span class="icon">🎴</span>
-                <span class="label">רקע הקלף</span>
+                <span class="label" data-i18n="editSidebar.cardBackground">רקע הקלף</span>
             </div>
         </div>
     </div>
@@ -41,15 +41,17 @@
 
         <!-- 1. Edit Content Section -->
         <div id="edit-content" class="scroll-section hidden">
-            <h3>עריכת תוכן</h3>
+            <h3 data-i18n="editSidebar.editContent">עריכת תוכן</h3>
 
             <!-- ===== FRONT SIDE CONTROLS ===== -->
             <div id="front-controls" class="space-y-4">
-                <h4 class="text-amber-400 text-sm font-bold border-b border-amber-600 pb-1 mb-3">צד קדמי</h4>
+                <h4 class="text-amber-400 text-sm font-bold border-b border-amber-600 pb-1 mb-3"
+                    data-i18n="editContent.frontSide">צד קדמי</h4>
 
                 <!-- 1. Rarity (Top) -->
                 <div class="control-group">
-                    <label for="edit-rarity" class="text-sm font-medium text-gray-300 mb-1 block">1. נדירות</label>
+                    <label for="edit-rarity" class="text-sm font-medium text-gray-300 mb-1 block"
+                        data-i18n="editContent.rarity">1. נדירות</label>
                     <div class="flex gap-2 items-center mb-2">
                         <input type="text" id="edit-rarity"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
@@ -84,13 +86,15 @@
                             </label>
                         </div>
                     </div>
-                    <label for="rarity-offset" class="text-xs text-gray-400">מיקום (גובה):</label>
+                    <label for="rarity-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
+                        (height):</label>
                     <input type="range" id="rarity-offset" min="-100" max="200" value="0" class="flex-1">
                 </div>
 
                 <!-- 2. Type -->
                 <div class="control-group">
-                    <label for="edit-type" class="text-sm font-medium text-gray-300 mb-1 block">2. סוג</label>
+                    <label for="edit-type" class="text-sm font-medium text-gray-300 mb-1 block"
+                        data-i18n="editContent.type">2. סוג</label>
                     <div class="flex gap-2 items-center mb-2">
                         <input type="text" id="edit-type"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
@@ -125,17 +129,20 @@
                             </label>
                         </div>
                     </div>
-                    <label for="type-offset" class="text-xs text-gray-400">מיקום (גובה):</label>
+                    <label for="type-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
+                        (height):</label>
                     <input type="range" id="type-offset" min="-100" max="200" value="0" class="flex-1">
                     <div class="flex items-center gap-2 mt-1">
-                        <label for="type-width" class="text-xs text-gray-400">רוחב:</label>
+                        <label for="type-width" class="text-xs text-gray-400"
+                            data-i18n="editContent.width">Width:</label>
                         <input type="range" id="type-width" min="200" max="700" value="500" class="flex-1">
                     </div>
                 </div>
 
                 <!-- 3. Name -->
                 <div class="control-group">
-                    <label for="edit-name" class="text-sm font-medium text-gray-300 mb-1 block">3. שם החפץ</label>
+                    <label for="edit-name" class="text-sm font-medium text-gray-300 mb-1 block"
+                        data-i18n="editContent.name">3. שם החפץ</label>
                     <div class="flex gap-2 items-center mb-2">
                         <input type="text" id="edit-name"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
@@ -170,18 +177,20 @@
                             </label>
                         </div>
                     </div>
-                    <label for="name-offset" class="text-xs text-gray-400">מיקום (גובה):</label>
+                    <label for="name-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
+                        (height):</label>
                     <input type="range" id="name-offset" min="-100" max="200" value="0" class="flex-1">
                     <div class="flex items-center gap-2 mt-1">
-                        <label for="name-width" class="text-xs text-gray-400">רוחב:</label>
+                        <label for="name-width" class="text-xs text-gray-400"
+                            data-i18n="editContent.width">Width:</label>
                         <input type="range" id="name-width" min="100" max="800" value="500" class="flex-1">
                     </div>
                 </div>
 
                 <!-- 4. Core Stats (Damage / AC) -->
                 <div class="control-group">
-                    <label for="edit-core-stats" class="text-sm font-bold text-amber-500 mb-1 block">4. נזק / דרג"ש
-                        (מודגש)</label>
+                    <label for="edit-core-stats" class="text-sm font-bold text-amber-500 mb-1 block"
+                        data-i18n="editContent.coreStats">4. Damage / AC (Bold)</label>
                     <div class="flex gap-2 items-center mb-2">
                         <input type="text" id="edit-core-stats" placeholder="לדוגמה: 1d8 משופר"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
@@ -216,18 +225,20 @@
                             </label>
                         </div>
                     </div>
-                    <label for="coreStats-offset" class="text-xs text-gray-400">מיקום (גובה):</label>
+                    <label for="coreStats-offset" class="text-xs text-gray-400"
+                        data-i18n="editContent.position">Position (height):</label>
                     <input type="range" id="coreStats-offset" min="400" max="900" value="680" class="flex-1">
                     <div class="flex items-center gap-2 mt-1">
-                        <label for="coreStats-width" class="text-xs text-gray-400">רוחב:</label>
+                        <label for="coreStats-width" class="text-xs text-gray-400"
+                            data-i18n="editContent.width">Width:</label>
                         <input type="range" id="coreStats-width" min="100" max="800" value="500" class="flex-1">
                     </div>
                 </div>
 
                 <!-- 5. Quick Description (Bottom) -->
                 <div class="control-group">
-                    <label for="edit-quick-stats" class="text-sm font-medium text-gray-300 mb-1 block">5. תיאור
-                        קצר</label>
+                    <label for="edit-quick-stats" class="text-sm font-medium text-gray-300 mb-1 block"
+                        data-i18n="editContent.quickDesc">5. Quick Description</label>
                     <div class="flex gap-2 items-start mb-2">
                         <textarea id="edit-quick-stats" placeholder="לדוגמה: חרב זו זוהרת בחושך" rows="2"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
@@ -262,17 +273,20 @@
                             </label>
                         </div>
                     </div>
-                    <label for="stats-offset" class="text-xs text-gray-400">מיקום (גובה):</label>
+                    <label for="stats-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
+                        (height):</label>
                     <input type="range" id="stats-offset" min="400" max="900" value="600" class="flex-1">
                     <div class="flex items-center gap-2 mt-1">
-                        <label for="stats-width" class="text-xs text-gray-400">רוחב:</label>
+                        <label for="stats-width" class="text-xs text-gray-400"
+                            data-i18n="editContent.width">Width:</label>
                         <input type="range" id="stats-width" min="100" max="800" value="500" class="flex-1">
                     </div>
                 </div>
 
                 <!-- 6. Gold -->
                 <div class="control-group">
-                    <label for="edit-gold" class="text-sm font-medium text-gray-300 mb-1 block">6. מחיר (זהב)</label>
+                    <label for="edit-gold" class="text-sm font-medium text-gray-300 mb-1 block"
+                        data-i18n="editContent.price">6. Price (Gold)</label>
                     <div class="flex gap-2 items-center mb-2">
                         <input type="text" id="edit-gold" value="400"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
@@ -307,18 +321,21 @@
                             </label>
                         </div>
                     </div>
-                    <label for="gold-offset" class="text-xs text-gray-400">מיקום (גובה):</label>
+                    <label for="gold-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
+                        (height):</label>
                     <input type="range" id="gold-offset" min="-100" max="100" value="0" class="flex-1">
                 </div>
             </div>
 
             <!-- ===== BACK SIDE CONTROLS ===== -->
             <div id="back-controls" class="space-y-4 hidden">
-                <h4 class="text-amber-400 text-sm font-bold border-b border-amber-600 pb-1 mb-3">צד אחורי</h4>
+                <h4 class="text-amber-400 text-sm font-bold border-b border-amber-600 pb-1 mb-3"
+                    data-i18n="editContent.backSide">צד אחורי</h4>
 
                 <!-- Ability Name -->
                 <div class="control-group">
-                    <label for="edit-ability-name" class="text-sm font-medium text-gray-300 mb-1 block">שם יכולת</label>
+                    <label for="edit-ability-name" class="text-sm font-medium text-gray-300 mb-1 block"
+                        data-i18n="editContent.abilityName">שם יכולת</label>
                     <div class="flex gap-2 items-center mb-2">
                         <input type="text" id="edit-ability-name"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
@@ -349,14 +366,16 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label for="ability-offset" class="text-xs text-gray-400">מיקום:</label>
+                        <label for="ability-offset" class="text-xs text-gray-400"
+                            data-i18n="editContent.positionLabel">Position:</label>
                         <input type="range" id="ability-offset" min="50" max="250" value="120" class="flex-1">
                     </div>
                 </div>
 
                 <!-- Mechanics (Ability Desc) -->
                 <div class="control-group">
-                    <label for="edit-ability-desc" class="text-sm font-medium text-gray-300 mb-1 block">מכניקה</label>
+                    <label for="edit-ability-desc" class="text-sm font-medium text-gray-300 mb-1 block"
+                        data-i18n="editContent.mechanics">מכניקה</label>
                     <div class="flex gap-2 items-start mb-2">
                         <textarea id="edit-ability-desc" rows="3"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
@@ -387,18 +406,21 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label for="mech-offset" class="text-xs text-gray-400">מיקום:</label>
+                        <label for="mech-offset" class="text-xs text-gray-400"
+                            data-i18n="editContent.positionLabel">Position:</label>
                         <input type="range" id="mech-offset" min="100" max="400" value="180" class="flex-1">
                     </div>
                     <div class="flex items-center gap-2 mt-2">
-                        <label for="ability-width" class="text-xs text-gray-400">רוחב טקסט:</label>
+                        <label for="ability-width" class="text-xs text-gray-400" data-i18n="editContent.textWidth">Text
+                            Width:</label>
                         <input type="range" id="ability-width" min="100" max="800" value="600" class="flex-1">
                     </div>
                 </div>
 
                 <!-- Lore (Fluff) -->
                 <div class="control-group">
-                    <label for="edit-desc" class="text-sm font-medium text-gray-300 mb-1 block">רקע וסיפור (לור)</label>
+                    <label for="edit-desc" class="text-sm font-medium text-gray-300 mb-1 block"
+                        data-i18n="editContent.lore">רקע וסיפור (לור)</label>
                     <div class="flex gap-2 items-start mb-2">
                         <textarea id="edit-desc" rows="3"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
@@ -429,11 +451,13 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label for="lore-offset" class="text-xs text-gray-400">מיקום:</label>
+                        <label for="lore-offset" class="text-xs text-gray-400"
+                            data-i18n="editContent.positionLabel">Position:</label>
                         <input type="range" id="lore-offset" min="400" max="1100" value="600" class="flex-1">
                     </div>
                     <div class="flex items-center gap-2 mt-1">
-                        <label for="lore-width" class="text-xs text-gray-400">רוחב:</label>
+                        <label for="lore-width" class="text-xs text-gray-400"
+                            data-i18n="editContent.width">Width:</label>
                         <input type="range" id="lore-width" min="100" max="800" value="550" class="flex-1">
                     </div>
                 </div>
@@ -442,14 +466,14 @@
 
         <!-- 2. Text Design Section -->
         <div id="text-design" class="scroll-section hidden">
-            <h3>עיצוב טקסט</h3>
+            <h3 data-i18n="textDesign.title">עיצוב טקסט</h3>
             <div class="control-group">
-                <label for="font-family-select">גופן</label>
+                <label for="font-family-select" data-i18n="textDesign.fontLabel">גופן</label>
                 <select id="font-family-select">
-                    <option value="Heebo">Heebo (רגיל)</option>
-                    <option value="Rubik">Rubik (עגול)</option>
-                    <option value="Frank Ruhl Libre">Frank Ruhl (ספרותי)</option>
-                    <option value="Assistant">Assistant (נקי)</option>
+                    <option value="Heebo" data-i18n="textDesign.fonts.heebo">Heebo (Regular)</option>
+                    <option value="Rubik" data-i18n="textDesign.fonts.rubik">Rubik (Rounded)</option>
+                    <option value="Frank Ruhl Libre" data-i18n="textDesign.fonts.frank">Frank Ruhl (Literary)</option>
+                    <option value="Assistant" data-i18n="textDesign.fonts.assistant">Assistant (Clean)</option>
                 </select>
             </div>
 
@@ -458,26 +482,26 @@
 
         <!-- 3. Image Tuning Section -->
         <div id="image-tuning" class="scroll-section hidden">
-            <h3>כיוונון תמונה</h3>
+            <h3 data-i18n="imageTuning.title">כיוונון תמונה</h3>
 
             <!-- Global Margin Controls -->
             <div class="control-group bg-gray-800 p-3 rounded-lg border border-amber-600 mb-4">
-                <label class="block text-sm font-bold mb-3" style="color: #fbbf24;">
-                    🎯 כיווץ/הרחבה גלובלי
+                <label class="block text-sm font-bold mb-3" style="color: #fbbf24;"
+                    data-i18n="imageTuning.globalMargin">
                 </label>
 
                 <!-- Lock checkbox -->
                 <div class="flex items-center gap-2 mb-3">
                     <input type="checkbox" id="global-margin-lock" checked class="accent-amber-500 w-4 h-4">
-                    <label for="global-margin-lock" class="text-xs text-gray-300 cursor-pointer">
-                        🔗 נעילת יחס
+                    <label for="global-margin-lock" class="text-xs text-gray-300 cursor-pointer"
+                        data-i18n="imageTuning.lockRatio">
                     </label>
                 </div>
 
                 <!-- Height (Vertical) Slider -->
                 <div class="mb-3">
                     <div class="flex justify-between text-xs text-gray-400 mb-1">
-                        <span>↕️ כיווץ אנכי</span>
+                        <span data-i18n="imageTuning.verticalShrink">↕️ Vertical Shrink</span>
                         <span id="global-margin-y-val">0</span>
                     </div>
                     <input type="range" id="global-margin-y" min="-100" max="100" value="0" class="w-full">
@@ -486,7 +510,7 @@
                 <!-- Width (Horizontal) Slider -->
                 <div>
                     <div class="flex justify-between text-xs text-gray-400 mb-1">
-                        <span>↔️ כיווץ אופקי</span>
+                        <span data-i18n="imageTuning.horizontalShrink">↔️ Horizontal Shrink</span>
                         <span id="global-margin-x-val">0</span>
                     </div>
                     <input type="range" id="global-margin-x" min="-100" max="100" value="0" class="w-full">
@@ -497,15 +521,15 @@
             <div class="mb-4">
                 <button id="auto-layout-btn" class="btn-primary w-full"
                     style="background: linear-gradient(135deg, #8b5cf6, #6366f1); border-color: #7c3aed;">
-                    ✨ כיוונון אוטומטי
+                    <span data-i18n="imageTuning.autoLayout">✨ Auto Layout</span>
                 </button>
             </div>
 
             <div class="layout-controls space-y-4">
                 <!-- Image Offset -->
                 <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
-                    <label for="image-offset" class="block text-sm font-bold mb-2" style="color: #fbbf24;">מיקום
-                        תמונה</label>
+                    <label for="image-offset" class="block text-sm font-bold mb-2" style="color: #fbbf24;"
+                        data-i18n="imageTuning.imagePosition">Image Position</label>
                     <input type="range" id="image-offset" min="-150" max="150" value="0" class="w-full">
                 </div>
 
@@ -513,7 +537,7 @@
                 <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
                     <label for="image-scale" class="block text-sm font-bold mb-2"
                         style="color: #fbbf24; display: flex; justify-content: space-between;">
-                        <span>זום (Zoom)</span>
+                        <span data-i18n="imageTuning.zoom">Zoom</span>
                         <span id="image-scale-val">1.0</span>
                     </label>
                     <input type="range" id="image-scale" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full">
@@ -523,7 +547,7 @@
                 <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
                     <label for="image-rotation" class="block text-sm font-bold mb-2"
                         style="color: #fbbf24; display: flex; justify-content: space-between;">
-                        <span>סיבוב (Rotation)</span>
+                        <span data-i18n="imageTuning.rotation">Rotation</span>
                         <span id="image-rotation-val">0°</span>
                     </label>
                     <input type="range" id="image-rotation" min="-180" max="180" step="5" value="0" class="w-full">
@@ -533,7 +557,7 @@
                 <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
                     <label for="image-fade" class="block text-sm font-bold mb-2"
                         style="color: #fbbf24; display: flex; justify-content: space-between;">
-                        <span>עמעום מסגרת (Fade)</span>
+                        <span data-i18n="imageTuning.fade">Frame Fade</span>
                         <span id="image-fade-val">0</span>
                     </label>
                     <input type="range" id="image-fade" min="0" max="100" value="0" class="w-full">
@@ -543,7 +567,7 @@
                 <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
                     <label for="image-shadow" class="block text-sm font-bold mb-2"
                         style="color: #fbbf24; display: flex; justify-content: space-between;">
-                        <span>הצללה (Shadow)</span>
+                        <span data-i18n="imageTuning.shadow">Shadow</span>
                         <span id="image-shadow-val">0</span>
                     </label>
                     <input type="range" id="image-shadow" min="0" max="100" value="0" class="w-full">
@@ -553,27 +577,30 @@
 
         <!-- 4. Card Background Section -->
         <div id="card-background" class="scroll-section hidden">
-            <h3>רקע הקלף</h3>
+            <h3 data-i18n="cardBackground.title">רקע הקלף</h3>
             <div class="control-group">
-                <label for="bg-theme-select">נושא הרקע</label>
+                <label for="bg-theme-select" data-i18n="cardBackground.themeLabel">נושא הרקע</label>
                 <select id="bg-theme-select"
                     class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white mb-3">
-                    <option value="Fire">אש (Fire)</option>
-                    <option value="Nature">טבע (Nature)</option>
-                    <option value="Arcane">קסם (Arcane)</option>
-                    <option value="Divine">קדושה (Divine)</option>
-                    <option value="Necrotic">מוות (Necrotic)</option>
-                    <option value="Industrial">תעשייתי (Industrial)</option>
-                    <option value="Iron">ברזל (Iron)</option>
-                    <option value="Old Scroll">מגילה (Scroll)</option>
-                    <option value="Elemental">יסודות (Elemental)</option>
+                    <option value="Fire" data-i18n="cardBackground.themes.fire">Fire</option>
+                    <option value="Nature" data-i18n="cardBackground.themes.nature">Nature</option>
+                    <option value="Arcane" data-i18n="cardBackground.themes.arcane">Arcane</option>
+                    <option value="Divine" data-i18n="cardBackground.themes.divine">Divine</option>
+                    <option value="Necrotic" data-i18n="cardBackground.themes.necrotic">Necrotic</option>
+                    <option value="Industrial" data-i18n="cardBackground.themes.industrial">Industrial</option>
+                    <option value="Iron" data-i18n="cardBackground.themes.iron">Iron</option>
+                    <option value="Old Scroll" data-i18n="cardBackground.themes.scroll">Scroll</option>
+                    <option value="Elemental" data-i18n="cardBackground.themes.elemental">Elemental</option>
                 </select>
-                <button id="generate-bg-btn" class="btn-primary w-full mb-2">צור רקע</button>
-                <button id="reset-bg-btn" class="btn-primary w-full">חזור לברירת מחדל</button>
+                <button id="generate-bg-btn" class="btn-primary w-full mb-2" data-i18n="cardBackground.generate">צור
+                    רקע</button>
+                <button id="reset-bg-btn" class="btn-primary w-full" data-i18n="cardBackground.reset">חזור לברירת
+                    מחדל</button>
 
                 <!-- Ready-made Backgrounds -->
                 <button id="ready-made-bg-btn" class="btn-primary w-full mt-2">
-                    <span class="icon">🖼️</span> רקעים מוכנים
+                    <span class="icon">🖼️</span> <span data-i18n="cardBackground.readyMadeLabel">Ready-Made
+                        Backgrounds</span>
                 </button>
             </div>
 
@@ -581,7 +608,7 @@
             <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700 mt-2">
                 <label for="bg-scale" class="block text-sm font-bold mb-2"
                     style="color: #fbbf24; display: flex; justify-content: space-between;">
-                    <span>גודל רקע (Scale)</span>
+                    <span data-i18n="cardBackground.scale">Background Scale</span>
                     <span id="bg-scale-val">1.0</span>
                 </label>
                 <input type="range" id="bg-scale" min="1.0" max="2.0" step="0.1" value="1.0" class="w-full">
@@ -594,17 +621,17 @@
     <div class="sidebar-actions-footer"
         style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; display: flex; gap: 0.75rem; background: rgba(0,0,0,0.3);">
         <button id="save-gallery-btn" class="btn-primary" style="flex: 1;" disabled>
-            <span class="icon">💾</span> שמור לגלריה
+            <span class="icon">💾</span> <span data-i18n="footer.saveToGallery">שמור לגלריה</span>
         </button>
         <button id="download-btn" class="btn-secondary" style="flex: 1;" disabled>
-            <span class="icon">📥</span> הורד
+            <span class="icon">📥</span> <span data-i18n="footer.download">הורד</span>
         </button>
     </div>
 
     <!-- Background Selection Panel (Overlay in Sidebar) -->
     <div id="bg-selection-modal" class="sidebar-overlay-panel hidden">
         <div class="panel-header">
-            <h3>בחר רקע מוכן</h3>
+            <h3 data-i18n="cardBackground.selectTitle">בחר רקע מוכן</h3>
             <button id="close-bg-modal" class="close-btn">&times;</button>
         </div>
 

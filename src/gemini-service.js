@@ -61,11 +61,15 @@ class GeminiService {
         return response.json();
     }
 
-    async generateItemDetails(level, type, subtype, rarity, ability, contextImage = null, complexityMode = 'creative') {
+    async generateItemDetails(level, type, subtype, rarity, ability, contextImage = null, complexityMode = 'creative', locale = 'he') {
+        // Determine output language based on locale
+        const isHebrew = locale === 'he';
+        const outputLanguage = isHebrew ? 'Hebrew' : 'English';
+
         let modeInstruction = "";
 
         if (complexityMode === 'simple') {
-            modeInstruction = `
+            modeInstruction = isHebrew ? `
             MODE: EXTREMELY SIMPLE (Stats Only)
             - STRICT PROHIBITION: Do NOT create summoning spells, complex active abilities, transformations, or multi-turn effects.
             - The item MUST be practical and strictly mechanical.
@@ -78,6 +82,19 @@ class GeminiService {
             - If I selected a Weapon, just give me a +1 Weapon with maybe 1d6 elemental damage.
             - KEEP IT SHORT.
             - Quick Stats Example: "+1 להתקפה ולנזק", "+1 לדרג השריון", "תוספת 1d6 נזק אש", "עמידות לאש".
+            ` : `
+            MODE: EXTREMELY SIMPLE (Stats Only)
+            - STRICT PROHIBITION: Do NOT create summoning spells, complex active abilities, transformations, or multi-turn effects.
+            - The item MUST be practical and strictly mechanical.
+            - PERMITTED EFFECTS ONLY:
+              1. Flat bonuses (+1/+2/+3 to Hit/Damage/AC/Saves).
+              2. Extra damage dice (e.g. +1d6 Fire).
+              3. Advantage on specific checks (e.g. Advantage on Perception).
+              4. Resistance to one damage type.
+              5. One simple utility spell cast once per day (e.g. Light, Feather Fall).
+            - If I selected a Weapon, just give me a +1 Weapon with maybe 1d6 elemental damage.
+            - KEEP IT SHORT.
+            - Quick Stats Example: "+1 to attack and damage", "+1 to AC", "extra 1d6 fire damage", "fire resistance".
             `;
         } else {
             modeInstruction = `
@@ -90,7 +107,7 @@ class GeminiService {
         }
 
         let prompt = `
-      You are a D&D 5e Dungeon Master. Create a unique magic item in Hebrew.
+      You are a D&D 5e Dungeon Master. Create a unique magic item in ${outputLanguage}.
       
       Parameters:
       - Level/Power: ${level}
@@ -132,7 +149,7 @@ class GeminiService {
       - If the Type is 'Weapon', create a weapon.
 
       Return ONLY a JSON object with this exact structure (no markdown, just raw JSON):
-      {
+      ${isHebrew ? `{
         "name": "STRICT RULES: 1-3 Hebrew words MAX. FORBIDDEN WORDS (never use these in name): חרב, גרזן, רומח, קשת, מגל, פטיש, פגיון, מגן, שריון, טבעת, שרביט, מטה, שיקוי. Use ONLY creative nicknames like: להב הרעם, עוקץ הצל, שן הדרקון, קול הקרח, נשימת האש, עין הנשר.",
         "typeHe": "Hebrew Type (e.g. נשק, שריון, שיקוי, טבעת)",
         "rarityHe": "Hebrew Rarity - Use these exact translations: Common=נפוץ, Uncommon=לא נפוץ, Rare=נדיר, Very Rare=נדיר מאוד, Legendary=אגדי, Artifact=ארטיפקט",
@@ -145,7 +162,20 @@ class GeminiService {
         "armorClass": "AC value (number) if armor, else null",
         "quickStats": "EXTREMELY CONCISE mechanical summary in Hebrew (max 4-5 words). Priority: mechanics over flavor. Examples: '1d8 + 1d6 אש', '+2 להגנה ולגלגולי הצלה', 'הטלת כדור אש פעם ביום', 'יתרון בבדיקות התגנבות'. Do NOT use full sentences.",
         "visualPrompt": "A SHORT, CONCISE English description (max 15 words) of the item for image generation. Focus ONLY on the main object's appearance. No background descriptions."
-      }
+      }` : `{
+        "name": "STRICT RULES: 1-3 English words MAX. Use ONLY creative nicknames like: Thunder's Edge, Shadow Sting, Dragon's Fang, Frost Voice, Fire's Breath, Eagle Eye. Do NOT use generic names like 'sword', 'axe', 'ring'.",
+        "typeHe": "English Type (e.g. Weapon, Armor, Potion, Ring)",
+        "rarityHe": "English Rarity - Use these exact terms: Common, Uncommon, Rare, Very Rare, Legendary, Artifact",
+        "abilityName": "English Ability Name",
+        "abilityDesc": "COMPLETE English mechanical description (max 50 words) with ALL game rules: include saving throw type and DC (e.g. 'DC 14 Wisdom'), duration (e.g. '1 minute', '1 hour', 'until next long rest'), number of uses (e.g. 'once per day', '3 times per night'), mechanical effects (e.g. 'disadvantage on attacks', 'speed reduced by 10'). Be specific and playable!",
+        "description": "English Fluff Description (max 20 words)",
+        "gold": "Estimated price in GP (number only, e.g. 500)",
+        "weaponDamage": "Full damage string including dice and type in ENGLISH (e.g. '1d8 + 1d6 fire' or '2d6 slashing'). Use English damage types: slashing, piercing, bludgeoning, fire, cold, lightning, poison, acid, necrotic, radiant, force, psychic, thunder.",
+        "damageType": "Always null (deprecated, put type in weaponDamage).",
+        "armorClass": "AC value (number) if armor, else null",
+        "quickStats": "EXTREMELY CONCISE mechanical summary in English (max 4-5 words). Priority: mechanics over flavor. Examples: '1d8 + 1d6 fire', '+2 to AC and saves', 'cast fireball once per day', 'advantage on stealth'. Do NOT use full sentences.",
+        "visualPrompt": "A SHORT, CONCISE English description (max 15 words) of the item for image generation. Focus ONLY on the main object's appearance. No background descriptions."
+      }`}
     `;
 
         const parts = [{ text: prompt }];
@@ -521,6 +551,116 @@ class GeminiService {
             console.error("All Background Generation failed:", error);
             throw error;
         }
+    }
+
+    /**
+     * Generate image using Google's Imagen 3 API
+     * Model: imagen-3.0-generate-002 (GA release Feb 2025)
+     * @param {string} visualPrompt - The prompt describing the image
+     * @param {string} style - Art style to apply
+     * @param {string} styleOption - Background style option
+     * @param {string} userColor - User selected color
+     * @returns {Promise<string>} - Object URL of generated image
+     */
+    async generateImageImagen3(visualPrompt, style = 'realistic', styleOption = 'natural', userColor = '#ffffff') {
+        const styles = {
+            'realistic': 'photorealistic, highly detailed',
+            'watercolor': 'watercolor painting, art line, defined edges, ink outline, artistic, colorful',
+            'oil': 'oil painting, classic fantasy art, detailed brushstrokes, rich colors',
+            'sketch': 'pencil sketch, graphite, technical drawing, on paper, monochrome',
+            'dark_fantasy': 'dark fantasy, gothic, grim, high contrast, moody lighting',
+            'anime': 'anime style, cel shaded, vibrant colors',
+            'woodcut': 'woodcut print, old book illustration, black and white, ink lines',
+            'pixel': 'pixel art, 16-bit, retro game asset',
+            'simple_icon': 'simple vector icon, flat design, minimal, white background'
+        };
+
+        const styleKeywords = styles[style] || 'detailed';
+
+        // Background prompt based on option
+        let backgroundPrompt = 'natural environment background, atmospheric';
+        if (styleOption === 'no-background') {
+            backgroundPrompt = 'pure white background, isolated subject';
+        } else if (styleOption === 'colored-background') {
+            const colorName = this.hexToColorName(userColor);
+            backgroundPrompt = `${colorName} toned background, atmospheric lighting`;
+        }
+
+        const finalPrompt = `${styleKeywords}, ${visualPrompt}, ${backgroundPrompt}, high quality, 8k resolution`;
+        console.log(`🎨 Imagen 3: Generating image with prompt: "${finalPrompt.substring(0, 100)}..."`);
+
+        const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict';
+
+        const requestBody = {
+            instances: [{ prompt: finalPrompt }],
+            parameters: {
+                sampleCount: 1,
+                aspectRatio: "3:4", // Card aspect ratio
+                safetyFilterLevel: "BLOCK_MEDIUM_AND_ABOVE",
+                personGeneration: "ALLOW_ADULT"
+            }
+        };
+
+        try {
+            let response;
+
+            if (this.useWorker) {
+                // Use Worker proxy for Imagen
+                console.log("🎨 Imagen 3: Using Worker proxy");
+                const data = await this.callViaWorker('imagen-generate', {
+                    prompt: finalPrompt,
+                    aspectRatio: "3:4"
+                });
+
+                if (data.image) {
+                    const imageUrl = `data:image/png;base64,${data.image}`;
+                    const blob = await (await fetch(imageUrl)).blob();
+                    return URL.createObjectURL(blob);
+                } else if (data.error) {
+                    throw new Error(data.error);
+                } else {
+                    throw new Error("Worker did not return an image");
+                }
+            } else {
+                // Direct API call
+                response = await fetch(`${endpoint}?key=${this.apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(`Imagen 3 API Error: ${errorData.error?.message || response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                // Extract base64 image from response
+                if (data.predictions && data.predictions[0] && data.predictions[0].bytesBase64Encoded) {
+                    const base64Image = data.predictions[0].bytesBase64Encoded;
+                    const imageUrl = `data:image/png;base64,${base64Image}`;
+                    const blob = await (await fetch(imageUrl)).blob();
+                    console.log("✅ Imagen 3: Image generated successfully");
+                    return URL.createObjectURL(blob);
+                } else {
+                    throw new Error("Imagen 3 returned no image data");
+                }
+            }
+        } catch (error) {
+            console.error("❌ Imagen 3 generation failed:", error);
+            throw error;
+        }
+    }
+
+    // Helper to convert hex to color name
+    hexToColorName(hex) {
+        const map = {
+            '#ffffff': 'white', '#000000': 'black', '#ff0000': 'red', '#00ff00': 'green', '#0000ff': 'blue',
+            '#ffff00': 'yellow', '#00ffff': 'cyan', '#ff00ff': 'magenta', '#8b4513': 'brown', '#808080': 'gray',
+            '#e6e6fa': 'lavender', '#f0f8ff': 'light blue', '#f5f5dc': 'beige', '#ffe4e1': 'rose pink'
+        };
+        return map[hex.toLowerCase()] || 'neutral';
     }
 
     async generateCardBackground(theme, getImgApiKey = '') {

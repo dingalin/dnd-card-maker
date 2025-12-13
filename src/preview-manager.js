@@ -215,7 +215,7 @@ export class PreviewManager {
      * Reset progress bar to initial state
      */
     resetProgress() {
-        this.updateProgress(0, 0, 'מתחיל...');
+        this.updateProgress(0, 0, window.i18n?.t('preview.loading') || 'Starting...');
         const connectors = document.querySelectorAll('.progress-steps .step-connector');
         connectors.forEach(c => c.classList.remove('filled'));
     }

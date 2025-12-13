@@ -1,17 +1,22 @@
 <header>
     <div class="header-content">
         <div class="logo-area">
-            <h1>מחולל קלפי D&D</h1>
-            <p>צור חפצים אגדיים למערכה שלך בעזרת בינה מלאכותית</p>
+            <h1 data-i18n="app.title">מחולל קלפי D&D</h1>
+            <p data-i18n="app.subtitle">צור חפצים אגדיים למערכה שלך בעזרת בינה מלאכותית</p>
         </div>
         <nav class="main-nav">
+            <!-- Language Toggle Button -->
+            <button class="stone-btn lang-toggle" id="lang-toggle-btn" title="Toggle Language / החלף שפה">
+                <span class="icon">🌐</span>
+                <span class="text" id="lang-toggle-text">EN</span>
+            </button>
             <button class="stone-btn" data-action="gallery">
                 <span class="icon">🏛️</span>
-                <span class="text">גלריה</span>
+                <span class="text" data-i18n="nav.gallery">גלריה</span>
             </button>
             <button class="stone-btn" data-target="about-section">
                 <span class="icon">📜</span>
-                <span class="text">אודות</span>
+                <span class="text" data-i18n="nav.about">אודות</span>
             </button>
         </nav>
     </div>

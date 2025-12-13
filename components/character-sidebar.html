@@ -1,5 +1,5 @@
 <div class="sidebar-start glass-panel">
-    <h2>יצירת דמות</h2>
+    <h2 data-i18n="characterSidebar.title">יצירת דמות</h2>
 
     <form id="character-form" onsubmit="return false;">
         <!-- Gender -->
@@ -42,8 +42,9 @@
         <!-- Portrait Style -->
         <div class="form-group mb-2">
             <select id="char-style" class="glass-input">
-                <option value="portrait">תמונה: פנים (Portrait)</option>
-                <option value="full_body">תמונה: גוף מלא (Full Body)</option>
+                <option value="portrait" data-i18n="characterSidebar.portraitFace">תמונה: פנים (Portrait)</option>
+                <option value="full_body" data-i18n="characterSidebar.portraitFullBody">תמונה: גוף מלא (Full Body)
+                </option>
             </select>
         </div>
 
@@ -56,13 +57,13 @@
 
         <!-- Action -->
         <button type="submit" id="create-character-btn" class="btn-primary btn-shine">
-            <span class="icon">✨</span> צור דמות
+            <span class="icon">✨</span> <span data-i18n="characterSidebar.createButton">צור דמות</span>
         </button>
 
         <!-- Status -->
         <div id="generation-status" class="status-message hidden">
             <div class="spinner-small"></div>
-            <span>מייצר דמות...</span>
+            <span data-i18n="characterSidebar.generatingStatus">מייצר דמות...</span>
         </div>
     </form>
 </div>

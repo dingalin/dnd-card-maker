@@ -1,0 +1,313 @@
+{
+    "app": {
+        "title": "D&D Card Generator",
+        "subtitle": "Create legendary items for your campaign with AI"
+    },
+    "nav": {
+        "gallery": "Gallery",
+        "about": "About",
+        "cardCreator": "Card Creator",
+        "characterSheet": "Character Sheet"
+    },
+    "modal": {
+        "confirmTitle": "Confirm Action",
+        "confirmMessage": "Are you sure?",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+    },
+    "sidebar": {
+        "createItem": "Create Item",
+        "apiKey": "API Key",
+        "level": "Level",
+        "typeAndDetails": "Type & Details",
+        "abilityTheme": "Ability / Theme",
+        "visualsStyle": "Visuals & Style"
+    },
+    "apiSection": {
+        "title": "Connection Settings",
+        "geminiLabel": "API Key (Google Gemini)",
+        "geminiPlaceholder": "Paste key here...",
+        "geminiHelp": "Required to generate content.",
+        "getimgLabel": "API Key / Password (Getimg.ai)",
+        "getimgPlaceholder": "Paste key or password...",
+        "getimgHelp": "Optional: For higher quality models."
+    },
+    "levelSection": {
+        "title": "Item Level",
+        "selectLabel": "Select Level:",
+        "level1_4": "1-4 (Common)",
+        "level5_10": "5-10 (Uncommon)",
+        "level11_16": "11-16 (Rare)",
+        "level17": "17+ (Legendary)",
+        "attunement": "Requires Attunement?"
+    },
+    "typeSection": {
+        "title": "Type & Details",
+        "mainTypeLabel": "Main Item Type",
+        "weapon": "Weapon",
+        "armor": "Armor",
+        "wondrous": "Wondrous Item",
+        "potion": "Potion",
+        "ring": "Ring",
+        "scroll": "Scroll",
+        "staff": "Staff",
+        "wand": "Wand",
+        "subtypeLabel": "Specific Item",
+        "subtypePlaceholder": "-- Select Item --",
+        "damageLabel": "Damage",
+        "damageTypeLabel": "Damage Type",
+        "armorClassLabel": "Armor Class (AC)"
+    },
+    "damageTypes": {
+        "slashing": "Slashing",
+        "piercing": "Piercing",
+        "bludgeoning": "Bludgeoning",
+        "fire": "Fire",
+        "cold": "Cold",
+        "lightning": "Lightning",
+        "necrotic": "Necrotic",
+        "radiant": "Radiant"
+    },
+    "abilitySection": {
+        "title": "Ability or Theme",
+        "descriptionLabel": "Describe the ability or theme of the item:",
+        "placeholder": "e.g., Blade of Fire, Ring of Invisibility...",
+        "help": "The AI will use this as inspiration."
+    },
+    "visualsSection": {
+        "title": "Visuals & Style",
+        "customPromptLabel": "Custom Visual Description (Optional)",
+        "customPromptPlaceholder": "Describe the item in English to override automatic description... (e.g., A glowing blue sword with runes)",
+        "customPromptHelp": "Leave empty for AI to decide.",
+        "imageModelLabel": "Image Model",
+        "imageStyleLabel": "Art Style",
+        "imageProcessingLabel": "Image Style (Processing)",
+        "colorPickerLabel": "Select Background Color:"
+    },
+    "imageStyles": {
+        "realistic": "Realistic",
+        "watercolor": "Watercolor & Line Art",
+        "oil": "Oil Painting",
+        "sketch": "Pencil Sketch",
+        "dark_fantasy": "Dark Fantasy",
+        "anime": "Anime",
+        "woodcut": "Woodcut",
+        "pixel": "Pixel Art",
+        "simple_icon": "Simple Icon"
+    },
+    "imageProcessing": {
+        "natural": "Natural Background",
+        "no_background": "No Background",
+        "square_frame": "Square Frame",
+        "round_frame": "Round Frame",
+        "colored_background": "Colored Background"
+    },
+    "actions": {
+        "visualContext": "Consider Card Appearance (Visual Context)",
+        "simple": "Simple",
+        "simpleTooltip": "Item with plusses and basic damage",
+        "creative": "Creative",
+        "creativeTooltip": "Item with special and complex mechanics",
+        "surprise": "Surprise Me",
+        "regenImage": "Image",
+        "regenImageTooltip": "Generate new image",
+        "regenStats": "Stats",
+        "regenStatsTooltip": "Generate new stats"
+    },
+    "stickyNote": {
+        "title": "🗡️ Item Details",
+        "level": "Level:",
+        "type": "Type:",
+        "item": "Item:"
+    },
+    "editSidebar": {
+        "title": "Edit & Design",
+        "editContent": "Edit Content",
+        "textDesign": "Text Design",
+        "imageTuning": "Image Tuning",
+        "cardBackground": "Card Background"
+    },
+    "editContent": {
+        "frontSide": "Front Side",
+        "backSide": "Back Side",
+        "rarity": "1. Rarity",
+        "type": "2. Type",
+        "name": "3. Item Name",
+        "coreStats": "4. Damage / AC (Bold)",
+        "coreStatsPlaceholder": "e.g., 1d8 enhanced",
+        "quickStats": "5. Short Description",
+        "quickStatsPlaceholder": "e.g., This sword glows in the dark",
+        "gold": "6. Price (Gold)",
+        "position": "Position (Height):",
+        "width": "Width:",
+        "bold": "Bold",
+        "glow": "Glow",
+        "italic": "Italic",
+        "shadow": "Shadow",
+        "abilityName": "Ability Name",
+        "mechanics": "Mechanics",
+        "lore": "Background & Story (Lore)",
+        "textWidth": "Text Width:"
+    },
+    "textDesign": {
+        "title": "Text Design",
+        "fontLabel": "Font",
+        "fonts": {
+            "heebo": "Heebo (Regular)",
+            "rubik": "Rubik (Rounded)",
+            "frank": "Frank Ruhl (Literary)",
+            "assistant": "Assistant (Clean)"
+        }
+    },
+    "imageTuning": {
+        "title": "Image Tuning",
+        "globalMargin": "🎯 Global Shrink/Expand",
+        "lockRatio": "🔗 Lock Ratio",
+        "verticalShrink": "↕️ Vertical Shrink",
+        "horizontalShrink": "↔️ Horizontal Shrink",
+        "autoLayout": "✨ Auto Layout",
+        "imagePosition": "Image Position",
+        "zoom": "Zoom",
+        "rotation": "Rotation",
+        "fade": "Frame Fade",
+        "shadow": "Shadow"
+    },
+    "cardBackground": {
+        "title": "Card Background",
+        "themeLabel": "Background Theme",
+        "themes": {
+            "fire": "Fire",
+            "nature": "Nature",
+            "arcane": "Arcane",
+            "divine": "Divine",
+            "necrotic": "Necrotic",
+            "industrial": "Industrial",
+            "iron": "Iron",
+            "scroll": "Scroll",
+            "elemental": "Elemental"
+        },
+        "generate": "Generate Background",
+        "reset": "Reset to Default",
+        "readyMade": "🖼️ Ready-Made Backgrounds",
+        "scale": "Background Scale",
+        "selectTitle": "Select Ready-Made Background"
+    },
+    "footer": {
+        "saveToGallery": "💾 Save to Gallery",
+        "download": "📥 Download"
+    },
+    "preview": {
+        "loading": "Starting...",
+        "step1": "Idea",
+        "step2": "Description",
+        "step3": "Drawing",
+        "step4": "Finishing",
+        "cancel": "Cancel",
+        "equipCharacter": "🗡️ Equip Character",
+        "splitView": "📄|📄 Split",
+        "flip": "↻ Show Back"
+    },
+    "gallery": {
+        "title": "🏛️ Item History",
+        "folders": "Folders",
+        "allItems": "📂 All Items",
+        "newFolder": "+ New Folder",
+        "selectAll": "Select All",
+        "deleteFolder": "🗑️ Delete Folder",
+        "loading": "Loading...",
+        "selected": "selected",
+        "print": "🖨️ Print",
+        "moveTo": "📂 Move to...",
+        "delete": "Delete",
+        "clearAll": "Clear All"
+    },
+    "characterSheet": {
+        "ammo": "Ammo",
+        "helmet": "Helmet",
+        "necklace": "Necklace",
+        "ranged": "Ranged",
+        "armor": "Armor",
+        "cape": "Cape",
+        "mainhand": "Main Hand",
+        "offhand": "Off Hand",
+        "ring": "Ring",
+        "boots": "Boots",
+        "belt": "Belt"
+    },
+    "equipModal": {
+        "title": "Equip Character with Item",
+        "message": "Which slot would you like to put this card in?",
+        "selectLabel": "Select Slot:",
+        "slots": {
+            "main_hand": "Main Hand",
+            "off_hand": "Off Hand",
+            "armor": "Armor",
+            "helmet": "Helmet",
+            "ring_1": "Ring 1",
+            "ring_2": "Ring 2",
+            "necklace": "Necklace / Amulet",
+            "cloak": "Cloak",
+            "boots": "Boots",
+            "gloves": "Gloves / Gauntlets",
+            "belt": "Belt",
+            "ranged": "Ranged / Ammo"
+        }
+    },
+    "printModal": {
+        "title": "Print Settings",
+        "cardWidth": "Card Width (mm)",
+        "lockRatio": "Lock Aspect Ratio",
+        "cardHeight": "Card Height (mm)",
+        "gap": "Gap Between Cards (mm)",
+        "paperSize": "Paper Size",
+        "orientation": "Page Orientation",
+        "portrait": "Portrait",
+        "landscape": "Landscape",
+        "scale": "Scale (Zoom)",
+        "calibration": "Printer Calibration Fix",
+        "calibrationHelp": "Use this if printed size doesn't match reality (e.g., ruler came out too short).",
+        "status": "Page Status:",
+        "paperSizeLabel": "Paper Size:",
+        "cardsPerPage": "Cards per Page:",
+        "totalPages": "Total Pages:",
+        "maximum": "maximum",
+        "printNow": "🖨️ Print Now"
+    },
+    "toasts": {
+        "loadingError": "Error loading canvas",
+        "lastCardLoaded": "📂 Last card loaded!",
+        "loading": "Loading...",
+        "starting": "Starting...",
+        "itemLoaded": "Item loaded for editing",
+        "cardSaved": "Card saved to gallery!",
+        "saveError": "Error saving",
+        "noCardId": "Cannot delete - no card ID",
+        "deleteConfirm": "Are you sure you want to delete this card?",
+        "cardDeleted": "Card deleted successfully",
+        "deleteError": "Error deleting",
+        "noBackSide": "No back side",
+        "unnamed": "Unnamed Item"
+    },
+    "cardViewer": {
+        "edit": "Edit ✏️",
+        "flip": "Flip Card 🔄",
+        "save": "Save to Gallery 💾",
+        "delete": "Delete 🗑️"
+    },
+    "defaults": {
+        "itemName": "Item Name",
+        "itemType": "Item Type",
+        "rarity": "Rarity",
+        "quickStats": "2d6 damage",
+        "abilityName": "Ability Name",
+        "abilityDesc": "Mechanics description will appear here...",
+        "description": "Background story (Lore) will appear here..."
+    },
+    "characterSidebar": {
+        "title": "Create Character",
+        "portraitFace": "Portrait: Face",
+        "portraitFullBody": "Portrait: Full Body",
+        "createButton": "Create Character",
+        "generatingStatus": "Generating character..."
+    }
+}

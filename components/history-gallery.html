@@ -2,7 +2,8 @@
     style="left: 50%; top: 50%; transform: translate(-50%, -50%); width: 800px; height: 600px; z-index: 2000;">
     <div class="window-header"
         style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-bottom: 2px solid #3a3a3a; background: rgba(0,0,0,0.3); cursor: grab;">
-        <h2 style="margin: 0; font-family: var(--font-display); color: var(--accent-color);">🏛️ היסטוריית חפצים</h2>
+        <h2 style="margin: 0; font-family: var(--font-display); color: var(--accent-color);" data-i18n="gallery.title">
+            🏛️ היסטוריית חפצים</h2>
         <button class="window-close-btn" data-target="gallery-window"
             style="background: none; border: none; font-size: 1.5rem; color: #888; cursor: pointer;">&times;</button>
     </div>
@@ -11,15 +12,18 @@
         <!-- Folders Sidebar -->
         <div id="gallery-sidebar"
             style="width: 200px; background: rgba(0,0,0,0.2); border-left: 1px solid #3a3a3a; display: flex; flex-direction: column;">
-            <div style="padding: 1rem; border-bottom: 1px solid #3a3a3a; font-weight: bold; color: #ccc;">תיקיות</div>
+            <div style="padding: 1rem; border-bottom: 1px solid #3a3a3a; font-weight: bold; color: #ccc;"
+                data-i18n="gallery.folders">תיקיות</div>
             <div id="folder-list" style="flex: 1; overflow-y: auto; padding: 0.5rem;">
                 <!-- Injected via JS -->
                 <button class="folder-item active" data-id="all"
-                    style="width: 100%; text-align: right; padding: 0.5rem; background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; margin-bottom: 0.25rem; border-radius: 4px;">📂
+                    style="width: 100%; text-align: right; padding: 0.5rem; background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; margin-bottom: 0.25rem; border-radius: 4px;"
+                    data-i18n="gallery.allItems">📂
                     כל החפצים</button>
             </div>
             <div style="padding: 1rem; border-top: 1px solid #3a3a3a;">
-                <button id="add-folder-btn" class="btn-secondary" style="width: 100%; font-size: 0.8rem;">+ תיקייה
+                <button id="add-folder-btn" class="btn-secondary" style="width: 100%; font-size: 0.8rem;"
+                    data-i18n="gallery.newFolder">+ תיקייה
                     חדשה</button>
             </div>
         </div>
@@ -31,18 +35,21 @@
             <div
                 style="padding: 0.5rem 1rem; border-bottom: 1px solid #3a3a3a; display: flex; justify-content: space-between; align-items: center;">
                 <label style="display: flex; align-items: center; gap: 0.5rem; color: #ccc; cursor: pointer;">
-                    <input type="checkbox" id="gallery-select-all-checkbox"> בחר הכל
+                    <input type="checkbox" id="gallery-select-all-checkbox"> <span data-i18n="gallery.selectAll">בחר
+                        הכל</span>
                 </label>
                 <div id="current-folder-actions" class="hidden">
                     <button id="delete-folder-btn"
-                        style="color: #ff6b6b; background: none; border: none; cursor: pointer;">🗑️ מחק תיקייה</button>
+                        style="color: #ff6b6b; background: none; border: none; cursor: pointer;"
+                        data-i18n="gallery.deleteFolder">🗑️ מחק תיקייה</button>
                 </div>
             </div>
 
             <!-- Grid -->
             <div id="history-grid" class="history-grid" style="flex: 1; overflow-y: auto; padding: 1rem;">
                 <!-- Items injected here by HistoryController -->
-                <div class="empty-message" style="text-align: center; color: #888; margin-top: 2rem;">
+                <div class="empty-message" style="text-align: center; color: #888; margin-top: 2rem;"
+                    data-i18n="gallery.loading">
                     טוען...
                 </div>
             </div>
@@ -54,23 +61,26 @@
 
         <!-- Bulk Actions Toolbar -->
         <div id="selection-toolbar" class="hidden" style="display: flex; gap: 1rem; align-items: center;">
-            <span id="selection-count" style="color: #ccc; font-weight: bold;">0 נבחרו</span>
+            <span id="selection-count" style="color: #ccc; font-weight: bold;">0 <span
+                    data-i18n="gallery.selected">נבחרו</span></span>
             <button id="print-selected-btn" class="btn-primary"
                 style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
-                <span>🖨️</span> הדפס
+                <span data-i18n="gallery.print">🖨️ הדפס</span>
             </button>
             <button id="move-selected-btn" class="btn-secondary"
-                style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem;" data-i18n="gallery.moveTo">
                 📂 העבר ל...
             </button>
             <button id="delete-selected-btn" class="btn-secondary"
-                style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem; color: #ff6b6b; border-color: #ff6b6b;">
+                style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem; color: #ff6b6b; border-color: #ff6b6b;"
+                data-i18n="gallery.delete">
                 מחק
             </button>
         </div>
 
         <button id="clear-history-btn" class="btn-secondary"
-            style="width: auto; margin: 0; padding: 0.5rem 1rem; color: #aaa; border-color: #666; font-size: 0.9rem;">נקה
+            style="width: auto; margin: 0; padding: 0.5rem 1rem; color: #aaa; border-color: #666; font-size: 0.9rem;"
+            data-i18n="gallery.clearAll">נקה
             הכל</button>
     </div>
 </div>

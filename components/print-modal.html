@@ -4,10 +4,11 @@
     <!-- Sidebar Settings -->
     <div class="print-settings-sidebar"
         style="width: 320px; background: #1a1a1a; color: #e0e0e0; border-right: 1px solid #444; padding: 1.5rem; display: flex; flex-direction: column; overflow-y: auto;">
-        <h2 style="color: #d4af37; font-family: var(--font-display); margin-top: 0;">הגדרות הדפסה</h2>
+        <h2 style="color: #d4af37; font-family: var(--font-display); margin-top: 0;" data-i18n="printModal.title">הגדרות
+            הדפסה</h2>
 
         <div class="form-group">
-            <label>רוחב קלף (מ"מ)</label>
+            <label data-i18n="printModal.cardWidth">רוחב קלף (מ"מ)</label>
             <div style="display: flex; gap: 0.5rem; align-items: center;">
                 <input type="range" id="print-card-width-slider" min="20" max="100" value="63" style="flex: 1;">
                 <input type="number" id="print-card-width-input" value="63" style="width: 60px; text-align: center;">
@@ -16,12 +17,13 @@
 
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
             <input type="checkbox" id="print-lock-ratio" checked>
-            <label for="print-lock-ratio" style="margin: 0; font-weight: normal; font-size: 0.9rem;">נעל יחס
+            <label for="print-lock-ratio" style="margin: 0; font-weight: normal; font-size: 0.9rem;"
+                data-i18n="printModal.lockRatio">נעל יחס
                 גובה-רוחב</label>
         </div>
 
         <div class="form-group">
-            <label>גובה קלף (מ"מ)</label>
+            <label data-i18n="printModal.cardHeight">גובה קלף (מ"מ)</label>
             <div style="display: flex; gap: 0.5rem; align-items: center;">
                 <input type="range" id="print-card-height-slider" min="30" max="150" value="88" style="flex: 1;">
                 <input type="number" id="print-card-height-input" value="88" style="width: 60px; text-align: center;">
@@ -29,7 +31,7 @@
         </div>
 
         <div class="form-group">
-            <label>מרווח בין קלפים (מ"מ)</label>
+            <label data-i18n="printModal.gap">מרווח בין קלפים (מ"מ)</label>
             <div style="display: flex; gap: 0.5rem; align-items: center;">
                 <input type="range" id="print-gap-slider" min="0" max="20" value="2" step="1" style="flex: 1;">
                 <span id="print-gap-display" style="width: 40px; text-align: center;">2</span>
@@ -38,7 +40,7 @@
 
         <!-- Paper Settings -->
         <div class="form-group">
-            <label>גודל דף</label>
+            <label data-i18n="printModal.paperSize">גודל דף</label>
             <select id="print-paper-size">
                 <option value="a4">A4 (210x297mm)</option>
                 <option value="letter">Letter (8.5x11")</option>
@@ -46,18 +48,20 @@
         </div>
 
         <div class="form-group">
-            <label>כיוון דף</label>
+            <label data-i18n="printModal.orientation">כיוון דף</label>
             <div style="display: flex; gap: 0.5rem;">
-                <button class="btn-secondary active" id="print-orient-p" style="flex: 1; margin: 0;">לאורך
+                <button class="btn-secondary active" id="print-orient-p" style="flex: 1; margin: 0;"
+                    data-i18n="printModal.portrait">לאורך
                     (Portrait)</button>
-                <button class="btn-secondary" id="print-orient-l" style="flex: 1; margin: 0;">לרוחב (Landscape)</button>
+                <button class="btn-secondary" id="print-orient-l" style="flex: 1; margin: 0;"
+                    data-i18n="printModal.landscape">לרוחב (Landscape)</button>
             </div>
         </div>
 
         <div class="divider"></div>
 
         <div class="form-group">
-            <label>קנה מידה (זום)</label>
+            <label data-i18n="printModal.scale">קנה מידה (זום)</label>
             <input type="range" id="print-scale-slider" min="0.8" max="1.2" step="0.01" value="1.0">
             <div style="text-align: center; color: #888; font-size: 0.8rem;" id="print-scale-display">100%</div>
         </div>
@@ -65,10 +69,12 @@
         <div class="divider"></div>
 
         <div class="form-group" style="background: #2a2a2a; padding: 0.5rem; border-radius: 4px;">
-            <label style="color: #ff9; font-size: 0.85rem;">תיקון כיול מדפסת (Calibration)</label>
+            <label style="color: #ff9; font-size: 0.85rem;" data-i18n="printModal.calibration">תיקון כיול מדפסת
+                (Calibration)</label>
             <input type="range" id="print-calibration-slider" min="0.8" max="1.5" step="0.01" value="1.0">
             <div style="text-align: center; color: #ff9; font-size: 0.8rem;" id="print-calibration-display">100%</div>
-            <div style="font-size: 0.7rem; color: #888; margin-top: 4px;">השתמש בזה אם הגודל בהדפסה לא תואם למציאות
+            <div style="font-size: 0.7rem; color: #888; margin-top: 4px;" data-i18n="printModal.calibrationHelp">השתמש
+                בזה אם הגודל בהדפסה לא תואם למציאות
                 (למשל: סרגל יצא קצר מדי).</div>
         </div>
 
@@ -79,9 +85,10 @@
                 ...
             </div>
 
-            <button id="do-print-btn" class="btn-primary" style="margin-bottom: 0.5rem;">🖨️ הדפס עכשיו</button>
-            <button id="cancel-print-btn" class="btn-secondary"
-                style="border-color: #ff4444; color: #ff4444;">ביטול</button>
+            <button id="do-print-btn" class="btn-primary" style="margin-bottom: 0.5rem;"
+                data-i18n="printModal.printNow">🖨️ הדפס עכשיו</button>
+            <button id="cancel-print-btn" class="btn-secondary" style="border-color: #ff4444; color: #ff4444;"
+                data-i18n="modal.cancel">ביטול</button>
         </div>
     </div>
 

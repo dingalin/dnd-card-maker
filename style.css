@@ -2158,3 +2158,110 @@ body::before {
   margin-top: 2mm;
   color: black;
 }
+
+/* === i18n Language Toggle === */
+.lang-toggle {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+  border: 2px solid #2980b9 !important;
+  transition: all 0.3s ease;
+  min-width: 60px;
+}
+
+.lang-toggle:hover {
+  background: linear-gradient(135deg, #2980b9, #1a5276) !important;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.lang-toggle .text {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* === LTR (Left-to-Right) Layout Support === */
+body.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+body.ltr .sidebar-start {
+  order: 0;
+  /* Keep on left in LTR */
+}
+
+body.ltr .sidebar-end {
+  order: 2;
+  /* Keep on right in LTR */
+}
+
+body.ltr .main-layout {
+  direction: ltr;
+}
+
+/* RTL specific overrides (default) */
+body.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+body.rtl .main-layout {
+  direction: rtl;
+}
+
+/* Form inputs alignment */
+body.ltr input,
+body.ltr textarea,
+body.ltr select {
+  text-align: left;
+}
+
+body.rtl input,
+body.rtl textarea,
+body.rtl select {
+  text-align: right;
+}
+
+/* Stone menu in LTR */
+body.ltr .stone-menu {
+  direction: ltr;
+}
+
+/* Gallery sidebar in LTR */
+body.ltr #gallery-sidebar {
+  border-left: none;
+  border-right: 1px solid #3a3a3a;
+}
+
+/* Sticky note alignment */
+body.ltr .sticky-note {
+  text-align: left;
+}
+
+body.ltr .note-row {
+  flex-direction: row;
+}
+
+/* Control groups alignment */
+body.ltr .control-group label {
+  text-align: left;
+}
+
+/* Modal alignment */
+body.ltr .modal-content {
+  text-align: left;
+}
+
+/* Slider labels */
+body.ltr .slider-label-row {
+  flex-direction: row;
+}
+
+/* Preview controls */
+body.ltr .preview-controls {
+  direction: ltr;
+}
+
+/* Header nav ordering */
+body.ltr .main-nav {
+  direction: ltr;
+}

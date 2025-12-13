@@ -532,7 +532,7 @@ export class RenderController {
                 cardName = cardName.replace(/[^a-zA-Z0-9\u0590-\u05FF\-_ ]/g, "").trim();
                 if (!cardName) cardName = "dnd_card";
                 this.renderer.downloadCard(cardName).then(() => {
-                    if (window.uiManager) window.uiManager.showToast(`התהליך הסתיים!`, 'info');
+                    if (window.uiManager) window.uiManager.showToast(window.i18n?.t('toasts.processComplete') || 'Process complete!', 'info');
                 });
             }
 
@@ -560,7 +560,7 @@ export class RenderController {
                 }
 
                 this.state.saveToHistory(thumbUrl);
-                if (window.uiManager) window.uiManager.showToast('הקלף נשמר לגלריה בהצלחה!', 'success');
+                if (window.uiManager) window.uiManager.showToast(window.i18n?.t('toasts.cardSaved') || 'Card saved!', 'success');
             }
         });
     }
@@ -576,7 +576,7 @@ export class RenderController {
                 const cardData = currentState.cardData;
 
                 if (!cardData) {
-                    if (window.uiManager) window.uiManager.showToast('אין נתונים לקלף', 'error');
+                    if (window.uiManager) window.uiManager.showToast(window.i18n?.t('toasts.noCardData') || 'No card data', 'error');
                     return;
                 }
 
@@ -631,7 +631,7 @@ export class RenderController {
 
                     } catch (err) {
                         console.error("Failed to capture card for equipment:", err);
-                        if (window.uiManager) window.uiManager.showToast('שגיאה ביצוא הקלף', 'error');
+                        if (window.uiManager) window.uiManager.showToast(window.i18n?.t('toasts.exportError') || 'Export error', 'error');
                     }
                 }
             }

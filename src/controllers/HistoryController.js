@@ -47,11 +47,11 @@ export class HistoryController {
                     this.ui.showConfirm('האם למחוק את כ-ל ההיסטוריה מכל התיקיות?', async () => {
                         await this.state.clearHistory();
                         this.renderGrid();
-                        this.ui.showToast('ההיסטוריה נמחקה', 'success');
+                        this.ui.showToast(window.i18n?.t('toasts.historyCleared') || 'History cleared', 'success');
                     });
                 } else {
                     // Maybe just clear current folder items? For now block.
-                    this.ui.showToast('ניתן לנקות הכל רק בתיקייה "כל החפצים"', 'info');
+                    this.ui.showToast(window.i18n?.t('toasts.clearOnlyInAllItems') || 'Can only clear in All Items folder', 'info');
                 }
             };
         }
@@ -122,7 +122,7 @@ export class HistoryController {
             return btn;
         };
 
-        list.appendChild(createItem('all', 'כל החפצים'));
+        list.appendChild(createItem('all', window.i18n?.t('gallery.allItems') || 'All Items'));
         // list.appendChild(createItem('unfiled', 'ללא שיוך', '❓')); // Optional
 
         this.folders.forEach(f => {
@@ -166,7 +166,7 @@ export class HistoryController {
             this.currentFolder = 'all';
             await this.refreshFolders();
             this.renderGrid();
-            this.ui.showToast('התיקייה נמחקה', 'success');
+            this.ui.showToast(window.i18n?.t('toasts.folderDeleted') || 'Folder deleted', 'success');
         });
     }
 
@@ -274,7 +274,7 @@ export class HistoryController {
             this.selectedIds.clear();
             this.updateToolbar();
             await this.renderGrid();
-            this.ui.showToast(`${ids.length} חפצים נמחקו`, 'success');
+            this.ui.showToast(`${ids.length} ${window.i18n?.t('toasts.itemsDeleted') || 'items deleted'}`, 'success');
         });
     }
 
@@ -491,7 +491,7 @@ export class HistoryController {
                         this.selectedIds.delete(item.id);
                         this.updateToolbar();
                         this.renderGrid();
-                        this.ui.showToast('החפץ נמחק', 'success');
+                        this.ui.showToast(window.i18n?.t('toasts.itemDeleted') || 'Item deleted', 'success');
                     });
                 });
 

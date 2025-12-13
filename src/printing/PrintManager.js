@@ -208,11 +208,18 @@ export class PrintManager {
         const perPage = cols * rows;
         const totalPages = Math.ceil(this.cards.length / perPage);
 
+        const i18n = window.i18n;
+        const statusLabel = i18n?.t('printModal.status') || 'Page Status:';
+        const paperLabel = i18n?.t('printModal.paperSizeLabel') || 'Paper Size:';
+        const cardsLabel = i18n?.t('printModal.cardsPerPage') || 'Cards per Page:';
+        const totalLabel = i18n?.t('printModal.totalPages') || 'Total Pages:';
+        const maxLabel = i18n?.t('printModal.maximum') || 'maximum';
+
         info.innerHTML = `
-            <strong>סטטוס דף:</strong><br>
-            גודל נייר: ${paperW.toFixed(0)}x${paperH.toFixed(0)} מ"מ<br>
-            קלפים בדף: ${Math.min(this.cards.length, perPage)} / ${perPage} מקסימום<br>
-            סה"כ דפים: ${totalPages}
+            <strong>${statusLabel}</strong><br>
+            ${paperLabel} ${paperW.toFixed(0)}x${paperH.toFixed(0)} mm<br>
+            ${cardsLabel} ${Math.min(this.cards.length, perPage)} / ${perPage} ${maxLabel}<br>
+            ${totalLabel} ${totalPages}
         `;
 
         // Ensure calibration line exists in preview

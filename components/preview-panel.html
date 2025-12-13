@@ -13,22 +13,22 @@
                 <div class="progress-steps">
                     <div class="step" data-step="1">
                         <div class="step-icon">💭</div>
-                        <div class="step-label">רעיון</div>
+                        <div class="step-label" data-i18n="preview.step1">רעיון</div>
                     </div>
                     <div class="step-connector"></div>
                     <div class="step" data-step="2">
                         <div class="step-icon">✍️</div>
-                        <div class="step-label">תיאור</div>
+                        <div class="step-label" data-i18n="preview.step2">תיאור</div>
                     </div>
                     <div class="step-connector"></div>
                     <div class="step" data-step="3">
                         <div class="step-icon">🎨</div>
-                        <div class="step-label">ציור</div>
+                        <div class="step-label" data-i18n="preview.step3">ציור</div>
                     </div>
                     <div class="step-connector"></div>
                     <div class="step" data-step="4">
                         <div class="step-icon">✨</div>
-                        <div class="step-label">סיום</div>
+                        <div class="step-label" data-i18n="preview.step4">סיום</div>
                     </div>
                 </div>
 
@@ -37,23 +37,23 @@
                     <div id="progress-bar" class="progress-bar"></div>
                 </div>
 
-                <p id="loading-text">מתחיל...</p>
-                <button id="cancel-btn" class="cancel-btn">ביטול</button>
+                <p id="loading-text" data-i18n="preview.loading">מתחיל...</p>
+                <button id="cancel-btn" class="cancel-btn" data-i18n="preview.cancel">ביטול</button>
             </div>
         </div>
     </div>
 
     <!-- Flip Card Button - Below the card -->
     <div class="preview-controls">
-        <button id="equip-item-btn" class="btn-primary" title="צייד דמות"
+        <button id="equip-item-btn" class="btn-primary" data-i18n-title="preview.equipCharacter" title="צייד דמות"
             style="background: linear-gradient(135deg, #e67e22, #d35400);">
-            🗡️ צייד דמות
+            <span data-i18n="preview.equipCharacter">🗡️ צייד דמות</span>
         </button>
-        <button id="split-view-btn" class="btn-secondary" title="תצוגה מפוצלת">
-            📄|📄 פיצול
+        <button id="split-view-btn" class="btn-secondary" data-i18n-title="preview.splitView" title="תצוגה מפוצלת">
+            <span data-i18n="preview.splitView">📄|📄 פיצול</span>
         </button>
-        <button id="flip-card-btn" class="flip-card-btn" title="הפוך קלף">
-            ↻ הצג אחורה
+        <button id="flip-card-btn" class="flip-card-btn" data-i18n-title="preview.flip" title="הפוך קלף">
+            <span data-i18n="preview.flip">↻ הצג אחורה</span>
         </button>
     </div>
 </section>

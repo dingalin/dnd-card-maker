@@ -19,6 +19,9 @@ import { TabManager } from './controllers/TabManager.js';
 import { CharacterController } from './controllers/CharacterController.js';
 import { CardViewerService } from './services/CardViewerService.js';
 
+// i18n (Internationalization)
+import i18n from './i18n.js';
+
 // Legacy Init (for floating windows, bubbles)
 import { initUI, showToast, initWindowManager } from './ui-helpers.js';
 
@@ -28,8 +31,61 @@ window.onerror = function (msg, url, line, col, error) {
     return false;
 };
 
+// Expose i18n globally for easy access
+window.i18n = i18n;
+
+/**
+ * Setup Language Toggle Button
+ * This is called after i18n is initialized and components are loaded
+ */
+function setupLanguageToggle() {
+    const langToggleBtn = document.getElementById('lang-toggle-btn');
+    const langToggleText = document.getElementById('lang-toggle-text');
+
+    if (!langToggleBtn) {
+        console.warn('[i18n] Language toggle button not found');
+        return;
+    }
+
+    // Update button text based on current language
+    const updateButtonText = () => {
+        const locale = i18n.getLocale();
+        langToggleText.textContent = locale === 'he' ? 'EN' : 'עב';
+    };
+
+    // Initial update
+    updateButtonText();
+
+    // Register for future changes
+    i18n.onLocaleChange(() => updateButtonText());
+
+    // Click handler
+    langToggleBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log('[i18n] Toggle button clicked');
+        console.log('[i18n] Current locale:', i18n.getLocale());
+
+        await i18n.toggleLocale();
+
+        console.log('[i18n] New locale:', i18n.getLocale());
+        updateButtonText();
+    });
+
+    console.log('[i18n] ✅ Language toggle handler initialized');
+}
+
 async function initApp() {
     console.log("🚀 Initializing D&D Card Creator (Professional Architecture v2)...");
+
+    // 0. Initialize i18n (Internationalization)
+    await i18n.init();
+    console.log(`🌐 Language: ${i18n.getLocale()} | Direction: ${i18n.getDirection()}`);
+
+    // 0.1 Setup Language Toggle Button
+    setupLanguageToggle();
+
 
     // 0. Initialize Tab System
     const tabManager = new TabManager();
@@ -47,7 +103,7 @@ async function initApp() {
         window.cardRenderer = renderer; // Global for debug/legacy access
     } catch (e) {
         console.error("Renderer Init Error:", e);
-        showToast("שגיאה בטעינת הקנבס", 'error');
+        showToast(i18n.t('toasts.loadingError'), 'error');
         return;
     }
 
@@ -101,15 +157,15 @@ async function initApp() {
     // 6. Restore Session
     const loadedSavedCard = stateManager.loadCurrentCard();
     if (!loadedSavedCard) {
-        // Initial Default State
+        // Initial Default State (use i18n for translated defaults)
         stateManager.setCardData({
-            name: "שם החפץ",
-            typeHe: "סוג חפץ",
-            rarityHe: "נדירות",
-            quickStats: "2d6 נזק", // NEW: Quick stats for front
-            abilityName: "שם יכולת",
-            abilityDesc: "תיאור המכניקה יופיע כאן...",
-            description: "סיפור הרקע (Lore) יופיע כאן...",
+            name: i18n.t('defaults.itemName'),
+            typeHe: i18n.t('defaults.itemType'),
+            rarityHe: i18n.t('defaults.rarity'),
+            quickStats: i18n.t('defaults.quickStats'),
+            abilityName: i18n.t('defaults.abilityName'),
+            abilityDesc: i18n.t('defaults.abilityDesc'),
+            description: i18n.t('defaults.description'),
             gold: "-"
         });
 
@@ -145,8 +201,8 @@ async function initApp() {
                 currentData.back = { title: '', mechanics: '', lore: '' };
             }
 
-            stateManager.updateCardField('back.title', "שם יכולת");
-            stateManager.updateCardField('back.mechanics', "תיאור היכולת יופיע כאן...");
+            stateManager.updateCardField('back.title', i18n.t('defaults.abilityName'));
+            stateManager.updateCardField('back.mechanics', i18n.t('defaults.abilityDesc'));
             patched = true;
         }
 
@@ -155,7 +211,7 @@ async function initApp() {
             // Updates trigger RenderController automatically
         }
 
-        showToast("📂 קלף אחרון נטען!", 'info');
+        showToast(i18n.t('toasts.lastCardLoaded'), 'info');
         // If we loaded a card, we should show the editor UI
         if (uiManager.elements.regenerateControls) uiManager.elements.regenerateControls.classList.remove('hidden');
         if (uiManager.elements.contentEditor) uiManager.elements.contentEditor.classList.remove('hidden');

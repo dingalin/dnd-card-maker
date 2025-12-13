@@ -49,10 +49,10 @@
     <!-- Tabs Navigation -->
     <nav class="main-nav glass-panel">
       <button class="nav-tab active" data-tab="card-creator">
-        <span class="icon">🎴</span> יוצר קלפים
+        <span class="icon">🎴</span> <span data-i18n="nav.cardCreator">יוצר קלפים</span>
       </button>
       <button class="nav-tab" data-tab="character-sheet">
-        <span class="icon">👤</span> דף דמות
+        <span class="icon">👤</span> <span data-i18n="nav.characterSheet">דף דמות</span>
       </button>
     </nav>
 
@@ -84,11 +84,11 @@
     <!-- Custom Confirmation Modal -->
     <div id="confirmation-modal" class="modal-overlay hidden">
       <div class="modal-content glass-panel">
-        <h3 class="modal-title">אישור פעולה</h3>
-        <p class="modal-message">האם אתה בטוח?</p>
+        <h3 class="modal-title" data-i18n="modal.confirmTitle">אישור פעולה</h3>
+        <p class="modal-message" data-i18n="modal.confirmMessage">האם אתה בטוח?</p>
         <div class="modal-actions">
-          <button id="confirm-cancel-btn" class="btn-secondary">ביטול</button>
-          <button id="confirm-ok-btn" class="btn-primary">אישור</button>
+          <button id="confirm-cancel-btn" class="btn-secondary" data-i18n="modal.cancel">ביטול</button>
+          <button id="confirm-ok-btn" class="btn-primary" data-i18n="modal.confirm">אישור</button>
         </div>
       </div>
     </div>

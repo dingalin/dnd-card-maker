@@ -743,15 +743,32 @@ export class EditorController {
 
                 if (subtypeSelect && window.OFFICIAL_ITEMS[selectedType]) {
                     subtypeContainer.classList.remove('hidden');
-                    subtypeSelect.innerHTML = '<option value="">-- בחר חפץ --</option>';
+
+                    // Get current locale
+                    const locale = window.i18n?.getLocale() || 'he';
+                    const isHebrew = locale === 'he';
+
+                    // Helper function to display item name based on locale
+                    // Format is "EnglishName (HebrewName)" - show appropriate part
+                    const getDisplayName = (fullName) => {
+                        const match = fullName.match(/^(.+?)\s*\((.+)\)$/);
+                        if (match) {
+                            const [, englishName, hebrewName] = match;
+                            return isHebrew ? `${hebrewName} (${englishName})` : englishName;
+                        }
+                        return fullName; // No parentheses, return as-is
+                    };
+
+                    const defaultText = isHebrew ? '-- בחר חפץ --' : '-- Select Item --';
+                    subtypeSelect.innerHTML = `<option value="">${defaultText}</option>`;
                     const categories = window.OFFICIAL_ITEMS[selectedType];
                     for (const [category, items] of Object.entries(categories)) {
                         const optgroup = document.createElement('optgroup');
                         optgroup.label = category;
                         items.forEach(item => {
                             const option = document.createElement('option');
-                            option.value = item;
-                            option.textContent = item;
+                            option.value = item; // Keep original value for lookups
+                            option.textContent = getDisplayName(item);
                             optgroup.appendChild(option);
                         });
                         subtypeSelect.appendChild(optgroup);
@@ -759,6 +776,7 @@ export class EditorController {
                 } else if (subtypeContainer) {
                     subtypeContainer.classList.add('hidden');
                 }
+
 
                 // Toggle Weapon/Armor Fields
                 const weaponFields = document.getElementById('weapon-fields');
