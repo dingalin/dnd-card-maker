@@ -5,7 +5,7 @@
 
 class I18nService {
     constructor() {
-        this.currentLocale = 'he'; // Default to Hebrew
+        this.currentLocale = 'en'; // Default to English
         this.translations = {};
         this.fallbackTranslations = {};
         this.isLoaded = false;
@@ -19,7 +19,7 @@ class I18nService {
         console.log('[i18n] Starting initialization...');
 
         // Load saved preference or default to Hebrew
-        this.currentLocale = localStorage.getItem('dnd-card-locale') || 'he';
+        this.currentLocale = localStorage.getItem('dnd-card-locale') || 'en';
         console.log('[i18n] Saved locale:', this.currentLocale);
 
         // Load fallback (Hebrew) first
