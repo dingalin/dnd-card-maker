@@ -25,7 +25,7 @@ class I18nService {
         // Load fallback (Hebrew) first
         try {
             console.log('[i18n] Fetching Hebrew translations from /locales/he.json...');
-            const heResponse = await fetch('/locales/he.json');
+            const heResponse = await fetch('./locales/he.json');
             console.log('[i18n] Hebrew fetch response status:', heResponse.status);
             if (!heResponse.ok) {
                 throw new Error(`HTTP ${heResponse.status}: ${heResponse.statusText}`);
@@ -56,7 +56,7 @@ class I18nService {
      */
     async loadLocale(locale, updateDOM = true) {
         try {
-            const response = await fetch(`/locales/${locale}.json`);
+            const response = await fetch(`./locales/${locale}.json`);
             if (!response.ok) throw new Error(`Failed to load locale: ${locale}`);
 
             this.translations = await response.json();
