@@ -585,9 +585,10 @@ export class GeneratorController {
         try {
             this.gemini = new GeminiService(apiKey);
             const theme = document.getElementById('bg-theme-select')?.value || 'Fire';
+            const style = document.getElementById('bg-style-select')?.value || 'watercolor';
             const getImgKey = document.getElementById('getimg-api-key')?.value.trim() || '';
 
-            const bgUrl = await this.gemini.generateCardBackground(theme, getImgKey);
+            const bgUrl = await this.gemini.generateCardBackground(theme, style, getImgKey);
 
             // Convert to Base64 for persistence
             let persistentBgUrl = bgUrl;
@@ -596,10 +597,15 @@ export class GeneratorController {
             }
 
             // Save to state so it persists in history
+            // RenderController will detect the change and load the new background via its render() method
             this.state.updateStyle('cardBackgroundUrl', persistentBgUrl);
-            if (window.cardRenderer) {
-                // Ensure renderer updates immediately
-                await window.cardRenderer.setTemplate(persistentBgUrl);
+
+            // Trigger re-render via settings change - this will make RenderController:
+            // 1. Detect the new cardBackgroundUrl differs from currentBackgroundUrl (line 67-68)
+            // 2. Call setTemplate() to load the new background
+            // 3. Render the full card (text + image) on top
+            if (window.stateManager) {
+                window.stateManager.notify('settings.style');
             }
 
             this.ui.showToast(window.i18n?.t('toasts.newBackgroundCreated') || 'New background created!', 'success');
@@ -680,44 +686,24 @@ export class GeneratorController {
     }
 
     async generateImage(prompt) {
-        const model = document.getElementById('image-model')?.value || 'imagen3';
         const style = document.getElementById('image-style')?.value || 'realistic';
         const styleOption = document.getElementById('image-style-option')?.value || 'natural';
         const color = document.getElementById('image-bg-color')?.value || '#ffffff';
 
-        // Primary: Use Gemini Imagen 3 (for Kaggle competition - 100% Google AI)
-        if (model === 'imagen3' || model === 'flux') {
-            try {
-                console.log("🎨 Attempting Imagen 3 generation...");
-                return await this.gemini.generateImageImagen3(prompt, style, styleOption, color);
-            } catch (imagenError) {
-                console.warn("⚠️ Imagen 3 failed, trying fallbacks:", imagenError.message);
+        // Get API key from UI or localStorage
+        const key = document.getElementById('getimg-api-key')?.value.trim()
+            || localStorage.getItem('getimg_api_key');
 
-                // Fallback 1: GetImg if available
-                const fallbackKey = document.getElementById('getimg-api-key')?.value.trim()
-                    || localStorage.getItem('getimg_api_key');
-
-                if (fallbackKey) {
-                    console.log("🔄 Using GetImg as fallback...");
-                    return await this.gemini.generateImageGetImg(prompt, 'getimg-flux', style, fallbackKey, styleOption, color);
-                }
-
-                // Fallback 2: Pollinations (free, no API key needed)
-                console.log("🔄 Using Pollinations as free fallback...");
-                return await this.gemini.generateItemImage(prompt, 'flux', style, styleOption, color);
-            }
+        if (!key) {
+            throw new Error("Missing GetImg API key. Please enter your API key.");
         }
 
-        // Legacy: Direct GetImg models
-        if (model.startsWith('getimg-')) {
-            const key = document.getElementById('getimg-api-key')?.value.trim();
-            if (!key) throw new Error("Missing GetImg API key");
-            localStorage.setItem('getimg_api_key', key);
-            return await this.gemini.generateImageGetImg(prompt, model, style, key, styleOption, color);
-        }
+        // Save key for future use
+        localStorage.setItem('getimg_api_key', key);
 
-        // Default fallback
-        return await this.gemini.generateItemImage(prompt, model, style, styleOption, color);
+        // Use GetImg with FLUX model (the only working image provider)
+        console.log("🎨 Generating image with GetImg/FLUX...");
+        return await this.gemini.generateImageGetImg(prompt, 'getimg-flux', style, key, styleOption, color);
     }
 
 

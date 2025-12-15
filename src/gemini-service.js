@@ -1,6 +1,8 @@
-// No external imports needed! We use raw fetch.
+// GeminiService - Cleaned version (Dec 2024)
+// Removed: generateItemImage (Pollinations), removeWhiteBackground (duplicate), generateImageImagen3 (not working)
+// Image generation now uses GetImg/FLUX exclusively
 
-console.log("GeminiService module loaded (Raw Fetch Version)");
+console.log("GeminiService module loaded (Clean Version)");
 
 // Cloudflare Worker URL for secure API access
 const WORKER_URL = "https://dnd-api-proxy.dingalin2000.workers.dev/";
@@ -50,7 +52,6 @@ class GeminiService {
                 throw new Error(error.error || `Worker Error ${response.status}`);
             } else {
                 const text = await response.text();
-                // Check if it looks like a Cloudflare Access page
                 if (text.includes('Access')) {
                     throw new Error(`Cloudflare Access Blocked (Status ${response.status}). Check Settings.`);
                 }
@@ -62,7 +63,6 @@ class GeminiService {
     }
 
     async generateItemDetails(level, type, subtype, rarity, ability, contextImage = null, complexityMode = 'creative', locale = 'he') {
-        // Determine output language based on locale
         const isHebrew = locale === 'he';
         const outputLanguage = isHebrew ? 'Hebrew' : 'English';
 
@@ -143,7 +143,7 @@ class GeminiService {
       - If Type is 'Potion' (or contains 'Potion'), the item MUST be a consumable liquid in a bottle/vial.
       - If Type is 'Ring' (or contains 'Ring'), it MUST be a finger ring.
       - If Type is 'Scroll', it MUST be a parchment scroll.
-      - If the Subtype is 'Helmet', 'Belt', 'Boots', 'Cloak', or 'Amulet', CREATE THAT SPECIFIC ITEM. Do not create a generic wondrous item.
+      - If the Subtype is 'Helmet', 'Belt', 'Boots', 'Cloak', or 'Amulet', CREATE THAT SPECIFIC ITEM.
       - If Type is 'Wondrous Item' and no specific subtype is given, it can be anything.
       - If the Type is 'Armor' (and not Shield/Helmet), you MUST create BODY ARMOR (Chest/Torso).
       - If the Type is 'Weapon', create a weapon.
@@ -153,8 +153,8 @@ class GeminiService {
         "name": "STRICT RULES: 1-3 Hebrew words MAX. FORBIDDEN WORDS (never use these in name): חרב, גרזן, רומח, קשת, מגל, פטיש, פגיון, מגן, שריון, טבעת, שרביט, מטה, שיקוי. Use ONLY creative nicknames like: להב הרעם, עוקץ הצל, שן הדרקון, קול הקרח, נשימת האש, עין הנשר.",
         "typeHe": "Hebrew Type (e.g. נשק, שריון, שיקוי, טבעת)",
         "rarityHe": "Hebrew Rarity - Use these exact translations: Common=נפוץ, Uncommon=לא נפוץ, Rare=נדיר, Very Rare=נדיר מאוד, Legendary=אגדי, Artifact=ארטיפקט",
-        "abilityName": "ENGLISH Ability Name (always in English, e.g. 'Resonant Transmutation', 'Shadow Strike', 'Elemental Fury')",
-        "abilityDesc": "COMPLETE ENGLISH mechanical description (max 50 words) with ALL game rules: include saving throw type and DC (e.g. 'DC 14 Wisdom'), duration (e.g. '1 minute', '1 hour', 'until next long rest'), number of uses (e.g. 'once per day', '3 times per night'), mechanical effects (e.g. 'disadvantage on attacks', 'speed reduced by 10'). ALWAYS IN ENGLISH. Be specific and playable!",
+        "abilityName": "HEBREW Ability Name (שם היכולת בעברית, e.g. 'התמרה הדהודית', 'מכת צל', 'זעם יסודי', 'נשימת מים'). Creative and thematic.",
+        "abilityDesc": "COMPLETE HEBREW mechanical description (max 50 words) with ALL game rules in Hebrew: include saving throw type and DC (e.g. 'חיסכון חוכמה DC 14'), duration (e.g. 'דקה אחת', 'שעה', 'עד המנוחה הארוכה הבאה'), number of uses (e.g. 'פעם ביום', '3 פעמים בלילה'), mechanical effects (e.g. 'חיסרון בהתקפות', 'מהירות מופחתת ב-10'). הכל בעברית!",
         "description": "Hebrew Fluff Description (max 20 words)",
         "gold": "Estimated price in GP (number only, e.g. 500)",
         "weaponDamage": "Full damage string including dice and type in HEBREW (e.g. '1d8 + 1d6 אש' or '2d6 חותך'). Use Hebrew damage types: slashing=חותך, piercing=דוקר, bludgeoning=מוחץ, fire=אש, cold=קור, lightning=ברק, poison=רעל, acid=חומצה, necrotic=נמק, radiant=זוהר, force=כוח, psychic=נפשי, thunder=רעם.",
@@ -182,7 +182,6 @@ class GeminiService {
 
         if (contextImage) {
             try {
-                // Convert URL to Base64 if needed
                 let base64Data = contextImage;
                 let mimeType = "image/jpeg";
 
@@ -227,14 +226,12 @@ class GeminiService {
             let data;
 
             if (this.useWorker) {
-                // Use Worker proxy
                 data = await this.callViaWorker('gemini-generate', {
                     model: 'gemini-2.0-flash',
                     contents: payload.contents,
                     generationConfig: payload.generationConfig
                 });
             } else {
-                // Direct API call
                 const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -256,7 +253,6 @@ class GeminiService {
 
             if (!data.candidates || !data.candidates[0]) {
                 console.error("Gemini Unexpected Response:", data);
-                // Check for safety ratings blocking
                 if (data.promptFeedback) {
                     throw new Error(`Blocked by Safety Filters: ${JSON.stringify(data.promptFeedback)}`);
                 }
@@ -264,12 +260,9 @@ class GeminiService {
             }
 
             const text = data.candidates[0].content.parts[0].text;
-
-            // Clean up markdown if present
             const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(jsonStr);
         } catch (error) {
-            // Retry without context image if it failed
             if (contextImage) {
                 console.warn("Gemini API request failed with context image. Retrying without image...", error);
                 return this.generateItemDetails(level, type, subtype, rarity, ability, null);
@@ -280,206 +273,185 @@ class GeminiService {
         }
     }
 
-    async generateItemImage(visualPrompt, model = 'flux', style = 'realistic', styleOption = 'natural', userColor = '#ffffff') {
-        // Style Mappings
-        const styles = {
-            'realistic': '',
-            'watercolor': 'watercolor painting, art line, defined edges, ink outline, artistic, colorful',
-            'oil': 'oil painting, classic fantasy art, detailed brushstrokes, rich colors',
-            'sketch': 'pencil sketch, graphite, technical drawing, on paper, monochrome',
-            'dark_fantasy': 'dark fantasy, gothic, grim, high contrast, moody lighting, elden ring style',
-            'anime': 'anime style, cel shaded, vibrant, studio ghibli style',
-            'woodcut': 'woodcut print, old book illustration, black and white, ink lines',
-            'pixel': 'pixel art, 16-bit, retro game asset',
-            'simple_icon': 'simple vector icon, flat design, minimal, white background, high contrast, symbol'
-        };
-
-        const styleKeywords = styles[style] || '';
-
-        // Prompt Modification Logic
-        // Prompt Modification Logic
-        let backgroundPrompt = `detailed cinematic ${userColor} background, atmospheric, context appropriate`;
-
-        // Helper to convert hex to name
-        const getColorName = (hex) => {
-            const map = {
-                '#ffffff': 'White', '#000000': 'Black', '#ff0000': 'Red', '#00ff00': 'Green', '#0000ff': 'Blue',
-                '#ffff00': 'Yellow', '#00ffff': 'Cyan', '#ff00ff': 'Magenta', '#8b4513': 'Brown', '#808080': 'Gray',
-                '#e6e6fa': 'Lavender', '#f0f8ff': 'Alice Blue', '#f5f5dc': 'Beige', '#ffe4e1': 'Rose'
-            };
-            return map[hex.toLowerCase()] || hex;
-        };
-        const colorName = getColorName(userColor);
-
-        if (styleOption === 'no-background') {
-            backgroundPrompt = "white background";
-        } else if (styleOption === 'colored-background') {
-            backgroundPrompt = `natural environment background, ${colorName} tones, atmospheric lighting, ${colorName} color palette`;
-        } else if (styleOption === 'square-frame') {
-            backgroundPrompt = `inside a decorative square border frame, framed illustration, parchment background, rpg icon style`;
-        } else if (styleOption === 'round-frame') {
-            backgroundPrompt = `inside a decorative circular round border frame, token style, round icon, isolated`;
-        } else if (styleOption === 'natural') {
-            backgroundPrompt = `natural environment background`;
-        }
-
-        // Truncate visualPrompt to avoid URL length issues (keep first 150 chars)
-        const safePrompt = (visualPrompt || '').substring(0, 150).replace(/[^a-zA-Z0-9, ]/g, '').trim();
-
-        // Construct final prompt, filtering out empty parts
-        const promptParts = [
-            'full shot',
-            'entire object visible',
-            'centered',
-            styleKeywords,
-            safePrompt,
-            backgroundPrompt,
-            '8k'
-        ].filter(part => part && part.trim()); // Remove empty parts
-
-        const enhancedPrompt = encodeURIComponent(promptParts.join(', '));
-        console.log(`GeminiService DEBUG: Style=${style}, Option=${styleOption}, Color=${userColor}`);
-        console.log(`GeminiService DEBUG: Background Prompt="${backgroundPrompt}"`);
-        // Construct URL based on selected model
-        let modelParam = `model=${model}`;
-
-        const imageUrl = `https://image.pollinations.ai/prompt/${enhancedPrompt}?width=512&height=512&${modelParam}&seed=${Math.floor(Math.random() * 10000)}`;
-        console.log(`GeminiService: Generated Prompt: "${decodeURIComponent(enhancedPrompt)}"`);
-
-        try {
-            // Fetch with 90s timeout (Pollinations can be slow)
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 90000);
-
-            const response = await fetch(imageUrl, { signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (!response.ok) throw new Error(`${model} generation failed: ${response.status}`);
-
-            const blob = await response.blob();
-            return URL.createObjectURL(blob);
-
-        } catch (error) {
-            console.warn("FLUX Image Generation Error, trying default model:", error);
-
-            // Fallback to default model
-            const defaultUrl = `https://image.pollinations.ai/prompt/${enhancedPrompt}?width=512&height=512&seed=${Math.floor(Math.random() * 10000)}`;
-            console.log("GeminiService: Fetching image from (Default)", defaultUrl);
-
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 90000);
-                const response = await fetch(defaultUrl, { signal: controller.signal });
-                clearTimeout(timeoutId);
-
-                if (!response.ok) throw new Error(`Default generation failed: ${response.status}`);
-
-                const blob = await response.blob();
-                return URL.createObjectURL(blob);
-            } catch (fallbackError) {
-                console.error("All Image Generation failed:", fallbackError);
-                return `https://placehold.co/400x400/222/d4af37?text=${encodeURIComponent(visualPrompt.substring(0, 20))}`;
-            }
-        }
-    }
-
-    async removeWhiteBackground(imageBlob) {
-        return new Promise((resolve, reject) => {
-            // Safety timeout (3 seconds)
-            const timeout = setTimeout(() => {
-                console.warn("Background removal timed out, returning original");
-                resolve(URL.createObjectURL(imageBlob));
-            }, 3000);
-
-            const img = new Image();
-            img.crossOrigin = "Anonymous"; // Important for canvas manipulation
-            img.onload = () => {
-                clearTimeout(timeout);
-                try {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-
-                    // Draw original image
-                    ctx.drawImage(img, 0, 0);
-
-                    // Get pixel data
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const data = imageData.data;
-
-                    // Iterate through pixels
-                    // R, G, B, A
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i];
-                        const g = data[i + 1];
-                        const b = data[i + 2];
-
-                        // Simple threshold for "white"
-                        // If all channels are bright (> 240), make it transparent
-                        if (r > 240 && g > 240 && b > 240) {
-                            data[i + 3] = 0; // Alpha = 0
-                        }
-                    }
-
-                    // Put modified data back
-                    ctx.putImageData(imageData, 0, 0);
-
-                    // Return as Data URL
-                    resolve(canvas.toDataURL('image/png'));
-                } catch (e) {
-                    console.error("Canvas processing error:", e);
-                    resolve(URL.createObjectURL(imageBlob)); // Fallback to original
-                }
-            };
-            img.onerror = (e) => {
-                clearTimeout(timeout);
-                console.error("Image load error for processing:", e);
-                resolve(URL.createObjectURL(imageBlob)); // Fallback
-            };
-            img.src = URL.createObjectURL(imageBlob);
-        });
-    }
-
+    // Main image generation using GetImg/FLUX - OPTIMIZED FOR FANTASY ITEMS
     async generateImageGetImg(visualPrompt, model, style, getImgApiKey, styleOption = 'natural', userColor = '#ffffff') {
-        const styles = {
-            'realistic': '',
-            'watercolor': 'watercolor painting, art line, defined edges, ink outline, artistic, colorful',
-            'oil': 'oil painting, classic fantasy art, detailed brushstrokes, rich colors',
-            'sketch': 'pencil sketch, graphite, technical drawing, on paper, monochrome',
-            'dark_fantasy': 'dark fantasy, gothic, grim, high contrast, moody lighting, elden ring style',
-            'anime': 'anime style, cel shaded, vibrant, studio ghibli style',
-            'woodcut': 'woodcut print, old book illustration, black and white, ink lines',
-            'pixel': 'pixel art, 16-bit, retro game asset',
-            'simple_icon': 'simple vector icon, flat design, minimal, white background, high contrast, symbol'
+
+        // === FLUX-OPTIMIZED PROMPT BUILDER ===
+        // Based on research: FLUX excels with natural language, detailed descriptions,
+        // and structured prompts following Subject → Style → Context format
+
+        const styleConfigs = {
+            'realistic': {
+                prefix: 'ultra-realistic photography',
+                suffix: 'studio lighting, professional product shot, sharp focus, 8K resolution',
+                quality: 'highly detailed, photorealistic, cinematic'
+            },
+            'watercolor': {
+                prefix: 'watercolor painting, artistic illustration',
+                suffix: 'soft edges, flowing colors, painterly strokes, art paper texture',
+                quality: 'beautiful artwork, defined ink outlines, vibrant pigments'
+            },
+            'oil': {
+                prefix: 'classical oil painting, Renaissance style artwork',
+                suffix: 'rich oil colors, detailed brushwork, dramatic chiaroscuro lighting',
+                quality: 'masterpiece quality, museum painting, baroque details'
+            },
+            'sketch': {
+                prefix: 'detailed pencil sketch, technical drawing',
+                suffix: 'graphite on paper, cross-hatching, precise lines, monochrome',
+                quality: 'professional illustration, concept art style'
+            },
+            'dark_fantasy': {
+                prefix: 'dark fantasy artwork, gothic illustration',
+                suffix: 'dramatic shadows, ominous atmosphere, Elden Ring aesthetic',
+                quality: 'high contrast, moody lighting, gritty details, dark souls style'
+            },
+            'anime': {
+                prefix: 'anime style illustration, manga artwork',
+                suffix: 'cel shading, clean lines, vibrant colors, Studio Ghibli inspired',
+                quality: 'high quality anime, detailed, beautiful illustration'
+            },
+            'woodcut': {
+                prefix: 'medieval woodcut print, old book illustration',
+                suffix: 'black and white, carved lines, vintage printed art',
+                quality: 'antique style, historical artwork, ink print'
+            },
+            'pixel': {
+                prefix: '16-bit pixel art, retro game sprite',
+                suffix: 'clean pixels, limited color palette, nostalgic',
+                quality: 'game asset, sharp pixels, iconic design'
+            },
+            'simple_icon': {
+                prefix: 'flat vector icon, minimalist design',
+                suffix: 'clean edges, symbolic, high contrast',
+                quality: 'professional icon, simple shapes, clear silhouette'
+            }
         };
 
-        const styleKeywords = styles[style] || '';
+        const styleConfig = styleConfigs[style] || styleConfigs['realistic'];
 
-        // Helper to convert hex to name
+        // Helper to convert hex to descriptive color name
         const getColorName = (hex) => {
             const map = {
-                '#ffffff': 'White', '#000000': 'Black', '#ff0000': 'Red', '#00ff00': 'Green', '#0000ff': 'Blue',
-                '#ffff00': 'Yellow', '#00ffff': 'Cyan', '#ff00ff': 'Magenta', '#8b4513': 'Brown', '#808080': 'Gray',
-                '#e6e6fa': 'Lavender', '#f0f8ff': 'Alice Blue', '#f5f5dc': 'Beige', '#ffe4e1': 'Rose'
+                '#ffffff': 'pure white', '#000000': 'deep black', '#ff0000': 'crimson red',
+                '#00ff00': 'emerald green', '#0000ff': 'royal blue', '#ffff00': 'golden yellow',
+                '#00ffff': 'icy cyan', '#ff00ff': 'arcane magenta', '#8b4513': 'rich brown',
+                '#808080': 'steel gray', '#e6e6fa': 'soft lavender', '#f0f8ff': 'pale ice blue',
+                '#f5f5dc': 'antique beige', '#ffe4e1': 'rose quartz'
             };
-            return map[hex.toLowerCase()] || hex;
+            return map[hex.toLowerCase()] || 'neutral';
         };
         const colorName = getColorName(userColor);
 
-        // Prompt Modification Logic
-        let backgroundPrompt = `detailed cinematic ${colorName} background, atmospheric, context appropriate`;
-        if (styleOption === 'no-background') {
-            backgroundPrompt = "white background";
-        } else if (styleOption === 'colored-background') {
-            backgroundPrompt = `natural environment background, ${colorName} tones, atmospheric lighting, ${colorName} color palette`;
-        } else if (styleOption === 'natural') {
-            backgroundPrompt = "natural environment background, atmospheric, context appropriate";
+        // === ITEM TYPE DETECTION & SPECIALIZED PROMPTS ===
+        // Detect item type from visualPrompt and apply type-specific enhancements
+        const promptLower = visualPrompt.toLowerCase();
+        let itemTypeEnhancement = '';
+        let compositionGuide = '';
+
+        // WEAPONS - Enhanced for clear, detailed weapon renders
+        if (promptLower.includes('sword') || promptLower.includes('blade') || promptLower.includes('חרב')) {
+            itemTypeEnhancement = 'ornate fantasy sword, detailed hilt and guard, sharp glinting blade edge, intricate engravings';
+            compositionGuide = 'full weapon visible from pommel to tip, angled hero pose';
+        } else if (promptLower.includes('axe') || promptLower.includes('גרזן')) {
+            itemTypeEnhancement = 'formidable battle axe, heavy curved blade, reinforced handle with leather grip';
+            compositionGuide = 'dynamic angle showing the axe head detail';
+        } else if (promptLower.includes('bow') || promptLower.includes('קשת')) {
+            itemTypeEnhancement = 'elegant recurve bow, carved wood or bone, taut bowstring, decorative limbs';
+            compositionGuide = 'full bow visible, graceful curved shape emphasized';
+        } else if (promptLower.includes('staff') || promptLower.includes('מטה') || promptLower.includes('שרביט')) {
+            itemTypeEnhancement = 'magical wizard staff, crystalline focus gemstone, arcane runes along the shaft';
+            compositionGuide = 'vertical composition showing the magical top ornament';
+        } else if (promptLower.includes('dagger') || promptLower.includes('פגיון')) {
+            itemTypeEnhancement = 'sleek throwing dagger, double-edged blade, balanced design';
+            compositionGuide = 'centered blade with sharp point visible';
+        } else if (promptLower.includes('spear') || promptLower.includes('רומח')) {
+            itemTypeEnhancement = 'long war spear, deadly pointed head, wrapped shaft grip';
+            compositionGuide = 'angled to show spear tip detail and length';
+        } else if (promptLower.includes('hammer') || promptLower.includes('mace') || promptLower.includes('פטיש')) {
+            itemTypeEnhancement = 'heavy war hammer, reinforced striking head, powerful design';
+            compositionGuide = 'showing the weight and impact potential of the head';
+        } else if (promptLower.includes('crossbow') || promptLower.includes('arbalet')) {
+            itemTypeEnhancement = 'mechanical crossbow, intricate trigger mechanism, loaded bolt';
+            compositionGuide = 'three-quarter view showing mechanism detail';
         }
 
-        const finalPrompt = `full shot, entire object visible, centered, ${styleKeywords}, ${visualPrompt}, ${backgroundPrompt}, 8k`.replace(/^, /, '');
-        console.log(`GeminiService DEBUG (GetImg): Style=${style}, Option=${styleOption}, Color=${userColor}`);
-        console.log(`GeminiService DEBUG (GetImg): Final Prompt="${finalPrompt}"`);
+        // ARMOR - Enhanced for detailed armor renders
+        else if (promptLower.includes('armor') || promptLower.includes('plate') || promptLower.includes('שריון')) {
+            itemTypeEnhancement = 'ornate plate armor piece, polished metal surface, functional battle design, riveted construction';
+            compositionGuide = 'front view showing craftsmanship details';
+        } else if (promptLower.includes('shield') || promptLower.includes('מגן')) {
+            itemTypeEnhancement = 'heraldic battle shield, emblazoned surface, reinforced rim, sturdy grip';
+            compositionGuide = 'front face view with emblem visible';
+        } else if (promptLower.includes('helmet') || promptLower.includes('קסדה')) {
+            itemTypeEnhancement = 'detailed warrior helmet, protective visor, decorative crest';
+            compositionGuide = 'three-quarter view showing depth and profile';
+        } else if (promptLower.includes('gauntlet') || promptLower.includes('glove') || promptLower.includes('כפפ')) {
+            itemTypeEnhancement = 'articulated armored gauntlet, flexible finger joints, reinforced knuckles';
+            compositionGuide = 'dynamic pose showing articulation';
+        } else if (promptLower.includes('boots') || promptLower.includes('מגפ')) {
+            itemTypeEnhancement = 'sturdy adventuring boots, reinforced toe and heel, magical enhancement visible';
+            compositionGuide = 'side profile showing design';
+        }
+
+        // ACCESSORIES & MAGICAL ITEMS
+        else if (promptLower.includes('ring') || promptLower.includes('טבעת')) {
+            itemTypeEnhancement = 'intricate magical ring, precious metal band, embedded gemstone, subtle enchantment glow';
+            compositionGuide = 'close-up macro view, gemstone as focal point';
+        } else if (promptLower.includes('amulet') || promptLower.includes('necklace') || promptLower.includes('קמע')) {
+            itemTypeEnhancement = 'mystical amulet pendant, ornate chain, magical centerpiece gem';
+            compositionGuide = 'centered with chain flowing around it';
+        } else if (promptLower.includes('potion') || promptLower.includes('bottle') || promptLower.includes('שיקוי')) {
+            itemTypeEnhancement = 'glass potion bottle, swirling magical liquid inside, cork stopper, alchemical labels';
+            compositionGuide = 'vertical bottle with liquid effects visible';
+        } else if (promptLower.includes('scroll') || promptLower.includes('מגילה')) {
+            itemTypeEnhancement = 'ancient spell scroll, weathered parchment, magical glowing text, wax seal';
+            compositionGuide = 'partially unrolled showing mystical writing';
+        } else if (promptLower.includes('cloak') || promptLower.includes('cape') || promptLower.includes('גלימ')) {
+            itemTypeEnhancement = 'flowing magical cloak, rich fabric, ornate clasp, mystical shimmer';
+            compositionGuide = 'draped to show fabric flow and magical effects';
+        } else if (promptLower.includes('belt') || promptLower.includes('חגור')) {
+            itemTypeEnhancement = 'enchanted leather belt, ornate buckle, magical pouches attached';
+            compositionGuide = 'horizontal layout showing buckle detail';
+        } else if (promptLower.includes('wand') || promptLower.includes('שרביט')) {
+            itemTypeEnhancement = 'elegant magical wand, carved from rare wood, crystalline tip emanating power';
+            compositionGuide = 'diagonal pose with magical particles at tip';
+        }
+
+        // Default enhancement if no type detected
+        if (!itemTypeEnhancement) {
+            itemTypeEnhancement = 'detailed fantasy item, magical craftsmanship, mystical properties';
+            compositionGuide = 'centered product shot, clear details visible';
+        }
+
+        // === BACKGROUND CONFIGURATION ===
+        let backgroundPrompt = '';
+        if (styleOption === 'no-background') {
+            backgroundPrompt = 'isolated on pure white background, clean studio shot, no shadows';
+        } else if (styleOption === 'colored-background') {
+            backgroundPrompt = `isolated on ${colorName} gradient background, soft ambient glow, ${colorName} color tones`;
+        } else { // natural
+            backgroundPrompt = 'atmospheric fantasy environment background, mystical ambiance, complementary lighting';
+        }
+
+        // === NEGATIVE PROMPTS (what to avoid) ===
+        const negativeElements = 'NO hands holding the item, NO people, NO watermarks, NO text, NO cropped edges, NO blurry, NO low quality';
+
+        // === BUILD FINAL OPTIMIZED PROMPT ===
+        // Structure: [Composition] [Style Prefix] [Subject/Item] [Type Enhancement] [Visual Prompt] [Quality] [Background] [Style Suffix] [Negatives]
+        const finalPrompt = [
+            compositionGuide,
+            styleConfig.prefix,
+            itemTypeEnhancement,
+            visualPrompt,
+            styleConfig.quality,
+            backgroundPrompt,
+            styleConfig.suffix,
+            negativeElements
+        ].filter(Boolean).join(', ');
+
+        console.log(`🎨 GeminiService (GetImg/FLUX): Style=${style}, Option=${styleOption}`);
+        console.log(`📝 Optimized Prompt: "${finalPrompt.substring(0, 150)}..."`);
 
         let endpoint = 'https://api.getimg.ai/v1/flux-schnell/text-to-image';
         let body = {
@@ -489,12 +461,9 @@ class GeminiService {
 
         if (model === 'getimg-seedream') {
             endpoint = 'https://api.getimg.ai/v1/seedream-v4/text-to-image';
-            // Seedream specific params if needed, otherwise same structure usually works or check docs
-            // Docs say /v1/seedream-v4/text-to-image
         }
 
-        // Check if getImgApiKey looks like a password (not starting with 'key-') or we want to force worker
-        // Assume keys start with 'key-' (standard GetImg). If not, we try worker with this "key" as password.
+        // Use Worker proxy if not a direct API key
         const useWorkersForGetImg = !getImgApiKey.startsWith('key-');
 
         if (useWorkersForGetImg) {
@@ -540,138 +509,19 @@ class GeminiService {
             }
 
             const data = await response.json();
-            const base64Image = data.image; // Getimg returns 'image' field with base64 string
+            const base64Image = data.image;
             const imageUrl = `data:image/jpeg;base64,${base64Image}`;
 
-            // Return original image URL (Background removal is now handled in renderer)
             const blob = await (await fetch(imageUrl)).blob();
             return URL.createObjectURL(blob);
 
         } catch (error) {
-            console.error("All Background Generation failed:", error);
+            console.error("GetImg Generation failed:", error);
             throw error;
         }
     }
 
-    /**
-     * Generate image using Google's Imagen 3 API
-     * Model: imagen-3.0-generate-002 (GA release Feb 2025)
-     * @param {string} visualPrompt - The prompt describing the image
-     * @param {string} style - Art style to apply
-     * @param {string} styleOption - Background style option
-     * @param {string} userColor - User selected color
-     * @returns {Promise<string>} - Object URL of generated image
-     */
-    async generateImageImagen3(visualPrompt, style = 'realistic', styleOption = 'natural', userColor = '#ffffff') {
-        const styles = {
-            'realistic': 'photorealistic, highly detailed',
-            'watercolor': 'watercolor painting, art line, defined edges, ink outline, artistic, colorful',
-            'oil': 'oil painting, classic fantasy art, detailed brushstrokes, rich colors',
-            'sketch': 'pencil sketch, graphite, technical drawing, on paper, monochrome',
-            'dark_fantasy': 'dark fantasy, gothic, grim, high contrast, moody lighting',
-            'anime': 'anime style, cel shaded, vibrant colors',
-            'woodcut': 'woodcut print, old book illustration, black and white, ink lines',
-            'pixel': 'pixel art, 16-bit, retro game asset',
-            'simple_icon': 'simple vector icon, flat design, minimal, white background'
-        };
-
-        const styleKeywords = styles[style] || 'detailed';
-
-        // Background prompt based on option
-        let backgroundPrompt = 'natural environment background, atmospheric';
-        if (styleOption === 'no-background') {
-            backgroundPrompt = 'pure white background, isolated subject';
-        } else if (styleOption === 'colored-background') {
-            const colorName = this.hexToColorName(userColor);
-            backgroundPrompt = `${colorName} toned background, atmospheric lighting`;
-        }
-
-        const finalPrompt = `${styleKeywords}, ${visualPrompt}, ${backgroundPrompt}, high quality, 8k resolution`;
-        console.log(`🎨 Imagen 3: Generating image with prompt: "${finalPrompt.substring(0, 100)}..."`);
-
-        // Use predict endpoint (correct method for Imagen 3)
-        const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict';
-
-        const requestBody = {
-            instances: [{ prompt: finalPrompt }],
-            parameters: {
-                sampleCount: 1,
-                aspectRatio: "3:4",
-                safetyFilterLevel: "BLOCK_MEDIUM_AND_ABOVE",
-                personGeneration: "ALLOW_ADULT"
-            }
-        };
-
-        try {
-            let response;
-
-            if (this.useWorker) {
-                // Use Worker proxy for Imagen
-                console.log("🎨 Imagen 3: Using Worker proxy");
-                const data = await this.callViaWorker('imagen-generate', {
-                    prompt: finalPrompt,
-                    aspectRatio: "3:4"
-                });
-
-                if (data.image) {
-                    const imageUrl = `data:image/png;base64,${data.image}`;
-                    const blob = await (await fetch(imageUrl)).blob();
-                    return URL.createObjectURL(blob);
-                } else if (data.error) {
-                    throw new Error(data.error);
-                } else {
-                    throw new Error("Worker did not return an image");
-                }
-            } else {
-                // Direct API call
-                response = await fetch(`${endpoint}?key=${this.apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestBody)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(`Imagen 3 API Error: ${errorData.error?.message || response.statusText}`);
-                }
-
-                const data = await response.json();
-
-                // Extract base64 image from response (new format uses generatedImages)
-                if (data.generatedImages && data.generatedImages[0] && data.generatedImages[0].image) {
-                    const base64Image = data.generatedImages[0].image.imageBytes;
-                    const imageUrl = `data:image/png;base64,${base64Image}`;
-                    const blob = await (await fetch(imageUrl)).blob();
-                    console.log("✅ Imagen 3: Image generated successfully");
-                    return URL.createObjectURL(blob);
-                }
-                // Fallback to old format
-                else if (data.predictions && data.predictions[0] && data.predictions[0].bytesBase64Encoded) {
-                    const base64Image = data.predictions[0].bytesBase64Encoded;
-                    const imageUrl = `data:image/png;base64,${base64Image}`;
-                    const blob = await (await fetch(imageUrl)).blob();
-                    console.log("✅ Imagen 3: Image generated successfully (legacy format)");
-                    return URL.createObjectURL(blob);
-                } else {
-                    throw new Error("Imagen 3 returned no image data");
-                }
-            }
-        } catch (error) {
-            console.error("❌ Imagen 3 generation failed:", error);
-            throw error;
-        }
-    }
-
-    // Helper to convert hex to color name
-    hexToColorName(hex) {
-        const map = {
-            '#ffffff': 'white', '#000000': 'black', '#ff0000': 'red', '#00ff00': 'green', '#0000ff': 'blue',
-            '#ffff00': 'yellow', '#00ffff': 'cyan', '#ff00ff': 'magenta', '#8b4513': 'brown', '#808080': 'gray',
-            '#e6e6fa': 'lavender', '#f0f8ff': 'light blue', '#f5f5dc': 'beige', '#ffe4e1': 'rose pink'
-        };
-        return map[hex.toLowerCase()] || 'neutral';
-    }
-
+    // Background generation using GetImg/FLUX
     async generateCardBackground(theme, getImgApiKey = '') {
         const themeColors = {
             'Fire': 'light orange',
@@ -686,95 +536,37 @@ class GeminiService {
         };
         const color = themeColors[theme] || 'light';
         const prompt = `watercolor style, ${color} colored ornate ${theme} style decorated old parchment paper texture, vintage card background, no white`;
-        const encodedPrompt = encodeURIComponent(prompt);
 
-        // 1. Try Pollinations Flux
-        const fluxUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=768&model=flux&seed=${Math.floor(Math.random() * 10000)}`;
-        console.log(`GeminiService: Generating background for theme "${theme}" (Flux)`, fluxUrl);
+        console.log(`GeminiService: Generating background for theme "${theme}" with GetImg/FLUX`);
 
+        // Use GetImg/FLUX via Worker proxy
         try {
-            const response = await fetch(fluxUrl);
-            if (!response.ok) throw new Error(`Flux generation failed: ${response.status}`);
-            const blob = await response.blob();
-            return URL.createObjectURL(blob);
-        } catch (fluxError) {
-            console.warn("Background Flux generation failed:", fluxError);
+            const body = {
+                prompt: prompt,
+                response_format: 'b64',
+                width: 512,
+                height: 768
+            };
 
-            // 2. Try GetImg if Key is available
-            if (getImgApiKey) {
-                console.log("GeminiService: Trying GetImg fallback...");
+            console.log("GeminiService: Using Worker for Background generation");
+            const data = await this.callViaWorker('getimg-generate', body);
 
-                // Proxy Check
-                const useWorkersForGetImg = !getImgApiKey.startsWith('key-');
-
-                try {
-                    let endpoint = 'https://api.getimg.ai/v1/flux-schnell/text-to-image';
-                    let body = {
-                        prompt: prompt,
-                        response_format: 'b64',
-                        width: 512,
-                        height: 768
-                    };
-
-                    if (useWorkersForGetImg) {
-                        console.log("GeminiService: Using Worker for Background (Proxy Mode)");
-                        const data = await this.callViaWorker('getimg-generate', body);
-
-                        if (data.image) {
-                            const imageUrl = `data:image/jpeg;base64,${data.image}`;
-                            const blob = await (await fetch(imageUrl)).blob();
-                            return URL.createObjectURL(blob);
-                        } else if (data.error) {
-                            throw new Error(data.error);
-                        } else {
-                            throw new Error("Worker (BG) did not return an image");
-                        }
-                    } else {
-                        // Direct Call
-                        const response = await fetch(endpoint, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${getImgApiKey}`,
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify(body)
-                        });
-
-                        if (!response.ok) throw new Error(`GetImg failed: ${response.status}`);
-                        const data = await response.json();
-                        const imageUrl = `data:image/jpeg;base64,${data.image}`;
-                        const blob = await (await fetch(imageUrl)).blob();
-                        return URL.createObjectURL(blob);
-                    }
-
-                } catch (getImgError) {
-                    console.warn("Background GetImg fallback failed:", getImgError);
-                }
-            }
-
-            // 3. Fallback to Pollinations Default (Turbo)
-            const defaultUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=768&model=turbo&seed=${Math.floor(Math.random() * 10000)}`;
-            console.log(`GeminiService: Generating background for theme "${theme}" (Default/Turbo)`, defaultUrl);
-
-            try {
-                const response = await fetch(defaultUrl);
-                if (!response.ok) throw new Error(`Default generation failed: ${response.status}`);
-                const blob = await response.blob();
+            if (data.image) {
+                const imageUrl = `data:image/jpeg;base64,${data.image}`;
+                const blob = await (await fetch(imageUrl)).blob();
                 return URL.createObjectURL(blob);
-            } catch (fallbackError) {
-                console.error("All Background Generation failed:", fallbackError);
-                throw fallbackError;
+            } else if (data.error) {
+                throw new Error(data.error);
+            } else {
+                throw new Error("Worker did not return an image");
             }
+        } catch (error) {
+            console.error("Background generation failed:", error);
+            throw error;
         }
     }
 
-    /**
-     * Analyze card layout using AI vision and suggest optimal positioning
-     * @param {string} cardImageBase64 - Base64 encoded screenshot of the current card
-     * @param {Object} contentInfo - Information about the card content
-     * @returns {Object} Suggested offsets and settings
-     */
+    // AI-powered layout analysis
     async analyzeCardLayout(cardImageBase64, contentInfo) {
         const prompt = `
 You are a professional D&D card designer. Your goal is to achieve a CLEAN, BALANCED layout like a professional trading card.
@@ -885,6 +677,5 @@ Return ONLY a JSON object (no markdown):
         }
     }
 }
-
 
 export default GeminiService;

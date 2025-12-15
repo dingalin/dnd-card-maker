@@ -89,18 +89,18 @@ class CardRenderer {
         return new Promise((resolve, reject) => {
             this.template.src = url;
             this.template.onload = () => {
-                console.log("CardRenderer: New template loaded");
+                console.log("CardRenderer: New template loaded from:", url.substring(0, 50) + "...");
                 this.templateLoaded = true;
-                // Enforce standard resolution
+                // Set canvas dimensions (this clears the canvas, but we'll trigger re-render)
                 this.canvas.width = 750;
                 this.canvas.height = 1050;
+                // Draw the template immediately so it's visible
+                this.ctx.drawImage(this.template, 0, 0, 750, 1050);
+                console.log("CardRenderer: Template drawn to canvas");
                 resolve();
             };
             this.template.onerror = (e) => {
                 console.error("CardRenderer: Failed to load new template", e);
-                // Don't set templateLoaded = false here as we might fallback? 
-                // Actually if new template fails we might have a broken state.
-                // But for now let's just reject.
                 reject(e);
             };
         });

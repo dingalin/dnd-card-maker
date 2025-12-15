@@ -43,3 +43,13 @@
     /* Align with left edge */
     right: auto !important;
 }
+
+/* LTR Mode Fixes - Flip the scroll panel positions */
+html[dir="ltr"] .scroll-container-left {
+    left: auto !important;
+    right: 0 !important;
+}
+
+html[dir="ltr"] .scroll-container {
+    direction: ltr;
+}

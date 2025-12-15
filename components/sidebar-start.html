@@ -7,7 +7,7 @@
             <!-- API Key Button -->
             <div class="stone-btn" data-target="api-content">
                 <div class="btn-content">
-                    <span class="icon">🔑</span>
+                    <img src="assets/icons/icon-api.png" class="icon-img" alt="API">
                     <span class="label" data-i18n="sidebar.apiKey">מפתח API</span>
                 </div>
                 <span class="status-indicator" id="api-key-indicator"></span>
@@ -16,7 +16,7 @@
             <!-- Level Button -->
             <div class="stone-btn" data-target="level-content">
                 <div class="btn-content">
-                    <span class="icon">📊</span>
+                    <img src="assets/icons/icon-d20.png" class="icon-img" alt="Level">
                     <span class="label" data-i18n="sidebar.level">רמה</span>
                 </div>
                 <span class="selected-value" id="level-display-btn">1-4</span>
@@ -25,7 +25,7 @@
             <!-- Type Button -->
             <div class="stone-btn" data-target="type-content">
                 <div class="btn-content">
-                    <span class="icon">⚔️</span>
+                    <img src="assets/icons/icon-type.png" class="icon-img" alt="Type">
                     <span class="label" data-i18n="sidebar.typeAndDetails">סוג ופרטים</span>
                 </div>
                 <span class="selected-value" id="type-display-btn" data-i18n="typeSection.weapon">נשק</span>
@@ -34,7 +34,7 @@
             <!-- Ability Button -->
             <div class="stone-btn" data-target="ability-content">
                 <div class="btn-content">
-                    <span class="icon">✨</span>
+                    <img src="assets/icons/icon-ability.png" class="icon-img" alt="Ability">
                     <span class="label" data-i18n="sidebar.abilityTheme">יכולת / נושא</span>
                 </div>
             </div>
@@ -42,7 +42,7 @@
             <!-- Visuals Button -->
             <div class="stone-btn" data-target="visuals-content">
                 <div class="btn-content">
-                    <span class="icon">🎨</span>
+                    <img src="assets/icons/icon-visuals.png" class="icon-img" alt="Visuals">
                     <span class="label" data-i18n="sidebar.visualsStyle">מראה וסגנון</span>
                 </div>
             </div>
@@ -184,8 +184,8 @@
                 <div class="form-group">
                     <label for="image-model" data-i18n="visualsSection.imageModelLabel">מודל תמונה</label>
                     <select id="image-model">
-                        <option value="imagen3" data-i18n="imageModels.imagen3">🌟 Gemini Imagen 3</option>
-                        <option value="getimg-flux" selected data-i18n="imageModels.flux">GetImg: FLUX Schnell
+                        <option value="imagen3" selected data-i18n="imageModels.imagen3">🌟 Gemini Imagen 3</option>
+                        <option value="getimg-flux" data-i18n="imageModels.flux">GetImg: FLUX Schnell
                             (Recommended)</option>
                     </select>
                 </div>
@@ -204,6 +204,8 @@
                         <option value="woodcut" data-i18n="imageStyles.woodcut">תחריט עץ (Woodcut)</option>
                         <option value="pixel" data-i18n="imageStyles.pixel">פיקסל ארט (Pixel Art)</option>
                         <option value="simple_icon" data-i18n="imageStyles.simple_icon">אייקון פשוט (Simple Icon)
+                        </option>
+                        <option value="handdrawn" data-i18n="imageStyles.handdrawn">רישום ביד (Hand-drawn)
                         </option>
                     </select>
                 </div>
@@ -254,29 +256,34 @@
             <div class="generation-buttons" style="display: flex; gap: 0.5rem; width: 100%;">
                 <button type="submit" id="generate-simple-btn" class="btn-create" style="flex: 1; min-width: 0;"
                     data-i18n-title="actions.simpleTooltip" data-tooltip="חפץ עם פלוסים ונזק בסיסי">
-                    <span class="icon">⚔️</span> <span data-i18n="actions.simple">פשוט</span>
+                    <img src="assets/icons/icon-swords.png" class="icon-img-sm" alt=""> <span
+                        data-i18n="actions.simple">פשוט</span>
                 </button>
                 <button type="submit" id="generate-creative-btn" class="btn-create"
                     style="flex: 1; min-width: 0; background: linear-gradient(135deg, #9b59b6, #8e44ad); border-color: #8e44ad;"
                     data-i18n-title="actions.creativeTooltip" data-tooltip="חפץ עם מכניקה מיוחדת ומורכבת">
-                    <span class="icon">✨</span> <span data-i18n="actions.creative">יצירתי</span>
+                    <img src="assets/icons/icon-amulet.png" class="icon-img-sm" alt=""> <span
+                        data-i18n="actions.creative">יצירתי</span>
                 </button>
             </div>
 
             <div class="secondary-actions-grid">
                 <button type="button" id="surprise-btn" class="btn-surprise">
-                    <span class="icon">🎲</span> <span data-i18n="actions.surprise">הפתע אותי</span>
+                    <img src="assets/icons/icon-d20.png" class="icon-img-sm" alt=""> <span
+                        data-i18n="actions.surprise">הפתע אותי</span>
                 </button>
 
                 <!-- Regenerate Controls (Hidden by default) -->
                 <div id="regenerate-controls" class="regenerate-grid hidden">
                     <button type="button" id="regen-image-btn" class="btn-secondary small-btn"
                         data-i18n-title="actions.regenImageTooltip" title="צור תמונה חדשה">
-                        <span class="icon">🎨</span> <span data-i18n="actions.regenImage">מראה</span>
+                        <img src="assets/icons/icon-brush.png" class="icon-img-sm" alt=""> <span
+                            data-i18n="actions.regenImage">מראה</span>
                     </button>
                     <button type="button" id="regen-stats-btn" class="btn-secondary small-btn"
                         data-i18n-title="actions.regenStatsTooltip" title="צור תכונות חדשות">
-                        <span class="icon">📝</span> <span data-i18n="actions.regenStats">תכונות</span>
+                        <img src="assets/icons/icon-quill.png" class="icon-img-sm" alt=""> <span
+                            data-i18n="actions.regenStats">תכונות</span>
                     </button>
                 </div>
             </div>

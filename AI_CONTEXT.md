@@ -1,77 +1,110 @@
 # AI Context & Developer Notes
 
-This file serves as a persistent memory and knowledge base for the AI assistant and developers working on the D&D Card Creator project. **READ THIS FIRST** when starting a new session.
+This file serves as a persistent memory and knowledge base for AI assistants and developers working on the D&D Card Creator project. **READ THIS FIRST** when starting a new session.
 
 ## Project Overview
-- **Type:** Vanilla JavaScript Web Application (Vite)
-- **Runtime:** **MUST** be run via a local server (e.g., `npm run dev`). Opening `index.html` directly (`file://`) will fail due to CORS and Module security policies.
-- **Language:** Hebrew (RTL interface) - *All UI text must be in Hebrew.*
-- **Core Functionality:** Generating D&D item cards using AI (Gemini) and rendering them on an HTML5 Canvas.
+- **Type:** Vanilla JavaScript Web Application (Vite + ES Modules)
+- **Runtime:** **MUST** run via `npm run dev`. Opening `index.html` directly fails due to CORS.
+- **Language:** Hebrew (RTL) primary, English secondary - using i18n system
+- **Core Functionality:** Generate D&D item cards using AI (Gemini/Imagen3/FLUX) and render on HTML5 Canvas
 
-## Architecture & File Responsibilities
-- **Entry Point:** `index.html` (Minimal Shell) loads `component-loader.js` and `main.js`.
-- **Components (`components/`):**
-  - `header.html`: Top bar with logo.
-  - `sidebar-start.html`: Generation form (Right sidebar).
-  - `preview-panel.html`: Center canvas area.
-  - `sidebar-end.html`: Edit & Design controls (Left sidebar).
-- **Logic:**
-  - `component-loader.js`: **Dynamic Loader.** Fetches and injects HTML components into placeholders.
-  - `main.js`: **Core Orchestrator.** Initializes app *after* `componentsLoaded` event.
-  - `ui-helpers.js`: **UI Utilities.** Handles collapsible sections, sliders, etc.
-  - `src/gemini-service.js`: **AI Integration.** Gemini (text) & Pollinations.ai (image).
-  - `src/card-renderer.js`: **Canvas Drawing.** Renders the card visual.
-  - `src/dnd-data.js`: Static data.
-- **Styling:**
-  - `style.css`: Base styles.
-  - `ui-improvements.css`: Primary stylesheet (Glassmorphism, Layout).
-  - `collapsible-sections.css`: Specific styles for sidebar accordions.
+## Architecture (MVC Pattern)
 
-## ⚠️ CRITICAL WARNINGS & COMMON PITFALLS ⚠️
+### Controllers (`src/controllers/`)
+| Controller | Responsibility |
+|------------|----------------|
+| `GeneratorController` | Card/image generation, AI API calls |
+| `EditorController` | Form inputs → State updates |
+| `RenderController` | State → Canvas rendering |
+| `HistoryController` | Gallery/save/load functionality |
+| `CharacterController` | Character sheet & portrait generation |
+| `TabManager` | Tab navigation & lazy loading |
+
+### Services (`src/services/`)
+- `GeminiService` - All AI integrations (Gemini, Imagen3, GetImg/FLUX)
+- `CardViewerService` - Modal card preview/edit
+- `GetImgService` - FLUX image generation wrapper
+
+### Core Files
+| File | Lines | Responsibility |
+|------|-------|----------------|
+| `main.js` | ~240 | App initialization orchestrator |
+| `state.js` | ~600 | Centralized state management |
+| `card-renderer.js` | ~1100 | Canvas drawing (needs refactor) |
+| `gemini-service.js` | ~1000 | AI APIs (needs refactor) |
+| `i18n.js` | ~250 | Internationalization system |
+
+## ⚠️ CRITICAL WARNINGS
 
 ### 1. Component Loading Timing
-- **Context:** HTML is loaded dynamically via JS.
-- **Pitfall:** Trying to access DOM elements (like `getElementById`) before `componentsLoaded` event fires will fail.
-- **Rule:** Wrap all initialization logic in `document.addEventListener('componentsLoaded', ...)` or use the `initializeApp` function in `main.js`.
+```javascript
+// CORRECT: Wait for components
+if (window.areComponentsLoaded) {
+    init();
+} else {
+    document.addEventListener('componentsLoaded', init);
+}
+```
 
-### 2. CSS Syntax Errors
-- **Issue:** `ui-improvements.css` is large and prone to unclosed blocks (`}`). This breaks the entire stylesheet silently.
-- **Prevention:** After any CSS edit, verify that all blocks are closed. Be careful when nesting media queries.
+### 2. i18n Singleton (HMR Safe)
+The i18n instance is stored on `window.__i18n_instance` to survive Vite HMR. Always import from `i18n.js` - don't create new instances.
 
-### 3. RTL & Positioning
-- **Context:** The app is `dir="rtl"`.
-- **Pitfall:** "Left" often means "Right" in visual positioning.
-- **Rule:** Test all positional changes (absolute positioning, floats, flex-direction) to ensure they behave correctly in RTL.
+### 3. RTL Positioning
+`dir="rtl"` means "Left" is visually "Right". Test all positional CSS changes.
 
-### 4. Canvas Text Wrapping
-- **Context:** `card-renderer.js` handles text manually.
-- **Pitfall:** Hebrew text wrapping can be tricky on Canvas.
-- **Rule:** If text cuts off or overlaps, check the `wrapText` function in `card-renderer.js`.
-
-## Optimization & Refactoring Goals
-- **Split `main.js`:** It is becoming a "God Object". Move distinct logic (e.g., event handlers) to separate modules.
-- **CSS Modularization:** Break `ui-improvements.css` into smaller, component-specific files (e.g., `buttons.css`, `forms.css`).
-- **State Management:** Move away from reading/writing directly to the DOM for application state. Implement a simple `state.js` module.
-
-## Workflow Tips
-- **Git:** The project uses Git. If the code gets into an unrecoverable state, a hard reset to `origin/main` is a valid recovery strategy (after confirming with the user).
-- **Testing:** Always verify:
-    1.  Card Generation (Text & Image).
-    2.  UI Layout (No duplications).
-    3.  Console for errors (especially 404s or syntax errors).
+### 4. Large Files Warning
+Files >500 lines are hard to maintain:
+- `gemini-service.js` (998 lines) - Consider splitting by provider
+- `card-renderer.js` (1086 lines) - Consider extracting utilities
+- `GeneratorController.js` (940 lines) - Complex logic
 
 ### 5. Code Maintenance Rule
-- **Context:** When modifying behavior or fixing bugs.
-- **Rule:** **DO NOT** add new code to override existing behavior (e.g., `!important` overrides or conflicting event listeners). **ALWAYS** find the original code causing the issue and remove or modify it directly. Delete old/obsolete code instead of patching over it.
+**DO NOT** add overrides (`!important`, duplicate listeners). **ALWAYS** find and fix the root cause.
 
-### 6. Component Loading Race Conditions
-- **Context:** Scripts like `navigation-manager.js` might run before `component-loader.js` finishes injecting HTML.
-- **Pitfall:** Initializing logic on `DOMContentLoaded` often fails because components aren't there yet. Setting an `initialized` flag on failure prevents the correct run on `componentsLoaded`.
-- **Rule:** **ALWAYS** check `window.areComponentsLoaded` or wait specifically for the `componentsLoaded` event. **NEVER** rely solely on `DOMContentLoaded` for logic that depends on dynamic components.
-  ```javascript
-  if (window.areComponentsLoaded) {
-      init();
-  } else {
-      document.addEventListener('componentsLoaded', init);
-  }
-  ```
+## i18n Usage
+
+```javascript
+import i18n from './i18n.js';
+
+// Get translation
+const text = i18n.t('toasts.cardSaved');
+
+// With parameters
+const msg = i18n.t('character.creatingItemFor', { label: 'Sword' });
+
+// Check locale
+if (i18n.getLocale() === 'he') { /* Hebrew */ }
+
+// Listen for changes
+i18n.onLocaleChange((newLocale) => {
+    // Update UI elements
+});
+```
+
+## Key Data Flows
+
+### Card Generation
+```
+User Input → GeneratorController.onGenerate()
+  → GeminiService.generateItemDetails() → AI Text Response
+  → GeminiService.generateItemImage() → AI Image
+  → StateManager.setCardData()
+  → RenderController.render() → Canvas Update
+```
+
+### Locale Change
+```
+Toggle Button Click → i18n.toggleLocale()
+  → i18n.loadLocale() → Fetch JSON
+  → i18n.updateDOM() → data-i18n elements
+  → i18n.notifyListeners() → Custom callbacks
+```
+
+## Git Recovery
+If code is broken: `git checkout origin/main -- <file>` or `git reset --hard origin/main`
+
+## Testing Checklist
+1. ✅ Card generates (text + image)
+2. ✅ Language toggle works (EN ↔ עב)
+3. ✅ Character dropdowns update with language
+4. ✅ No console errors

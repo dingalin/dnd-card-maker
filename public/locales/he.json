@@ -7,7 +7,8 @@
         "gallery": "גלריה",
         "about": "אודות",
         "cardCreator": "יוצר קלפים",
-        "characterSheet": "דף דמות"
+        "characterSheet": "דף דמות",
+        "toggleLang": "החלף שפה (EN/HE)"
     },
     "modal": {
         "confirmTitle": "אישור פעולה",
@@ -21,7 +22,10 @@
         "level": "רמה",
         "typeAndDetails": "סוג ופרטים",
         "abilityTheme": "יכולת / נושא",
-        "visualsStyle": "מראה וסגנון"
+        "visualsStyle": "מראה וסגנון",
+        "geminiFreeKey": "👉 קבל מפתח בחינם מ-Google AI Studio",
+        "exampleDamage": "לדוגמה: 1d8",
+        "exampleAC": "לדוגמה: 15"
     },
     "apiSection": {
         "title": "הגדרות חיבור",
@@ -84,6 +88,10 @@
         "imageProcessingLabel": "סגנון תמונה (עיבוד)",
         "colorPickerLabel": "בחר צבע רקע:"
     },
+    "imageModels": {
+        "imagen3": "🌟 Gemini Imagen 3",
+        "flux": "GetImg: FLUX Schnell (מומלץ)"
+    },
     "imageStyles": {
         "realistic": "ריאליסטי (Realistic)",
         "watercolor": "צבעי מים וקו (Watercolor & Line Art)",
@@ -93,7 +101,8 @@
         "anime": "אנימה (Anime)",
         "woodcut": "תחריט עץ (Woodcut)",
         "pixel": "פיקסל ארט (Pixel Art)",
-        "simple_icon": "אייקון פשוט (Simple Icon)"
+        "simple_icon": "אייקון פשוט (Simple Icon)",
+        "handdrawn": "רישום ביד (Hand-drawn)"
     },
     "imageProcessing": {
         "natural": "רקע טבעי (Natural)",
@@ -148,9 +157,9 @@
         "mechanics": "מכניקה",
         "lore": "רקע וסיפור (לור)",
         "textWidth": "רוחב טקסט:",
-        "positionLabel": "מיקום:",
-        "quickDesc": "5. תיאור קצר",
-        "price": "6. מחיר (זהב)"
+        "quickDesc": "תיאור מהיר",
+        "price": "מחיר",
+        "positionLabel": "מיקום:"
     },
     "textDesign": {
         "title": "עיצוב טקסט",
@@ -178,6 +187,7 @@
     "cardBackground": {
         "title": "רקע הקלף",
         "themeLabel": "נושא הרקע",
+        "styleLabel": "סגנון הקלף",
         "themes": {
             "fire": "אש (Fire)",
             "nature": "טבע (Nature)",
@@ -192,9 +202,9 @@
         "generate": "צור רקע",
         "reset": "חזור לברירת מחדל",
         "readyMade": "🖼️ רקעים מוכנים",
-        "readyMadeLabel": "רקעים מוכנים",
         "scale": "גודל רקע (Scale)",
-        "selectTitle": "בחר רקע מוכן"
+        "selectTitle": "בחר רקע מוכן",
+        "readyMadeLabel": "רקעים מוכנים:"
     },
     "footer": {
         "saveToGallery": "💾 שמור לגלריה",
@@ -210,7 +220,8 @@
         "equipCharacter": "🗡️ צייד דמות",
         "splitView": "📄|📄 פיצול",
         "splitViewActive": "📄 פיצול (פעיל)",
-        "flip": "↻ הצג אחורה",
+        "flip": "↺ סובב קלף",
+        "flipBack": "↻ סובב קלף",
         "starting": "מתחיל...",
         "processingImage": "מעבד תמונה...",
         "writingStory": "כותב סיפור...",
@@ -282,7 +293,11 @@
         "cardsPerPage": "קלפים בדף:",
         "totalPages": "סה\"כ דפים:",
         "maximum": "מקסימום",
-        "printNow": "🖨️ הדפס עכשיו"
+        "printNow": "🖨️ הדפס עכשיו",
+        "paperSizes": {
+            "a4": "A4 (210x297 מ\"מ)",
+            "letter": "Letter (8.5x11 אינץ')"
+        }
     },
     "toasts": {
         "loadingError": "שגיאה בטעינת הקנבס",
@@ -298,43 +313,16 @@
         "deleteError": "שגיאה במחיקה",
         "noBackSide": "אין צד אחורי",
         "unnamed": "חפץ ללא שם",
-        "enterApiKey": "נא להזין מפתח API",
-        "noPromptSaved": "אין פרומפט שמור - נסה ליצור חפץ חדש",
-        "newImageCreated": "תמונה חדשה נוצרה!",
+        "enterApiKey": "אנא הזן מפתח API",
+        "noPromptSaved": "לא נשמר תיאור לתמונה",
+        "newImageCreated": "נוצרה תמונה חדשה!",
         "errorCreatingImage": "שגיאה ביצירת תמונה",
-        "newStatsCreated": "תכונות חדשות נוצרו!",
+        "newStatsCreated": "נוצרו תכונות חדשות!",
         "errorCreatingStats": "שגיאה ביצירת תכונות",
-        "newBackgroundCreated": "רקע חדש נוצר ונשמר!",
+        "newBackgroundCreated": "נוצר רקע חדש!",
         "errorCreatingBackground": "שגיאה ביצירת רקע",
         "selectingRandomBg": "בוחר רקע אקראי...",
-        "surpriseRolling": "מגריל חפץ בהפתעה...",
-        "noCardToAdjust": "אין קלף להתאמה",
-        "autoLayoutComplete": "✨ הכיוונון הושלם!",
-        "autoLayoutError": "שגיאה בכיוונון",
-        "noCardToAnalyze": "אין קלף לניתוח",
-        "canvasNotFound": "Canvas לא נמצא",
-        "templateStillLoading": "Template עדיין נטען, נסה שוב",
-        "toolOpenError": "שגיאה בפתיחת הכלי",
-        "layoutApplied": "✅ הפריסה הוחלה!",
-        "layoutApplyError": "שגיאה ביישום הפריסה",
-        "historyCleared": "ההיסטוריה נמחקה",
-        "clearOnlyInAllItems": "ניתן לנקות הכל רק בתיקייה \"כל החפצים\"",
-        "folderDeleted": "התיקייה נמחקה",
-        "itemsMoved": "חפצים הועברו",
-        "itemsDeleted": "חפצים נמחקו",
-        "itemLoadedForEdit": "נטען לעריכה!",
-        "itemDeleted": "החפץ נמחק",
-        "processComplete": "התהליך הסתיים!",
-        "noCardData": "אין נתונים לקלף",
-        "exportError": "שגיאה ביצוא הקלף",
-        "itemEquipped": "החפץ הוסף בהצלחה!",
-        "itemAlreadyEquipped": "כבר מצויד!",
-        "noSlotFound": "לא נמצא מקום מתאים לחפץ זה.",
-        "portraitUpdated": "דיוקן דמות עודכן!",
-        "noBgToCrop": "אין רקע לקיצוץ",
-        "noDarkMargins": "לא נמצאו שוליים כהים לקיצוץ",
-        "marginsRemoved": "✂️ שוליים כהים הוסרו אוטומטית!",
-        "creatingItemFor": "יוצר חפץ חדש עבור"
+        "surpriseRolling": "מגריל חפץ בהפתעה..."
     },
     "cardViewer": {
         "edit": "ערוך ✏️",
@@ -350,5 +338,36 @@
         "abilityName": "שם יכולת",
         "abilityDesc": "תיאור המכניקה יופיע כאן...",
         "description": "סיפור הרקע (Lore) יופיע כאן..."
+    },
+    "characterSidebar": {
+        "title": "יצירת דמות",
+        "portraitFace": "תמונה: פנים (Portrait)",
+        "portraitFullBody": "תמונה: גוף מלא (Full Body)",
+        "createButton": "צור דמות",
+        "generatingStatus": "מייצר דמות..."
+    },
+    "scrollMenu": {
+        "galleryTitle": "הגלריה העתיקה",
+        "galleryBuilding": "כאן יוצגו הקלפים שיצרתם (בקרוב...)",
+        "aboutTitle": "אודות המחולל",
+        "aboutText1": "מחולל זה נוצר כדי לעזור לשליטי מבוך ליצור חפצים קסומים במהירות ובקלות.",
+        "aboutText2": "השתמשו בכוחה של הבינה המלאכותית כדי להפיח חיים בעולם שלכם."
+    },
+    "character": {
+        "successEquipped": "החפץ הוסף בהצלחה!",
+        "alreadyEquipped": "החפץ \"{{name}}\" כבר מצויד!",
+        "noSlotFound": "לא נמצא מקום מתאים לחפץ זה.",
+        "conflictConfirm": "המקום מיועד ל-{{label}} תפוס. האם להחליף ת'קיים?",
+        "apiKeyRequired": "נדרש מפתח API לביצוע הפעולה.",
+        "checkApiKey": "המפתח שהוזן שגוי. נסה שוב עם המפתח הנכון של GetImg.",
+        "generationError": "שגיאה ביצירת התמונה: {{error}}",
+        "portraitUpdated": "דיוקן דמות עודכן!",
+        "creatingItemFor": "יוצר חפץ חדש עבור: {{label}}"
+    },
+    "generator": {
+        "noCardForLayout": "אין קלף להתאמה",
+        "detectingArea": "🔍 מזהה שטח...",
+        "detectingFrame": "🔍 מזהה מסגרת...",
+        "calculating": "✨ מחשב..."
     }
 }

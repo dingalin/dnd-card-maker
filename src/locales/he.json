@@ -88,6 +88,10 @@
         "imageProcessingLabel": "סגנון תמונה (עיבוד)",
         "colorPickerLabel": "בחר צבע רקע:"
     },
+    "imageModels": {
+        "imagen3": "🌟 Gemini Imagen 3",
+        "flux": "GetImg: FLUX Schnell (מומלץ)"
+    },
     "imageStyles": {
         "realistic": "ריאליסטי (Realistic)",
         "watercolor": "צבעי מים וקו (Watercolor & Line Art)",
@@ -210,7 +214,14 @@
         "equipCharacter": "🗡️ צייד דמות",
         "splitView": "📄|📄 פיצול",
         "splitViewActive": "📄 פיצול (פעיל)",
-        "flip": "↻ הצג אחורה"
+        "flip": "↺ סובב קלף",
+        "flipBack": "↻ סובב קלף",
+        "starting": "מתחיל...",
+        "processingImage": "מעבד תמונה...",
+        "writingStory": "כותב סיפור...",
+        "drawing": "מצייר...",
+        "savingImage": "שומר תמונה...",
+        "ready": "מוכן!"
     },
     "gallery": {
         "title": "🏛️ היסטוריית חפצים",

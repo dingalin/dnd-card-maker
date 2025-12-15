@@ -543,9 +543,9 @@ export class BackgroundManager {
         });
     }
 
-    selectBackground(url) {
+    async selectBackground(url) {
         if (this.renderer) {
-            this.renderer.setTemplate(url);
+            await this.renderer.setTemplate(url);
             // Trigger re-render if needed
             if (window.stateManager) {
                 window.stateManager.setLastContext(url); // Store context

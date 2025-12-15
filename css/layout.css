@@ -85,10 +85,14 @@ body::before {
     gap: 0.5rem;
 }
 
-/* Fix for Sidebar Overflow Clipping */
+/* Fix for Sidebar Overflow - Allow scrolling while keeping dropdown menus visible */
 .sidebar-end,
 .sidebar-start {
-    overflow: visible !important;
+    overflow-x: visible;
+    overflow-y: auto;
+    max-height: calc(100vh - 100px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.3);
 }
 
 /* Header Styles */

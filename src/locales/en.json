@@ -88,6 +88,10 @@
         "imageProcessingLabel": "Image Style (Processing)",
         "colorPickerLabel": "Select Background Color:"
     },
+    "imageModels": {
+        "imagen3": "🌟 Gemini Imagen 3",
+        "flux": "GetImg: FLUX Schnell (Recommended)"
+    },
     "imageStyles": {
         "realistic": "Realistic",
         "watercolor": "Watercolor & Line Art",
@@ -210,7 +214,14 @@
         "equipCharacter": "🗡️ Equip Character",
         "splitView": "📄|📄 Split",
         "splitViewActive": "📄 Split (Active)",
-        "flip": "↻ Show Back"
+        "flip": "↺ Flip Card",
+        "flipBack": "↻ Flip Card",
+        "starting": "Starting...",
+        "processingImage": "Processing image...",
+        "writingStory": "Writing story...",
+        "drawing": "Drawing...",
+        "savingImage": "Saving image...",
+        "ready": "Ready!"
     },
     "gallery": {
         "title": "🏛️ Item History",

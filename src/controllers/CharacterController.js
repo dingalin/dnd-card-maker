@@ -9,18 +9,43 @@ export class CharacterController {
 
     init() {
         console.log("CharacterController: Initializing...");
+
+        // Populate dropdowns with current locale
         this.populateOptions();
         this.setupListeners();
 
-        // Listen for locale changes to update dropdowns
-        i18n.onLocaleChange(() => this.populateOptions());
+        // Register locale change listener only once
+        if (!this.localeListenerRegistered) {
+            this.localeListenerRegistered = true;
+            console.log('CharacterController: Registering locale change listener...');
+            i18n.onLocaleChange((newLocale) => {
+                console.log(`CharacterController: Locale changed to '${newLocale}', re-populating options...`);
+                this.populateOptions();
+            });
+            console.log('CharacterController: Locale change listener registered. Total listeners:', i18n.listeners?.length);
+        }
+
+        // Also re-populate after i18n finishes loading (handles initial load race condition)
+        if (!i18n.isLoaded && !this.i18nLoadWatcher) {
+            this.i18nLoadWatcher = true;
+            // Poll until i18n is loaded then re-populate
+            const checkLoaded = setInterval(() => {
+                if (i18n.isLoaded) {
+                    clearInterval(checkLoaded);
+                    console.log("CharacterController: i18n loaded, re-populating options...");
+                    this.populateOptions();
+                }
+            }, 100);
+        }
     }
 
     populateOptions() {
         const options = window.CHARACTER_OPTIONS;
         if (!options) return;
 
-        const isEnglish = i18n.getLocale() === 'en';
+        const locale = i18n.getLocale();
+        const isEnglish = locale === 'en';
+        console.log(`CharacterController: populateOptions() - locale='${locale}', isEnglish=${isEnglish}`);
 
         this.populateSelect('char-gender', options.genders, isEnglish);
         this.populateSelect('char-race', options.races, isEnglish);
@@ -38,7 +63,10 @@ export class CharacterController {
 
     populateSelect(elementId, items, isEnglish) {
         const select = document.getElementById(elementId);
-        if (!select) return;
+        if (!select) {
+            console.warn(`CharacterController: Element #${elementId} not found in DOM`);
+            return;
+        }
 
         select.innerHTML = '';
         items.forEach(item => {

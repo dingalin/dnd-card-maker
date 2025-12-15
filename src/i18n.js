@@ -5,7 +5,7 @@
 
 class I18nService {
     constructor() {
-        this.currentLocale = 'en'; // Default to English
+        this.currentLocale = 'he'; // Default to Hebrew (primary language for this app)
         this.translations = {};
         this.fallbackTranslations = {};
         this.isLoaded = false;
@@ -23,13 +23,15 @@ class I18nService {
         console.log('[i18n] Base URL:', baseUrl);
 
         // Load saved preference or default to Hebrew
-        this.currentLocale = localStorage.getItem('dnd-card-locale') || 'en';
+        this.currentLocale = localStorage.getItem('dnd-card-locale') || 'he';
         console.log('[i18n] Saved locale:', this.currentLocale);
 
         // Load fallback (Hebrew) first
         try {
+            const baseUrl = import.meta.env.BASE_URL || '/';
+            const timestamp = new Date().getTime(); // Cache busting
             console.log('[i18n] Fetching Hebrew translations from /locales/he.json...');
-            const heResponse = await fetch(`${baseUrl}locales/he.json`);
+            const heResponse = await fetch(`${baseUrl}locales/he.json?v=${timestamp}`);
             console.log('[i18n] Hebrew fetch response status:', heResponse.status);
             if (!heResponse.ok) {
                 throw new Error(`HTTP ${heResponse.status}: ${heResponse.statusText}`);
@@ -61,7 +63,8 @@ class I18nService {
     async loadLocale(locale, updateDOM = true) {
         try {
             const baseUrl = import.meta.env.BASE_URL || '/';
-            const response = await fetch(`${baseUrl}locales/${locale}.json`);
+            const timestamp = new Date().getTime(); // Cache busting
+            const response = await fetch(`${baseUrl}locales/${locale}.json?v=${timestamp}`);
             if (!response.ok) throw new Error(`Failed to load locale: ${locale}`);
 
             this.translations = await response.json();
@@ -199,6 +202,7 @@ class I18nService {
      * Notify all listeners of locale change
      */
     notifyListeners() {
+        console.log(`[i18n] notifyListeners() called - ${this.listeners.length} listeners registered`);
         this.listeners.forEach(callback => {
             try {
                 callback(this.currentLocale);
@@ -233,8 +237,18 @@ class I18nService {
     }
 }
 
-// Create singleton instance
-const i18n = new I18nService();
+// Create singleton instance - use window to survive HMR (Hot Module Replacement)
+// This ensures listeners are preserved across Vite dev server updates
+let i18n;
+if (typeof window !== 'undefined' && window.__i18n_instance) {
+    i18n = window.__i18n_instance;
+    console.log('[i18n] Reusing existing instance (HMR safe)');
+} else {
+    i18n = new I18nService();
+    if (typeof window !== 'undefined') {
+        window.__i18n_instance = i18n;
+    }
+}
 
 // Export for module usage
 export default i18n;

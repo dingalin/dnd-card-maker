@@ -246,8 +246,8 @@ export class EditorController {
         if (btn) {
             btn.classList.toggle('active', this.isFlipped);
             btn.innerHTML = this.isFlipped
-                ? (window.i18n?.t('preview.flip') || '↺ Show Front')
-                : (window.i18n?.t('preview.flipBack') || '↻ Show Back');
+                ? (window.i18n?.t('preview.flip') || '↺ Flip Card')
+                : (window.i18n?.t('preview.flipBack') || '↻ Flip Card');
         }
 
         // Toggle Visibility of Edit Sections based on Card Face

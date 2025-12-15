@@ -7,7 +7,8 @@
         "gallery": "Gallery",
         "about": "About",
         "cardCreator": "Card Creator",
-        "characterSheet": "Character Sheet"
+        "characterSheet": "Character Sheet",
+        "toggleLang": "Switch Language (EN/HE)"
     },
     "modal": {
         "confirmTitle": "Confirm Action",
@@ -21,7 +22,10 @@
         "level": "Level",
         "typeAndDetails": "Type & Details",
         "abilityTheme": "Ability / Theme",
-        "visualsStyle": "Visuals & Style"
+        "visualsStyle": "Visuals & Style",
+        "geminiFreeKey": "👉 Get FREE API Key from Google AI Studio",
+        "exampleDamage": "e.g. 1d8",
+        "exampleAC": "e.g. 15"
     },
     "apiSection": {
         "title": "Connection Settings",
@@ -84,6 +88,10 @@
         "imageProcessingLabel": "Image Style (Processing)",
         "colorPickerLabel": "Select Background Color:"
     },
+    "imageModels": {
+        "imagen3": "🌟 Gemini Imagen 3",
+        "flux": "GetImg: FLUX Schnell (Recommended)"
+    },
     "imageStyles": {
         "realistic": "Realistic",
         "watercolor": "Watercolor & Line Art",
@@ -93,7 +101,8 @@
         "anime": "Anime",
         "woodcut": "Woodcut",
         "pixel": "Pixel Art",
-        "simple_icon": "Simple Icon"
+        "simple_icon": "Simple Icon",
+        "handdrawn": "Hand-drawn"
     },
     "imageProcessing": {
         "natural": "Natural Background",
@@ -148,9 +157,9 @@
         "mechanics": "Mechanics",
         "lore": "Background & Story (Lore)",
         "textWidth": "Text Width:",
-        "positionLabel": "Position:",
-        "quickDesc": "5. Quick Description",
-        "price": "6. Price (Gold)"
+        "quickDesc": "Quick Description",
+        "price": "Price",
+        "positionLabel": "Position:"
     },
     "textDesign": {
         "title": "Text Design",
@@ -178,6 +187,7 @@
     "cardBackground": {
         "title": "Card Background",
         "themeLabel": "Background Theme",
+        "styleLabel": "Card Style",
         "themes": {
             "fire": "Fire",
             "nature": "Nature",
@@ -192,9 +202,9 @@
         "generate": "Generate Background",
         "reset": "Reset to Default",
         "readyMade": "🖼️ Ready-Made Backgrounds",
-        "readyMadeLabel": "Ready-Made Backgrounds",
         "scale": "Background Scale",
-        "selectTitle": "Select Ready-Made Background"
+        "selectTitle": "Select Ready-Made Background",
+        "readyMadeLabel": "Ready-Made Backgrounds:"
     },
     "footer": {
         "saveToGallery": "💾 Save to Gallery",
@@ -210,7 +220,8 @@
         "equipCharacter": "🗡️ Equip Character",
         "splitView": "📄|📄 Split",
         "splitViewActive": "📄 Split (Active)",
-        "flip": "↻ Show Back",
+        "flip": "↺ Flip Card",
+        "flipBack": "↻ Flip Card",
         "starting": "Starting...",
         "processingImage": "Processing image...",
         "writingStory": "Writing story...",
@@ -282,7 +293,11 @@
         "cardsPerPage": "Cards per Page:",
         "totalPages": "Total Pages:",
         "maximum": "maximum",
-        "printNow": "🖨️ Print Now"
+        "printNow": "🖨️ Print Now",
+        "paperSizes": {
+            "a4": "A4 (210x297mm)",
+            "letter": "Letter (8.5x11\")"
+        }
     },
     "toasts": {
         "loadingError": "Error loading canvas",
@@ -299,42 +314,15 @@
         "noBackSide": "No back side",
         "unnamed": "Unnamed Item",
         "enterApiKey": "Please enter API key",
-        "noPromptSaved": "No prompt saved - try creating a new item",
+        "noPromptSaved": "No prompt saved",
         "newImageCreated": "New image created!",
         "errorCreatingImage": "Error creating image",
         "newStatsCreated": "New stats created!",
         "errorCreatingStats": "Error creating stats",
-        "newBackgroundCreated": "New background created and saved!",
+        "newBackgroundCreated": "New background created!",
         "errorCreatingBackground": "Error creating background",
         "selectingRandomBg": "Selecting random background...",
-        "surpriseRolling": "Rolling surprise item...",
-        "noCardToAdjust": "No card to adjust",
-        "autoLayoutComplete": "✨ Auto layout complete!",
-        "autoLayoutError": "Auto layout error",
-        "noCardToAnalyze": "No card to analyze",
-        "canvasNotFound": "Canvas not found",
-        "templateStillLoading": "Template still loading, try again",
-        "toolOpenError": "Error opening tool",
-        "layoutApplied": "✅ Layout applied!",
-        "layoutApplyError": "Error applying layout",
-        "historyCleared": "History cleared",
-        "clearOnlyInAllItems": "Can only clear all in 'All Items' folder",
-        "folderDeleted": "Folder deleted",
-        "itemsMoved": "items moved",
-        "itemsDeleted": "items deleted",
-        "itemLoadedForEdit": "loaded for editing!",
-        "itemDeleted": "Item deleted",
-        "processComplete": "Process complete!",
-        "noCardData": "No card data",
-        "exportError": "Error exporting card",
-        "itemEquipped": "Item equipped successfully!",
-        "itemAlreadyEquipped": "is already equipped!",
-        "noSlotFound": "No suitable slot found for this item.",
-        "portraitUpdated": "Character portrait updated!",
-        "noBgToCrop": "No background to crop",
-        "noDarkMargins": "No dark margins found to crop",
-        "marginsRemoved": "✂️ Dark margins removed automatically!",
-        "creatingItemFor": "Creating new item for"
+        "surpriseRolling": "Rolling surprise item..."
     },
     "cardViewer": {
         "edit": "Edit ✏️",
@@ -350,5 +338,36 @@
         "abilityName": "Ability Name",
         "abilityDesc": "Mechanics description will appear here...",
         "description": "Background story (Lore) will appear here..."
+    },
+    "characterSidebar": {
+        "title": "Create Character",
+        "portraitFace": "Portrait: Face",
+        "portraitFullBody": "Portrait: Full Body",
+        "createButton": "Create Character",
+        "generatingStatus": "Generating character..."
+    },
+    "scrollMenu": {
+        "galleryTitle": "The Ancient Gallery",
+        "galleryBuilding": "Here you will see the cards you created (coming soon...)",
+        "aboutTitle": "About the Generator",
+        "aboutText1": "This generator was created to help Dungeon Masters create magic items quickly and easily.",
+        "aboutText2": "Use the power of AI to breathe life into your world."
+    },
+    "character": {
+        "successEquipped": "Item equipped successfully!",
+        "alreadyEquipped": "Item \"{{name}}\" is already equipped!",
+        "noSlotFound": "No suitable slot found for this item.",
+        "conflictConfirm": "Slot for {{label}} is occupied. Replace existing item?",
+        "apiKeyRequired": "API Key required for this action.",
+        "checkApiKey": "Invalid Key. Please try again with correct GetImg key.",
+        "generationError": "Error generating image: {{error}}",
+        "portraitUpdated": "Character portrait updated!",
+        "creatingItemFor": "Creating new item for: {{label}}"
+    },
+    "generator": {
+        "noCardForLayout": "No card to adjust",
+        "detectingArea": "🔍 Detecting area...",
+        "detectingFrame": "🔍 Detecting frame...",
+        "calculating": "✨ Calculating..."
     }
 }

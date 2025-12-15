@@ -383,12 +383,38 @@ class StateManager {
                     console.log('📂 Clearing stale blob URL from saved card');
                     data.cardData.imageUrl = null;
                 }
+                if (data.cardData.front?.imageUrl && data.cardData.front.imageUrl.startsWith('blob:')) {
+                    console.log('📂 Clearing stale blob URL from saved card (front)');
+                    data.cardData.front.imageUrl = null;
+                }
 
                 // Ensure data is V2 compliant (Migrate on load)
                 this.state.cardData = this.migrateToV2(data.cardData);
 
+                // Deep merge settings to preserve nested objects
                 if (data.settings) {
-                    this.state.settings = { ...this.state.settings, ...data.settings };
+                    this.state.settings = {
+                        ...this.state.settings,
+                        ...data.settings,
+                        front: {
+                            ...this.state.settings.front,
+                            ...(data.settings.front || {}),
+                            offsets: { ...this.state.settings.front.offsets, ...(data.settings.front?.offsets || {}) },
+                            fontSizes: { ...this.state.settings.front.fontSizes, ...(data.settings.front?.fontSizes || {}) },
+                            fontStyles: { ...this.state.settings.front.fontStyles, ...(data.settings.front?.fontStyles || {}) }
+                        },
+                        back: {
+                            ...this.state.settings.back,
+                            ...(data.settings.back || {}),
+                            offsets: { ...this.state.settings.back.offsets, ...(data.settings.back?.offsets || {}) },
+                            fontSizes: { ...this.state.settings.back.fontSizes, ...(data.settings.back?.fontSizes || {}) },
+                            fontStyles: { ...this.state.settings.back.fontStyles, ...(data.settings.back?.fontStyles || {}) }
+                        },
+                        style: {
+                            ...this.state.settings.style,
+                            ...(data.settings.style || {})
+                        }
+                    };
                 }
                 this.notify('cardData');
                 console.log('📂 Card loaded from localStorage');
@@ -496,24 +522,51 @@ class StateManager {
     }
 
     /**
-     * Load a card from history by ID
-     * @param {number} id - Card ID
-     * @returns {Promise<boolean>}
-     */
+ * Load a card from history by ID
+ * @param {number} id - Card ID
+ * @returns {Promise<boolean>}
+ */
     async loadFromHistory(id) {
         // We need to fetch all or find specific. getAll is fine for now.
         const history = await this.getHistory();
         const card = history.find(item => item.id === id);
 
         if (card) {
-            // Clear blob URLs
+            // Clear blob URLs (they don't survive page refresh)
+            // Handle both V1 (imageUrl) and V2 (front.imageUrl) formats
             if (card.cardData.imageUrl && card.cardData.imageUrl.startsWith('blob:')) {
                 card.cardData.imageUrl = null;
             }
+            if (card.cardData.front?.imageUrl && card.cardData.front.imageUrl.startsWith('blob:')) {
+                card.cardData.front.imageUrl = null;
+            }
 
             this.state.cardData = card.cardData;
+
+            // Deep merge settings to preserve nested objects (front, back, style)
             if (card.settings) {
-                this.state.settings = { ...this.state.settings, ...card.settings };
+                this.state.settings = {
+                    ...this.state.settings,
+                    ...card.settings,
+                    front: {
+                        ...this.state.settings.front,
+                        ...(card.settings.front || {}),
+                        offsets: { ...this.state.settings.front.offsets, ...(card.settings.front?.offsets || {}) },
+                        fontSizes: { ...this.state.settings.front.fontSizes, ...(card.settings.front?.fontSizes || {}) },
+                        fontStyles: { ...this.state.settings.front.fontStyles, ...(card.settings.front?.fontStyles || {}) }
+                    },
+                    back: {
+                        ...this.state.settings.back,
+                        ...(card.settings.back || {}),
+                        offsets: { ...this.state.settings.back.offsets, ...(card.settings.back?.offsets || {}) },
+                        fontSizes: { ...this.state.settings.back.fontSizes, ...(card.settings.back?.fontSizes || {}) },
+                        fontStyles: { ...this.state.settings.back.fontStyles, ...(card.settings.back?.fontStyles || {}) }
+                    },
+                    style: {
+                        ...this.state.settings.style,
+                        ...(card.settings.style || {})
+                    }
+                };
             }
             this.notify('cardData');
             console.log('📂 Card loaded from DB:', card.name);

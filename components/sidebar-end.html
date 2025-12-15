@@ -6,7 +6,7 @@
         <!-- Edit Content Button -->
         <div class="stone-btn" data-target="edit-content">
             <div class="btn-content">
-                <span class="icon">📝</span>
+                <img src="assets/icons/icon-edit.png" class="icon-img" alt="Edit">
                 <span class="label" data-i18n="editSidebar.editContent">עריכת תוכן</span>
             </div>
         </div>
@@ -477,6 +477,21 @@
                 </select>
             </div>
 
+            <!-- Text Backdrop Controls -->
+            <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700 mt-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <input type="checkbox" id="text-backdrop-enabled" class="accent-amber-500 w-4 h-4">
+                    <label for="text-backdrop-enabled" class="text-sm font-bold" style="color: #fbbf24;">רקע לטקסט
+                        (Backdrop)</label>
+                </div>
+                <div id="text-backdrop-controls" class="hidden">
+                    <div class="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>שקיפות (Opacity)</span>
+                        <span id="text-backdrop-opacity-val">50%</span>
+                    </div>
+                    <input type="range" id="text-backdrop-opacity" min="0" max="100" value="50" class="w-full">
+                </div>
+            </div>
 
         </div>
 
@@ -592,6 +607,21 @@
                     <option value="Old Scroll" data-i18n="cardBackground.themes.scroll">Scroll</option>
                     <option value="Elemental" data-i18n="cardBackground.themes.elemental">Elemental</option>
                 </select>
+
+                <!-- Card Style Select (same styles as image generation) -->
+                <label for="bg-style-select" data-i18n="cardBackground.styleLabel">סגנון הקלף</label>
+                <select id="bg-style-select"
+                    class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white mb-3">
+                    <option value="watercolor" data-i18n="imageStyles.watercolor">צבעי מים (Watercolor)</option>
+                    <option value="realistic" data-i18n="imageStyles.realistic">ריאליסטי (Realistic)</option>
+                    <option value="oil" data-i18n="imageStyles.oil">ציור שמן (Oil Painting)</option>
+                    <option value="sketch" data-i18n="imageStyles.sketch">רישום עיפרון (Pencil Sketch)</option>
+                    <option value="dark_fantasy" data-i18n="imageStyles.dark_fantasy">פנטזיה אפלה (Dark Fantasy)
+                    </option>
+                    <option value="woodcut" data-i18n="imageStyles.woodcut">תחריט עץ (Woodcut)</option>
+                    <option value="handdrawn" data-i18n="imageStyles.handdrawn">רישום ביד (Hand-drawn)</option>
+                </select>
+
                 <button id="generate-bg-btn" class="btn-primary w-full mb-2" data-i18n="cardBackground.generate">צור
                     רקע</button>
                 <button id="reset-bg-btn" class="btn-primary w-full" data-i18n="cardBackground.reset">חזור לברירת
