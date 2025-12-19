@@ -238,17 +238,27 @@ textarea:focus {
   }
 }
 
-/* Zoomed State */
+/* Zoomed State - Fit within viewport */
 .canvas-container.expanded {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(1.8);
+  transform: translate(-50%, -50%);
   z-index: 1000;
   box-shadow: 0 0 0 100vw rgba(0, 0, 0, 0.95);
   cursor: zoom-out;
-  max-height: 90vh;
+  max-height: 85vh;
+  max-width: 90vw;
   width: auto;
+  height: auto;
+}
+
+.canvas-container.expanded canvas {
+  max-height: 85vh;
+  max-width: 90vw;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 /* Split View Styles */
