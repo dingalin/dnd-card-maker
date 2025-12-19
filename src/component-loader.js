@@ -15,6 +15,9 @@ const BASE_PATH = (() => {
     return '/';
 })();
 
+// Expose BASE_PATH globally for other modules
+window.APP_BASE_PATH = BASE_PATH;
+
 class ComponentLoader {
     /**
      * טוען component בודד
@@ -43,6 +46,40 @@ class ComponentLoader {
     }
 
     /**
+     * Fix asset paths for GitHub Pages compatibility
+     * This fixes all relative paths to assets/icons, assets/textures, etc.
+     */
+    static fixAssetPaths() {
+        if (BASE_PATH === '/') return; // No fix needed for local dev
+
+        console.log('🔧 Fixing asset paths for GitHub Pages...');
+
+        // Fix all img src attributes that start with "assets/"
+        document.querySelectorAll('img[src^="assets/"]').forEach(img => {
+            const originalSrc = img.getAttribute('src');
+            img.src = BASE_PATH + originalSrc;
+        });
+
+        // Fix background images in inline styles
+        document.querySelectorAll('[style*="url(\'assets/"]').forEach(el => {
+            el.style.backgroundImage = el.style.backgroundImage.replace(
+                /url\(['"]?assets\//g,
+                `url('${BASE_PATH}assets/`
+            );
+        });
+
+        // Fix background images in inline styles (double quotes)
+        document.querySelectorAll('[style*="url(\\"assets/"]').forEach(el => {
+            el.style.backgroundImage = el.style.backgroundImage.replace(
+                /url\(['"]?assets\//g,
+                `url('${BASE_PATH}assets/`
+            );
+        });
+
+        console.log('✅ Asset paths fixed for GitHub Pages');
+    }
+
+    /**
      * טוען את כל ה-components
      */
     static async loadAll() {
@@ -67,6 +104,9 @@ class ComponentLoader {
                 components.map(c => this.loadComponent(c.id, c.path))
             );
 
+            // Fix asset paths AFTER components are loaded
+            this.fixAssetPaths();
+
             console.log('✅ All components loaded successfully');
             window.areComponentsLoaded = true;
             // Dispatch event שאומר שה-components נטענו
@@ -83,3 +123,4 @@ if (document.readyState === 'loading') {
 } else {
     ComponentLoader.loadAll();
 }
+
