@@ -44,30 +44,39 @@ export class PreviewManager {
         // Close on Escape key is handled in setupKeyboardShortcuts
     }
 
-    openFullscreen() {
+    async openFullscreen() {
         const canvas = document.getElementById('card-canvas');
-        const backCanvas = document.getElementById('card-canvas-back');
         if (!canvas) return;
-
-        // Use CardViewerService for beautiful popup with buttons
-        const frontImage = canvas.toDataURL('image/png');
-        let backImage = null;
-
-        // Always get back canvas image if it exists
-        // The back canvas may be hidden but still have content rendered on it
-        if (backCanvas) {
-            // Check if back canvas has actual content (not just empty/white)
-            const ctx = backCanvas.getContext('2d');
-            const imageData = ctx.getImageData(0, 0, 1, 1);
-            const hasContent = imageData.data[3] > 0; // Check alpha channel
-
-            if (hasContent) {
-                backImage = backCanvas.toDataURL('image/png');
-            }
-        }
 
         // Get current card data from state
         const cardData = window.stateManager?.getCardData?.() || null;
+
+        // Get front image from canvas
+        const frontImage = canvas.toDataURL('image/png');
+        let backImage = null;
+
+        // Try to render back side if we have card data with back content
+        if (cardData && window.cardRenderer) {
+            const hasBackContent = cardData.back && (
+                cardData.back.title ||
+                cardData.back.description ||
+                cardData.back.lore ||
+                cardData.back.story
+            );
+
+            if (hasBackContent) {
+                try {
+                    // Render back side to get the image
+                    await window.cardRenderer.render(cardData, {}, true);
+                    backImage = canvas.toDataURL('image/png');
+
+                    // Re-render front to restore the display
+                    await window.cardRenderer.render(cardData, {}, false);
+                } catch (err) {
+                    console.warn('Failed to render back for preview:', err);
+                }
+            }
+        }
 
         // Import and use CardViewerService
         import('./services/CardViewerService.js').then(({ CardViewerService }) => {
@@ -79,7 +88,6 @@ export class PreviewManager {
             });
         }).catch(err => {
             console.error('Failed to open card viewer:', err);
-            // Fallback to old CSS behavior
             const container = document.querySelector('.canvas-container');
             if (container) container.classList.toggle('expanded');
         });
