@@ -544,104 +544,12 @@ class TreasureController {
 
     /**
      * Render a full card to an off-screen canvas and return as dataURL
+     * Uses shared CardThumbnailRenderer utility for consistency
      */
     async renderCardThumbnail(cardData, imageUrl) {
-        try {
-            // Create off-screen canvas
-            const canvas = document.createElement('canvas');
-            canvas.width = 750;
-            canvas.height = 1050;
-            canvas.id = 'temp-treasure-canvas-' + Date.now();
-            canvas.style.display = 'none';
-            document.body.appendChild(canvas);
-
-            // Create temporary CardRenderer
-            const tempRenderer = new CardRenderer(canvas.id);
-            await tempRenderer.templateReady;
-
-            // Build render data (CardRenderer expects specific format)
-            // NOTE: CardRenderer.drawText uses weaponDamage, damageType, armorClass directly
-            //       NOT coreStats! It builds coreStatsText from these fields.
-            const renderData = {
-                name: cardData.name,
-                typeHe: cardData.typeHe,
-                rarityHe: cardData.rarityHe,
-                // Stats fields - CardRenderer reads these to build coreStatsText
-                weaponDamage: cardData.weaponDamage,
-                damageType: cardData.damageType,
-                armorClass: cardData.armorClass,
-                versatileDamage: cardData.versatileDamage,
-                weaponProperties: cardData.weaponProperties,
-                // Quick description
-                quickStats: cardData.quickStats || '',
-                gold: cardData.gold || '-',
-                imageUrl: imageUrl
-            };
-
-            // Get current settings from stateManager (same settings used in Card Creator)
-            const currentState = this.state.getState();
-            const frontSettings = currentState.settings?.front || {};
-            const styleSettings = currentState.settings?.style || {};
-            const fo = frontSettings.offsets || {};
-            const fs = frontSettings.fontSizes || {};
-
-            // Use stateManager's current settings - same as Card Creator!
-            const renderOptions = {
-                // Font sizes from stateManager
-                fontSizes: {
-                    nameSize: fs.nameSize || 64,
-                    typeSize: fs.typeSize || 24,
-                    raritySize: fs.raritySize || 24,
-                    statsSize: fs.statsSize || 32,
-                    coreStatsSize: fs.coreStatsSize || 42,
-                    goldSize: fs.goldSize || 32
-                },
-                // Offsets from stateManager
-                name: fo.name ?? 0,
-                type: fo.type ?? 0,
-                rarity: fo.rarity ?? 0,
-                stats: fo.stats ?? 780,
-                coreStats: fo.coreStats ?? 680,
-                gold: fo.gold ?? 0,
-                // Image settings from stateManager
-                imageYOffset: fo.imageYOffset ?? 0,
-                imageScale: fo.imageScale ?? 1.0,
-                imageRotation: fo.imageRotation ?? 0,
-                imageFade: fo.imageFade ?? 0,
-                imageShadow: fo.imageShadow ?? 0,
-                imageStyle: styleSettings.imageStyle || 'natural',
-                // Widths from stateManager
-                nameWidth: fo.nameWidth ?? 543,
-                typeWidth: fo.typeWidth ?? 500,
-                rarityWidth: fo.rarityWidth ?? 500,
-                coreStatsWidth: fo.coreStatsWidth ?? 500,
-                statsWidth: fo.statsWidth ?? 500,
-                goldWidth: fo.goldWidth ?? 500,
-                // Background
-                backgroundScale: fo.backgroundScale ?? 1.0,
-                // Font family from style settings
-                fontFamily: styleSettings.fontFamily || 'Heebo',
-                // Font styles
-                fontStyles: frontSettings.fontStyles || {}
-            };
-
-            console.log('TreasureController: Rendering with stateManager settings:', renderOptions);
-            console.log('TreasureController: Render data BEFORE render:', renderData);
-
-            // Render to canvas with options
-            await tempRenderer.render(renderData, renderOptions, false);
-
-            // Capture as dataURL
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-            // Cleanup
-            document.body.removeChild(canvas);
-
-            return dataUrl;
-        } catch (error) {
-            console.error('Failed to render card thumbnail:', error);
-            return imageUrl; // Fallback to item image
-        }
+        // Import shared renderer dynamically
+        const { renderFrontThumbnail } = await import('../utils/CardThumbnailRenderer.js');
+        return renderFrontThumbnail(cardData, imageUrl, this.state);
     }
 
     getRandomSubtype(type) {
