@@ -176,9 +176,9 @@ class CardViewerServiceClass {
             bar.appendChild(saveBtn);
         }
 
-        // Delete Button (only if cardData exists and has an ID)
-        if (this.currentCard.cardData && this.currentCard.cardData.id) {
-            const deleteBtn = this._createButton(window.i18n?.t('cardViewer.delete') || 'מחק 🗑️', 'secondary', () => {
+        // Delete Button (show when cardData exists)
+        if (this.currentCard.cardData) {
+            const deleteBtn = this._createButton(window.i18n?.t('cardViewer.delete') || 'מחק 🗑️', 'danger', () => {
                 this._handleDelete();
             });
             bar.appendChild(deleteBtn);
@@ -388,17 +388,10 @@ class CardViewerServiceClass {
      * Handle delete action
      */
     async _handleDelete() {
-        if (!this.currentCard?.cardData?.id) {
-            if (window.uiManager) {
-                window.uiManager.showToast(window.i18n?.t('toasts.noCardId') || 'לא ניתן למחוק - אין מזהה קלף', 'warning');
-            }
-            return;
-        }
-
-        // Store all data BEFORE the confirm dialog (currentCard may be null in callback)
-        const cardId = this.currentCard.cardData.id;
-        const cardName = this.currentCard.cardData.name || '';
-        const sourceElement = this.currentCard.sourceElement;
+        // Store data before confirm
+        const cardId = this.currentCard?.cardData?.id;
+        const cardName = this.currentCard?.cardData?.name || '';
+        const sourceElement = this.currentCard?.sourceElement;
         const uniqueId = sourceElement?.dataset?.uniqueId || null;
 
         console.log('🗑️ Delete: cardId=', cardId, 'cardName=', cardName, 'uniqueId=', uniqueId);
@@ -407,10 +400,10 @@ class CardViewerServiceClass {
         if (window.uiManager) {
             window.uiManager.showConfirm(window.i18n?.t('toasts.deleteConfirm') || 'האם אתה בטוח שברצונך למחוק קלף זה?', async () => {
                 try {
-                    await window.stateManager.deleteFromHistory(cardId);
-
-                    if (window.uiManager) {
-                        window.uiManager.showToast(window.i18n?.t('toasts.cardDeleted') || 'הקלף נמחק בהצלחה', 'success');
+                    // Delete from gallery if has ID
+                    if (cardId && window.stateManager) {
+                        await window.stateManager.deleteFromHistory(cardId);
+                        console.log('🗑️ Deleted from gallery:', cardId);
                     }
 
                     // Remove from character equipment slots if equipped (using uniqueId or cardName)
@@ -423,13 +416,20 @@ class CardViewerServiceClass {
 
                     // Fallback to cardName if no uniqueId match
                     if (!equippedImg && cardName) {
-                        // Use simple selector without CSS.escape for Hebrew text
                         const allSlotImages = document.querySelectorAll('.slot-content img');
                         allSlotImages.forEach(img => {
                             if (img.dataset.itemName === cardName) {
                                 equippedImg = img;
                             }
                         });
+                    }
+
+                    // Also try looking at sourceElement directly
+                    if (!equippedImg && sourceElement) {
+                        const slotContent = sourceElement.closest('.slot-content');
+                        if (slotContent) {
+                            equippedImg = sourceElement;
+                        }
                     }
 
                     if (equippedImg) {
@@ -444,6 +444,10 @@ class CardViewerServiceClass {
                             window.characterController.itemRegistry.delete(uniqueId);
                             console.log('🗑️ Removed from itemRegistry:', uniqueId);
                         }
+                    }
+
+                    if (window.uiManager) {
+                        window.uiManager.showToast(window.i18n?.t('toasts.cardDeleted') || 'הקלף נמחק בהצלחה', 'success');
                     }
 
                     // Close the viewer

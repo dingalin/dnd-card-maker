@@ -110,6 +110,13 @@
     color: #fff;
 }
 
+/* Danger Button (red for delete) */
+.card-viewer-btn-danger {
+    background: linear-gradient(135deg, #dc3545, #a71d2a);
+    color: #fff;
+    border-color: #a71d2a;
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
     .card-viewer-actions {
