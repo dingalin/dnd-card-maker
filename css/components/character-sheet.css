@@ -25,7 +25,7 @@
     max-width: 100%;
     aspect-ratio: 0.77;
     /* Match the reference image aspect ratio */
-    background: url('../../assets/textures/character-sheet-bg.jpg');
+    background: url('../../assets/characterpage.jpeg');
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;

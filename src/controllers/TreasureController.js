@@ -474,12 +474,19 @@ class TreasureController {
 
         let imageUrl = null;
         try {
+            // Get current template URL for AI theme detection
+            const currentState = this.state.getState();
+            const templateUrl = currentState?.settings?.style?.cardBackgroundUrl || null;
+
             const imageResult = await gemini.generateImageGetImg(
                 visualPrompt,
                 'getimg-flux',  // Use FLUX model (same as GeneratorController)
                 imageStyle,     // Use user-selected style or 'realistic'
                 getImgKey,
-                styleOption     // Use user-selected style option or 'natural'
+                styleOption,    // Use user-selected style option or 'natural'
+                '#ffffff',      // Default color
+                null,           // No color description
+                templateUrl     // Pass template URL for AI theme detection
             );
             imageUrl = imageResult?.url || imageResult;
         } catch (imgError) {

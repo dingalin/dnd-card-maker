@@ -115,6 +115,128 @@ class GeminiService {
         return response.json();
     }
 
+    // === AI TEMPLATE THEME DETECTION ===
+    // Cache for detected themes to avoid redundant API calls
+    static templateThemeCache = new Map(); // templateUrl -> { theme, timestamp }
+    static THEME_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
+    /**
+     * Detect the theme of a card template using Gemini Vision
+     * @param {string} templateImageUrl - URL or base64 of the template image
+     * @returns {Promise<string>} - Detected theme (e.g., 'Fire', 'Ocean', 'Arcane')
+     */
+    async detectTemplateTheme(templateImageUrl) {
+        if (!templateImageUrl) {
+            console.log('🎨 No template provided, using default theme: Nature');
+            return 'Nature';
+        }
+
+        // Check cache first
+        const cached = GeminiService.templateThemeCache.get(templateImageUrl);
+        if (cached && (Date.now() - cached.timestamp < GeminiService.THEME_CACHE_DURATION)) {
+            console.log(`🎨 Using cached theme: ${cached.theme}`);
+            return cached.theme;
+        }
+
+        const validThemes = [
+            'Fire', 'Nature', 'Arcane', 'Divine', 'Necrotic', 'Ice',
+            'Lightning', 'Ocean', 'Shadow', 'Celestial', 'Blood',
+            'Industrial', 'Iron', 'Old Scroll', 'Elemental'
+        ];
+
+        const prompt = `You are a fantasy card game designer. Analyze this D&D card template/border image and determine its PRIMARY THEME.
+
+VALID THEMES (pick EXACTLY ONE):
+- Fire: flames, embers, volcanic, red/orange colors, heat effects
+- Nature: plants, vines, leaves, forest, green/brown organic elements
+- Arcane: magical runes, purple/blue mystical energy, wizard symbols
+- Divine: holy symbols, gold/white radiance, angelic, celestial light
+- Necrotic: skulls, bones, death, green/purple decay, ghostly
+- Ice: frost, snow, crystals, blue/white frozen elements
+- Lightning: electricity, storms, crackling energy, blue/yellow
+- Ocean: water, waves, sea creatures, tentacles, coral, turquoise/blue aquatic
+- Shadow: darkness, void, black/purple creeping shadows
+- Celestial: stars, moons, cosmic, nebula, space themes
+- Blood: crimson red, thorns, violent, dark red
+- Industrial: gears, metal, steampunk, mechanical
+- Iron: weapons, armor, chains, battle-worn metal
+- Old Scroll: parchment, ancient paper, sepia, aged document
+- Elemental: mixed elements, chaotic, rainbow primal energy
+
+RESPONSE: Return ONLY the theme name (one word or two words exactly as written above, e.g., "Ocean" or "Old Scroll"). No explanation, no punctuation.`;
+
+        try {
+            // Convert URL to base64 if needed
+            let base64Data;
+            let mimeType = 'image/png';
+
+            if (templateImageUrl.startsWith('data:')) {
+                const matches = templateImageUrl.match(/^data:(.+);base64,(.+)$/);
+                if (matches) {
+                    mimeType = matches[1];
+                    base64Data = matches[2];
+                }
+            } else {
+                // Fetch and convert to base64
+                const response = await fetch(templateImageUrl);
+                const blob = await response.blob();
+                mimeType = blob.type || 'image/png';
+                const buffer = await blob.arrayBuffer();
+                base64Data = btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+            }
+
+            const parts = [
+                { text: prompt },
+                { inline_data: { mime_type: mimeType, data: base64Data } }
+            ];
+
+            const payload = { contents: [{ parts }] };
+
+            let data;
+            if (this.useWorker) {
+                data = await this.callViaWorker('gemini-generate', {
+                    model: 'gemini-2.0-flash',
+                    contents: payload.contents
+                });
+            } else {
+                const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error('Gemini API request failed');
+                data = await response.json();
+            }
+
+            if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                throw new Error('No response from Gemini');
+            }
+
+            const detectedTheme = data.candidates[0].content.parts[0].text.trim();
+
+            // Validate the response is a valid theme
+            const matchedTheme = validThemes.find(t =>
+                detectedTheme.toLowerCase() === t.toLowerCase() ||
+                detectedTheme.toLowerCase().includes(t.toLowerCase())
+            );
+
+            const finalTheme = matchedTheme || 'Nature';
+            console.log(`🎨 AI detected template theme: "${detectedTheme}" → Using: ${finalTheme}`);
+
+            // Cache the result
+            GeminiService.templateThemeCache.set(templateImageUrl, {
+                theme: finalTheme,
+                timestamp: Date.now()
+            });
+
+            return finalTheme;
+
+        } catch (error) {
+            console.error('🎨 Theme detection failed:', error);
+            return 'Nature'; // Fallback to Nature theme
+        }
+    }
+
     async generateItemDetails(level, type, subtype, rarity, ability, contextImage = null, complexityMode = 'creative', locale = 'he') {
         const isHebrew = locale === 'he';
         const outputLanguage = isHebrew ? 'Hebrew' : 'English';
@@ -359,57 +481,65 @@ class GeminiService {
     }
 
     // Main image generation using GetImg/FLUX - OPTIMIZED FOR FANTASY ITEMS
-    async generateImageGetImg(visualPrompt, model, style, getImgApiKey, styleOption = 'natural', userColor = '#ffffff', colorDescription = null) {
+    async generateImageGetImg(visualPrompt, model, style, getImgApiKey, styleOption = 'natural', userColor = '#ffffff', colorDescription = null, templateImageUrl = null) {
 
         // === FLUX-OPTIMIZED PROMPT BUILDER ===
         // Based on research: FLUX excels with natural language, detailed descriptions,
         // and structured prompts following Subject → Style → Context format
 
+        // === FLUX-OPTIMIZED STYLE CONFIGURATIONS ===
+        // Based on research: FLUX needs VERBOSE style descriptions, doubling down on style keywords
+        // Each style has: primary (main style instruction), technique (specific methods), and finish (final touches)
         const styleConfigs = {
             'realistic': {
-                prefix: 'ultra-realistic photography',
-                suffix: 'studio lighting, professional product shot, sharp focus, 8K resolution',
-                quality: 'highly detailed, photorealistic, cinematic'
+                primary: 'ultra-realistic professional product photography, photorealistic render',
+                technique: 'studio lighting setup, softbox lighting, professional DSLR camera shot, sharp focus throughout',
+                finish: 'high resolution, commercial photography quality, clean studio backdrop'
             },
             'watercolor': {
-                prefix: 'watercolor painting, artistic illustration',
-                suffix: 'soft edges, flowing colors, painterly strokes, art paper texture',
-                quality: 'beautiful artwork, defined ink outlines, vibrant pigments'
+                primary: 'beautiful watercolor painting, traditional watercolor artwork, hand-painted watercolor illustration',
+                technique: 'wet-on-wet watercolor technique, paint bleeding on textured paper, soft color bleeding edges, visible watercolor pigment granulation, loose flowing brushstrokes',
+                finish: 'art paper texture visible, dreamy soft aesthetic, pastel color palette, artistic watercolor finish'
             },
             'oil': {
-                prefix: 'classical oil painting, Renaissance style artwork',
-                suffix: 'rich oil colors, detailed brushwork, dramatic chiaroscuro lighting',
-                quality: 'masterpiece quality, museum painting, baroque details'
+                primary: 'classical oil painting artwork, traditional oil on canvas, museum quality oil painting',
+                technique: 'thick impasto brushstrokes, visible oil paint texture, rich color glazing layers, dramatic chiaroscuro lighting, Renaissance painting technique',
+                finish: 'gallery masterpiece quality, baroque details, warm color palette, canvas texture visible'
             },
             'sketch': {
-                prefix: 'detailed pencil sketch, technical drawing',
-                suffix: 'graphite on paper, cross-hatching, precise lines, monochrome',
-                quality: 'professional illustration, concept art style'
+                primary: 'detailed pencil sketch illustration, hand-drawn graphite artwork, professional sketch drawing',
+                technique: 'graphite pencil on textured paper, cross-hatching shading technique, varied line weights, light construction lines visible',
+                finish: 'monochrome grayscale, paper grain texture, concept art style, clean precise linework'
             },
             'dark_fantasy': {
-                prefix: 'dark fantasy artwork, gothic illustration',
-                suffix: 'dramatic shadows, ominous atmosphere, Elden Ring aesthetic',
-                quality: 'high contrast, moody lighting, gritty details, dark souls style'
+                primary: 'dark fantasy digital artwork, gothic fantasy illustration, grimdark aesthetic painting',
+                technique: 'dramatic rim lighting, deep shadows, ominous atmosphere, moody color grading, dark souls inspired aesthetic',
+                finish: 'high contrast, desaturated colors with accent highlights, cinematic dark atmosphere, Elden Ring art style'
             },
             'anime': {
-                prefix: 'anime style illustration, manga artwork',
-                suffix: 'cel shading, clean lines, vibrant colors, Studio Ghibli inspired',
-                quality: 'high quality anime, detailed, beautiful illustration'
+                primary: 'anime style illustration, Japanese anime artwork, manga art style drawing',
+                technique: 'clean cel shading, bold black outlines, flat color areas with subtle gradients, anime eye style',
+                finish: 'vibrant saturated colors, Studio Ghibli inspired, high quality anime illustration, clean vector-like finish'
             },
             'woodcut': {
-                prefix: 'medieval woodcut print, old book illustration',
-                suffix: 'black and white, carved lines, vintage printed art',
-                quality: 'antique style, historical artwork, ink print'
+                primary: 'medieval woodcut print artwork, vintage woodblock illustration, old book engraving style',
+                technique: 'carved wood texture lines, black ink on paper, cross-hatched shading, hand-carved appearance',
+                finish: 'antique aged paper, historical artwork style, vintage printed aesthetic, monochrome ink'
             },
             'pixel': {
-                prefix: '16-bit pixel art, retro game sprite',
-                suffix: 'clean pixels, limited color palette, nostalgic',
-                quality: 'game asset, sharp pixels, iconic design'
+                primary: 'pixel art sprite, retro 16-bit video game art, classic pixel artwork',
+                technique: 'crisp clean pixels, limited color palette, no anti-aliasing, dithering shading technique',
+                finish: 'lo-fi nostalgic aesthetic, flat color tones, iconic game asset style, sharp pixel edges'
+            },
+            'stained_glass': {
+                primary: 'stained glass window artwork, cathedral glass art, Art Nouveau glass design',
+                technique: 'bold black lead lines separating colored sections, translucent glass effect, geometric color panels',
+                finish: 'luminous backlit appearance, vibrant jewel tones, Gothic cathedral aesthetic, decorative border'
             },
             'simple_icon': {
-                prefix: 'flat vector icon, minimalist design',
-                suffix: 'clean edges, symbolic, high contrast',
-                quality: 'professional icon, simple shapes, clear silhouette'
+                primary: 'flat vector icon design, minimalist graphic symbol, clean simple illustration',
+                technique: 'solid flat colors, geometric shapes, no gradients, bold silhouette',
+                finish: 'professional icon quality, high contrast, clear readable symbol, app icon style'
             }
         };
 
@@ -491,12 +621,14 @@ class GeminiService {
         let compositionGuide = '';
 
         // WEAPONS - Enhanced for clear, detailed weapon renders
-        if (promptLower.includes('sword') || promptLower.includes('blade') || promptLower.includes('חרב')) {
+        // IMPORTANT: Check specific weapons BEFORE generic "blade" keyword
+        // Axes often have "blade" in description, so check them first
+        if (promptLower.includes('axe') || promptLower.includes('גרזן') || promptLower.includes('hatchet')) {
+            itemTypeEnhancement = 'formidable battle axe weapon, heavy curved axe head, thick wooden or metal handle, single or double-headed axe design, chopping weapon';
+            compositionGuide = 'angled view showing the distinctive axe head shape';
+        } else if (promptLower.includes('sword') || promptLower.includes('blade') || promptLower.includes('חרב')) {
             itemTypeEnhancement = 'ornate fantasy sword, detailed hilt and guard, sharp glinting blade edge, intricate engravings';
             compositionGuide = 'full weapon visible from pommel to tip, angled hero pose';
-        } else if (promptLower.includes('axe') || promptLower.includes('גרזן')) {
-            itemTypeEnhancement = 'formidable battle axe, heavy curved blade, reinforced handle with leather grip';
-            compositionGuide = 'dynamic angle showing the axe head detail';
         } else if (promptLower.includes('bow') || promptLower.includes('קשת')) {
             itemTypeEnhancement = 'elegant recurve bow, carved wood or bone, taut bowstring, decorative limbs';
             compositionGuide = 'full bow visible, graceful curved shape emphasized';
@@ -521,6 +653,9 @@ class GeminiService {
         } else if (promptLower.includes('crossbow') || promptLower.includes('arbalet') || promptLower.includes('קשתון')) {
             itemTypeEnhancement = 'mechanical crossbow, intricate trigger mechanism, loaded bolt';
             compositionGuide = 'three-quarter view showing mechanism detail';
+        } else if (promptLower.includes('blowgun') || promptLower.includes('נשיפה') || promptLower.includes('dart') || promptLower.includes('חיצים')) {
+            itemTypeEnhancement = 'primitive blowgun hunting weapon, long hollow bamboo tube, tribal decorations, small poison darts nearby, simple ranged weapon';
+            compositionGuide = 'horizontal layout showing full length of tube, item displayed on stand, product photography';
         }
 
         // ARMOR - Enhanced for detailed armor renders
@@ -596,30 +731,69 @@ class GeminiService {
         } else if (styleOption === 'colored-background') {
             backgroundPrompt = `isolated on ${colorName} gradient background, soft ambient glow, ${colorName} color tones`;
         } else {
-            // 'natural' mode - item in sharp focus, nature bokeh background
-            backgroundPrompt = 'sharp focused item in foreground, beautiful blurred bokeh nature background, forest leaves and sunlight bokeh, shallow depth of field, dreamy soft background blur, natural outdoor lighting, fantasy forest atmosphere';
+            // 'natural' mode - item in sharp focus with THEME-AWARE bokeh background
+            // Use AI to detect template theme if available, otherwise fall back to dropdown
+            let cardTheme = 'Nature';
+
+            if (templateImageUrl) {
+                // AI-powered theme detection
+                try {
+                    cardTheme = await this.detectTemplateTheme(templateImageUrl);
+                } catch (e) {
+                    console.warn('🎨 AI theme detection failed, using dropdown fallback');
+                    const bgThemeSelect = document.getElementById('bg-theme-select');
+                    cardTheme = bgThemeSelect?.value || 'Nature';
+                }
+            } else {
+                // Fallback: read from dropdown
+                const bgThemeSelect = document.getElementById('bg-theme-select');
+                cardTheme = bgThemeSelect?.value || 'Nature';
+            }
+
+            // Theme-specific natural bokeh backgrounds
+            const themedNaturalBackgrounds = {
+                'Fire': 'sharp focused item in foreground, blurred volcanic landscape background, molten lava bokeh, ember particles floating, warm orange-red ambient glow, shallow depth of field, fiery atmosphere',
+                'Nature': 'sharp focused item in foreground, beautiful blurred bokeh nature background, forest leaves and sunlight bokeh, shallow depth of field, dreamy soft background blur, natural outdoor lighting, fantasy forest atmosphere',
+                'Arcane': 'sharp focused item in foreground, mystical purple fog bokeh background, floating magical particles, ethereal blue-purple ambient glow, shallow depth of field, arcane energy wisps blurred',
+                'Divine': 'sharp focused item in foreground, heavenly golden light bokeh background, radiant sunbeams, warm white celestial glow, shallow depth of field, blessed atmosphere, soft clouds blurred',
+                'Necrotic': 'sharp focused item in foreground, eerie graveyard fog bokeh background, ghostly green wisps, dark shadows, shallow depth of field, haunted atmosphere, spectral mist blurred',
+                'Ice': 'sharp focused item in foreground, blurred snowy mountain background, ice crystal bokeh, frozen blue ambient glow, shallow depth of field, winter frost atmosphere, snowflakes floating',
+                'Lightning': 'sharp focused item in foreground, stormy sky bokeh background, electric blue lightning flashes blurred, crackling energy atmosphere, shallow depth of field, thunderstorm ambiance',
+                'Ocean': 'sharp focused item in foreground, underwater caustic light bokeh background, floating bubbles, deep blue-turquoise ambient glow, shallow depth of field, marine atmosphere',
+                'Shadow': 'sharp focused item in foreground, dark void bokeh background, creeping shadow wisps, deep purple-black ambient, shallow depth of field, mysterious darkness atmosphere',
+                'Celestial': 'sharp focused item in foreground, cosmic starfield bokeh background, nebula colors blurred, twinkling stars, shallow depth of field, infinite cosmos atmosphere',
+                'Blood': 'sharp focused item in foreground, dark crimson fog bokeh background, floating blood mist, deep red ambient glow, shallow depth of field, violent dramatic atmosphere',
+                'Industrial': 'sharp focused item in foreground, steampunk factory bokeh background, steam clouds blurred, copper-brass ambient glow, shallow depth of field, mechanical workshop atmosphere',
+                'Iron': 'sharp focused item in foreground, forge fire bokeh background, molten metal sparks floating, warm iron-red glow, shallow depth of field, blacksmith workshop atmosphere',
+                'Old Scroll': 'sharp focused item in foreground, ancient library bokeh background, dust motes floating, warm candlelight amber glow, shallow depth of field, scholarly atmosphere',
+                'Elemental': 'sharp focused item in foreground, swirling elemental chaos bokeh background, multi-colored primal energy, rainbow ambient glow, shallow depth of field, raw elemental power atmosphere'
+            };
+
+            backgroundPrompt = themedNaturalBackgrounds[cardTheme] || themedNaturalBackgrounds['Nature'];
+            console.log(`🎨 AI-detected theme for natural background: ${cardTheme}`);
         }
 
-        // === POSITIVE REINFORCEMENT (FLUX works better with positive descriptions) ===
-        // Instead of "NO hands, NO people" - describe what we WANT to see
-        // Note: FLUX ignores generic quality keywords like "masterpiece", "8k" etc.
-        // Focus on specific descriptive details instead.
-        const positiveReinforcement = 'isolated single item displayed alone, clean professional product render, complete item fully visible, sharp focus, centered composition';
+        // === COMPOSITION INSTRUCTIONS ===
+        // FLUX best practices: Use natural language, camera terminology
+        // Item should fill ~65% of frame to leave room for bokeh background blur
+        // Reference: .agent/workflows/flux-prompts.md
+        const compositionInstructions = 'isolated single item floating in air, item fills two-thirds of image frame with generous space around, complete item fully visible, shot with 85mm lens at f/2.8, shallow depth of field, sharp focus on item, centered composition';
 
         // === BUILD FINAL OPTIMIZED PROMPT ===
-        // CRITICAL: Background instruction FIRST so FLUX prioritizes it
-        // Structure: [Background FIRST] [Composition] [Style Prefix] [Subject/Item] ...
+        // CRITICAL: Style FIRST so FLUX applies art style to entire image
+        // Structure: [Style Primary + Technique FIRST] [Subject/Item] [Details] [Background] [Style Finish]
+        // Research shows doubling down on style description is key for FLUX
         const finalPrompt = [
-            backgroundPrompt,  // FIRST - most important for background removal
-            positiveReinforcement,
-            compositionGuide,
-            styleConfig.prefix,
-            itemTypeEnhancement,
-            elementalEnhancement,
-            rarityQuality,
-            visualPrompt,
-            styleConfig.quality,
-            styleConfig.suffix
+            styleConfig.primary,    // FIRST - main style declaration (e.g., "watercolor painting artwork")
+            styleConfig.technique,  // SECOND - specific technique details
+            visualPrompt,           // THIRD - the actual item description from AI
+            itemTypeEnhancement,    // Item type details (axe, sword, etc.)
+            compositionGuide,           // Composition guidance
+            compositionInstructions,    // Camera/photography style instructions
+            elementalEnhancement,   // Elemental effects
+            rarityQuality,          // Rarity-based quality
+            backgroundPrompt,       // Background
+            styleConfig.finish      // LAST - style finishing touches to reinforce the style
         ].filter(Boolean).join(', ');
 
         console.log(`🎨 GeminiService (GetImg/FLUX): Style=${style}, Option=${styleOption}`);
