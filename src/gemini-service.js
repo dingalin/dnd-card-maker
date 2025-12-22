@@ -1020,32 +1020,90 @@ RESPONSE: Return ONLY the theme name (one word or two words exactly as written a
             }
         };
 
-        // Style-specific rendering approaches
+        // FLUX-OPTIMIZED STYLE CONFIGURATIONS
+        // Based on the same research as image generator: FLUX needs VERBOSE style descriptions
+        // Each style has: primary (main style instruction), technique (specific methods), and finish (final touches)
         const styleConfigs = {
-            'watercolor': 'soft watercolor painting style, flowing pigments, wet-on-wet technique, artistic brush strokes',
-            'realistic': 'photorealistic texture, detailed material rendering, professional photography lighting',
-            'oil': 'rich oil painting, thick brushwork, Renaissance master style, dramatic chiaroscuro',
-            'dark_fantasy': 'dark gothic illustration, ominous atmosphere, Elden Ring aesthetic, gritty details',
-            'sketch': 'detailed pencil sketch, graphite shading, technical illustration style',
-            'woodcut': 'medieval woodcut print, black ink lines, vintage engraving style',
-            // NEW STYLES
-            'anime': 'anime style illustration, vibrant colors, clean lines, Studio Ghibli inspired, cel shading',
-            'stained_glass': 'stained glass window art, vibrant colored glass panels, lead lines, cathedral style, luminous',
-            'pixel': '16-bit pixel art style, retro video game aesthetic, limited color palette, clean pixels',
-            'handdrawn': 'hand-drawn illustration, artist sketches, pencil and ink, personal artistic style'
+            'watercolor': {
+                primary: 'beautiful watercolor painting, traditional watercolor artwork, hand-painted frame border',
+                technique: 'wet-on-wet watercolor technique, soft color bleeding edges, visible watercolor pigment granulation, loose flowing brushstrokes on frame',
+                finish: 'art paper texture visible, dreamy soft aesthetic, pastel color palette, artistic watercolor finish'
+            },
+            'realistic': {
+                primary: 'ultra-realistic photographic texture, detailed material rendering, professional studio lighting',
+                technique: 'high resolution textures, physical material properties visible, cinematic lighting setup',
+                finish: 'commercial product photography quality, crisp details, premium finish'
+            },
+            'oil': {
+                primary: 'classical oil painting artwork, traditional oil on canvas, museum quality painting',
+                technique: 'thick impasto brushstrokes on frame, visible oil paint texture, rich color glazing layers, dramatic chiaroscuro lighting',
+                finish: 'gallery masterpiece quality, baroque decorative details, warm color palette, canvas texture visible'
+            },
+            'dark_fantasy': {
+                primary: 'dark fantasy digital artwork, gothic fantasy illustration, grimdark aesthetic',
+                technique: 'dramatic rim lighting, deep shadows, ominous atmosphere, moody color grading, dark souls inspired aesthetic',
+                finish: 'high contrast, desaturated colors with accent highlights, cinematic dark atmosphere, Elden Ring art style'
+            },
+            'sketch': {
+                primary: 'detailed pencil sketch illustration, hand-drawn graphite artwork, professional sketch drawing',
+                technique: 'graphite pencil on textured paper, cross-hatching shading technique, varied line weights, light construction lines visible',
+                finish: 'monochrome grayscale, paper grain texture, concept art style, clean precise linework'
+            },
+            'epic_fantasy': {
+                primary: 'medieval woodcut print artwork, vintage woodblock illustration, old book engraving style',
+                technique: 'carved wood texture lines, black ink on paper, cross-hatched shading, hand-carved appearance',
+                finish: 'antique aged paper, historical artwork style, vintage printed aesthetic, monochrome ink'
+            },
+            'anime': {
+                primary: 'anime style illustration, Japanese anime artwork, manga art style drawing',
+                technique: 'clean cel shading, bold black outlines, flat color areas with subtle gradients',
+                finish: 'vibrant saturated colors, Studio Ghibli inspired, high quality anime illustration, clean vector-like finish'
+            },
+            'stained_glass': {
+                primary: 'stained glass window artwork, cathedral glass art, Art Nouveau glass design',
+                technique: 'bold black lead lines separating colored sections, translucent glass effect, geometric color panels',
+                finish: 'luminous backlit appearance, vibrant jewel tones, Gothic cathedral aesthetic, decorative border'
+            },
+            'pixel': {
+                primary: '16-bit pixel art style, retro video game aesthetic, SNES game graphics',
+                technique: 'blocky square pixels visible, pixelated image, chunky pixel blocks, retro gaming sprite',
+                finish: 'classic retro Nintendo aesthetic, visible pixel grid, no smooth edges, looks like old video game'
+            },
+            'simple_icon': {
+                primary: 'flat 2D vector design, minimalist icon design, simple flat illustration, clean lines',
+                technique: 'completely flat solid colors only, zero gradients, zero shading, bold simple shapes',
+                finish: 'mobile game UI style, clean geometric silhouette, high contrast, minimal detail'
+            },
+            'ink_drawing': {
+                primary: 'black ink illustration, hand-drawn pen and ink artwork, old fantasy book illustration',
+                technique: 'fine black ink lines, crosshatch shading, hand-drawn imperfections, quill pen strokes, detailed linework',
+                finish: 'vintage Dungeons and Dragons manual style, 1980s fantasy book illustration, black ink on parchment paper'
+            },
+            'silhouette': {
+                primary: 'heraldic emblem design, coat of arms symbol, medieval heraldry, simple emblem artwork',
+                technique: 'solid black graphic elements, clean iconic shapes, bold symbolic design, flat graphic emblem',
+                finish: 'royal crest style, knightly insignia, medieval guild symbol, simple bold shapes'
+            },
+            'synthwave': {
+                primary: 'synthwave neon artwork, retrowave 80s aesthetic, cyberpunk neon style',
+                technique: 'glowing neon lights, hot pink and cyan color scheme, grid lines, chrome reflections',
+                finish: 'retro futuristic atmosphere, vaporwave aesthetic, glowing edges, 1980s sci-fi movie poster style'
+            }
         };
 
         const themeConfig = themeConfigs[theme] || themeConfigs['Old Scroll'];
-        const styleDescription = styleConfigs[style] || styleConfigs['watercolor'];
+        const styleConfig = styleConfigs[style] || styleConfigs['watercolor'];
 
         // Build prompt that matches the STRUCTURE of our ready-made backgrounds:
         // - Decorative ornate frame/border around edges
         // - Thematic corner pieces and edge decorations  
         // - Clear lighter center area (parchment/cream) for content
         // - Trading card proportions (2:3 vertical)
+        // FLUX-OPTIMIZED: Style elements FIRST, then structure, then theme
         const prompt = [
-            // Art style first
-            styleDescription,
+            // Art style first (FLUX best practice: style at beginning AND end)
+            styleConfig.primary,
+            styleConfig.technique,
 
             // CRITICAL STRUCTURE - Framed trading card design
             'FRAMED CARD DESIGN: ornate decorative border frame surrounding empty center',
@@ -1071,7 +1129,10 @@ RESPONSE: Return ONLY the theme name (one word or two words exactly as written a
             // Technical specs
             'vertical portrait orientation, 2:3 aspect ratio, trading card proportions',
             'absolutely no text, no letters, no characters, no creatures, no faces',
-            'center must remain completely empty and bright for content overlay'
+            'center must remain completely empty and bright for content overlay',
+
+            // Style finish at the end (reinforces the style)
+            styleConfig.finish
         ].join(', ');
 
         console.log(`🎨 GeminiService: Generating ${theme} background in ${style} style`);
