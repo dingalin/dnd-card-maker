@@ -226,6 +226,9 @@ class CardRenderer {
                 { glow: styles.loreGlow }
             );
         }
+
+        // Apply rounded corners at the end
+        this.applyRoundedCorners();
     }
 
     async renderFront(cardData, options = {}) {
@@ -363,7 +366,8 @@ class CardRenderer {
             console.error("CardRenderer: Failed to draw text", e);
         }
 
-
+        // Apply rounded corners at the end
+        this.applyRoundedCorners();
 
         console.log("CardRenderer: Render complete");
     }
@@ -436,6 +440,38 @@ class CardRenderer {
         ctx.restore();
 
         console.log(`CardRenderer: Drew center fade with intensity ${intensity}%`);
+    }
+
+    /**
+     * Apply rounded corners to the card like real trading cards
+     * Uses destination-in composite to mask the corners
+     */
+    applyRoundedCorners() {
+        const ctx = this.ctx;
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const radius = 15; // ~3.5mm at card size, like real TCG cards
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-in';
+
+        // Draw rounded rectangle mask
+        ctx.beginPath();
+        ctx.moveTo(radius, 0);
+        ctx.lineTo(w - radius, 0);
+        ctx.quadraticCurveTo(w, 0, w, radius);
+        ctx.lineTo(w, h - radius);
+        ctx.quadraticCurveTo(w, h, w - radius, h);
+        ctx.lineTo(radius, h);
+        ctx.quadraticCurveTo(0, h, 0, h - radius);
+        ctx.lineTo(0, radius);
+        ctx.quadraticCurveTo(0, 0, radius, 0);
+        ctx.closePath();
+
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+
+        ctx.restore();
     }
 
     async drawItemImage(url, yOffset = 0, scale = 1.0, rotation = 0, style = 'natural', color = '#ffffff', fade = 0, shadow = 0) {

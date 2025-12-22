@@ -228,10 +228,12 @@ async function handleKieZImage(data, apiKey) {
     console.log(`Kie.ai: Created task ${taskId}`);
 
     // Step 2: Poll for result (max 60 seconds)
+    // Adaptive polling: start fast (500ms), slow down over time to reduce API calls
     const maxAttempts = 60;
-    const pollInterval = 1000; // 1 second (faster polling)
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        // Adaptive polling: 500ms for first 5 attempts, then 1000ms
+        const pollInterval = attempt < 5 ? 500 : 1000;
         await new Promise(resolve => setTimeout(resolve, pollInterval));
 
         // Use recordInfo endpoint for querying Market model task status

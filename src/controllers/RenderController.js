@@ -87,6 +87,10 @@ export class RenderController {
                 fontSizes: sideSettings.fontSizes,
                 fontStyles: sideSettings.fontStyles,
 
+                // IMPORTANT: backgroundScale should ALWAYS come from front.offsets
+                // This ensures both sides of the card have the same background size
+                backgroundScale: state.settings.front?.offsets?.backgroundScale ?? 1.0,
+
                 // Helper to ensure critical Widths are present if not in offsets
                 nameWidth: sideSettings.offsets.nameWidth || 500,
                 typeWidth: sideSettings.offsets.typeWidth || 500,
@@ -123,10 +127,11 @@ export class RenderController {
                     fontStyles: state.settings.front.fontStyles
                 }, false); // Force Front
 
-                // 2. Render Back
+                // 2. Render Back (use backgroundScale from front so both sides match)
                 await this.backRenderer.render(state.cardData, {
                     ...renderOptions,
                     ...state.settings.back.offsets, // Ensure back offsets
+                    backgroundScale: state.settings.front?.offsets?.backgroundScale ?? 1.0, // Use FRONT's backgroundScale for consistency
                     fontSizes: state.settings.back.fontSizes,
                     fontStyles: state.settings.back.fontStyles
                 }, true); // Force Back
@@ -603,6 +608,7 @@ export class RenderController {
 
                                     await this.backRenderer.render(cardData, {
                                         ...backSettings.offsets,
+                                        backgroundScale: currentSettings.front?.offsets?.backgroundScale ?? 1.0, // Use FRONT's backgroundScale
                                         fontSizes: backSettings.fontSizes,
                                         fontStyles: backSettings.fontStyles,
                                         fontFamily: style.fontFamily || 'Heebo',

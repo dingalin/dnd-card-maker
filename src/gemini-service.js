@@ -1140,16 +1140,35 @@ RESPONSE: Return ONLY the theme name (one word or two words exactly as written a
 
         // Use selected model (FLUX or Z-Image) via Worker proxy
         try {
-            const body = {
-                prompt: prompt,
-                model: model,
-                response_format: 'b64',
-                width: 512,
-                height: 768
-            };
+            let data;
 
-            console.log(`GeminiService: Using Worker for Background generation (${model})`);
-            const data = await this.callViaWorker('getimg-generate', body);
+            if (model === 'getimg-zimage') {
+                // Z-Image uses Kie.ai API via dedicated action
+                // Kie.ai Z-Image has a 1000 character limit for prompts
+                const truncatedPrompt = prompt.length > 1000
+                    ? prompt.substring(0, 997) + '...'
+                    : prompt;
+
+                console.log(`GeminiService: Using Worker for Background generation (Z-Image via Kie.ai)`);
+                console.log(`Z-Image prompt length: ${truncatedPrompt.length} chars`);
+
+                data = await this.callViaWorker('kie-zimage', {
+                    prompt: truncatedPrompt,
+                    aspect_ratio: '3:4'  // Card proportions
+                });
+            } else {
+                // FLUX or Seedream via GetImg
+                const body = {
+                    prompt: prompt,
+                    model: model,
+                    response_format: 'b64',
+                    width: 512,
+                    height: 768
+                };
+
+                console.log(`GeminiService: Using Worker for Background generation (${model})`);
+                data = await this.callViaWorker('getimg-generate', body);
+            }
 
             if (data.image) {
                 const imageUrl = `data:image/jpeg;base64,${data.image}`;

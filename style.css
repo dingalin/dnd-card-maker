@@ -333,8 +333,8 @@ canvas {
   object-fit: contain;
   visibility: visible !important;
   opacity: 1 !important;
-  background-color: #e0cda8;
-  /* Fallback parchment color */
+  background-color: transparent;
+  /* Transparent to allow rounded corners to show page background */
   isolation: isolate;
   /* Prevent blend-mode inheritance */
 }

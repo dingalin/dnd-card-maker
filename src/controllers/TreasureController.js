@@ -141,8 +141,24 @@ class TreasureController {
         const selectedType = typeSelect.value;
         const items = window.OFFICIAL_ITEMS?.[selectedType];
 
+        // Get current locale
+        const locale = window.i18n?.getLocale() || 'he';
+        const isHebrew = locale === 'he';
+
+        // Helper function to display item name based on locale
+        // Format in data is "EnglishName (HebrewName)"
+        const getDisplayName = (fullName) => {
+            const match = fullName.match(/^(.+?)\s*\((.+)\)$/);
+            if (match) {
+                const [, englishName, hebrewName] = match;
+                return isHebrew ? `${hebrewName} (${englishName})` : englishName;
+            }
+            return fullName;
+        };
+
         // Clear existing options
-        subtypeSelect.innerHTML = '<option value="">-- בחר חפץ --</option>';
+        const defaultText = isHebrew ? '-- בחר חפץ --' : '-- Select Item --';
+        subtypeSelect.innerHTML = `<option value="">${defaultText}</option>`;
 
         if (items) {
             Object.entries(items).forEach(([category, itemList]) => {
@@ -151,8 +167,8 @@ class TreasureController {
 
                 itemList.forEach(item => {
                     const option = document.createElement('option');
-                    option.value = item;
-                    option.textContent = item;
+                    option.value = item; // Keep original value for lookups
+                    option.textContent = getDisplayName(item);
                     optgroup.appendChild(option);
                 });
 
@@ -191,26 +207,32 @@ class TreasureController {
     }
 
     getTypeName(type) {
+        const locale = window.i18n?.getLocale() || 'he';
+        const isHebrew = locale === 'he';
+
         const names = {
-            weapon: 'נשק',
-            armor: 'שריון',
-            wondrous: 'חפץ פלא',
-            potion: 'שיקוי',
-            ring: 'טבעת',
-            scroll: 'מגילה',
-            staff: 'מטה',
-            wand: 'שרביט'
+            weapon: isHebrew ? 'נשק' : 'Weapon',
+            armor: isHebrew ? 'שריון' : 'Armor',
+            wondrous: isHebrew ? 'חפץ פלא' : 'Wondrous Item',
+            potion: isHebrew ? 'שיקוי' : 'Potion',
+            ring: isHebrew ? 'טבעת' : 'Ring',
+            scroll: isHebrew ? 'מגילה' : 'Scroll',
+            staff: isHebrew ? 'מטה' : 'Staff',
+            wand: isHebrew ? 'שרביט' : 'Wand'
         };
         return names[type] || type;
     }
 
     getRarityLabel(rarity) {
+        const locale = window.i18n?.getLocale() || 'he';
+        const isHebrew = locale === 'he';
+
         const labels = {
-            'mundane': 'רגיל',
-            '1-4': 'נפוץ',
-            '5-10': 'לא נפוץ',
-            '11-16': 'נדיר',
-            '17+': 'אגדי'
+            'mundane': isHebrew ? 'רגיל' : 'Mundane',
+            '1-4': isHebrew ? 'נפוץ' : 'Common',
+            '5-10': isHebrew ? 'לא נפוץ' : 'Uncommon',
+            '11-16': isHebrew ? 'נדיר' : 'Rare',
+            '17+': isHebrew ? 'אגדי' : 'Legendary'
         };
         return labels[rarity] || rarity;
     }

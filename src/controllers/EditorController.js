@@ -758,11 +758,13 @@ export class EditorController {
                     const isHebrew = locale === 'he';
 
                     // Helper function to display item name based on locale
-                    // Format is "EnglishName (HebrewName)" - show appropriate part
+                    // Format in data is "EnglishName (HebrewName)"
                     const getDisplayName = (fullName) => {
                         const match = fullName.match(/^(.+?)\s*\((.+)\)$/);
                         if (match) {
                             const [, englishName, hebrewName] = match;
+                            // In Hebrew: show "HebrewName (EnglishName)"
+                            // In English: show just "EnglishName"
                             return isHebrew ? `${hebrewName} (${englishName})` : englishName;
                         }
                         return fullName; // No parentheses, return as-is
