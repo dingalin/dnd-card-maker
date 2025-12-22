@@ -923,8 +923,8 @@ RESPONSE: Return ONLY the theme name (one word or two words exactly as written a
         }
     }
 
-    // Background generation using GetImg/FLUX - ENHANCED
-    async generateCardBackground(theme, style = 'watercolor', getImgApiKey = '') {
+    // Background generation using GetImg/FLUX or Z-Image - ENHANCED
+    async generateCardBackground(theme, style = 'watercolor', getImgApiKey = '', model = 'getimg-flux') {
         // Rich theme-specific descriptions optimized for FLUX natural language
         const themeConfigs = {
             'Fire': {
@@ -1135,19 +1135,20 @@ RESPONSE: Return ONLY the theme name (one word or two words exactly as written a
             styleConfig.finish
         ].join(', ');
 
-        console.log(`🎨 GeminiService: Generating ${theme} background in ${style} style`);
+        console.log(`🎨 GeminiService: Generating ${theme} background in ${style} style using ${model}`);
         console.log(`📝 Background Prompt: "${prompt.substring(0, 100)}..."`);
 
-        // Use GetImg/FLUX via Worker proxy
+        // Use selected model (FLUX or Z-Image) via Worker proxy
         try {
             const body = {
                 prompt: prompt,
+                model: model,
                 response_format: 'b64',
                 width: 512,
                 height: 768
             };
 
-            console.log("GeminiService: Using Worker for Background generation");
+            console.log(`GeminiService: Using Worker for Background generation (${model})`);
             const data = await this.callViaWorker('getimg-generate', body);
 
             if (data.image) {

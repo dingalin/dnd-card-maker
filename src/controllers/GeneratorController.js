@@ -455,9 +455,10 @@ export class GeneratorController {
             this.gemini = new GeminiService(apiKey);
             const theme = document.getElementById('bg-theme-select')?.value || 'Fire';
             const style = document.getElementById('bg-style-select')?.value || 'watercolor';
+            const model = document.getElementById('bg-model-select')?.value || 'getimg-flux';
             const getImgKey = document.getElementById('getimg-api-key')?.value.trim() || '';
 
-            const bgUrl = await this.gemini.generateCardBackground(theme, style, getImgKey);
+            const bgUrl = await this.gemini.generateCardBackground(theme, style, getImgKey, model);
 
             // Convert to Base64 for persistence
             let persistentBgUrl = bgUrl;
