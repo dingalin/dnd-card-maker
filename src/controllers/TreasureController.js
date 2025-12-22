@@ -93,6 +93,13 @@ class TreasureController {
 
         // Initialize subtypes
         this.populateSubtypes();
+
+        // Subscribe to locale changes to refresh dropdowns
+        if (window.i18n && window.i18n.onLocaleChange) {
+            window.i18n.onLocaleChange(() => {
+                this.populateSubtypes();
+            });
+        }
     }
 
     switchMode(mode) {

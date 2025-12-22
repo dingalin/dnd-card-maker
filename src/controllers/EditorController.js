@@ -23,6 +23,17 @@ export class EditorController {
                 this.syncUIFromState(newState);
             }
         });
+
+        // Subscribe to locale changes to refresh dropdowns
+        if (window.i18n && window.i18n.onLocaleChange) {
+            window.i18n.onLocaleChange(() => {
+                // Refresh the subtype dropdown with new locale
+                const typeSelect = document.getElementById('item-type');
+                if (typeSelect && typeSelect.value) {
+                    typeSelect.dispatchEvent(new Event('change'));
+                }
+            });
+        }
     }
 
     syncUIFromState(state) {
