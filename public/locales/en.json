@@ -90,20 +90,23 @@
         "colorPickerLabel": "Select Background Color:"
     },
     "imageModels": {
-        "imagen3": "🌟 Gemini Imagen 3",
-        "flux": "GetImg: FLUX Schnell (Recommended)"
+        "flux": "⚡ FLUX Schnell (Fast)",
+        "zimage": "🎨 Z-Image (High Quality, Slower)"
     },
     "imageStyles": {
         "realistic": "Realistic",
-        "watercolor": "Watercolor & Line Art",
+        "watercolor": "Watercolor",
         "oil": "Oil Painting",
         "sketch": "Pencil Sketch",
         "dark_fantasy": "Dark Fantasy",
+        "epic_fantasy": "Epic Fantasy",
         "anime": "Anime",
-        "woodcut": "Woodcut",
         "pixel": "Pixel Art",
-        "simple_icon": "Simple Icon",
-        "handdrawn": "Hand-drawn"
+        "stained_glass": "Stained Glass",
+        "simple_icon": "Flat Icon",
+        "ink_drawing": "Ink Drawing",
+        "silhouette": "Emblem",
+        "synthwave": "Synthwave"
     },
     "imageProcessing": {
         "natural": "Natural Background",
@@ -252,7 +255,9 @@
         "ring": "Ring",
         "boots": "Boots",
         "belt": "Belt",
+        "gloves": "Gloves",
         "backpack": "Backpack",
+        "namePlaceholderHint": "Type name and press Enter",
         "itemMoved": "Item moved!",
         "itemStored": "Item stored in backpack",
         "edit": "Edit Item",

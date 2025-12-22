@@ -275,6 +275,81 @@ function initFormHeaderUpdates() {
     }
 }
 
+// ================================================
+// Mobile Sidebar Toggle
+// ================================================
+
+function initMobileSidebar() {
+    const overlay = document.getElementById('mobile-overlay');
+    const menuStartBtn = document.getElementById('mobile-menu-start');
+    const menuEndBtn = document.getElementById('mobile-menu-end');
+    const menuGalleryBtn = document.getElementById('mobile-menu-gallery');
+    const sidebarStart = document.querySelector('.sidebar-start');
+    const sidebarEnd = document.querySelector('.sidebar-end');
+
+    function openSidebar(sidebar) {
+        if (!sidebar) return;
+        sidebar.classList.add('open');
+        overlay?.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAllSidebars() {
+        sidebarStart?.classList.remove('open');
+        sidebarEnd?.classList.remove('open');
+        overlay?.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Menu buttons
+    menuStartBtn?.addEventListener('click', () => openSidebar(sidebarStart));
+    menuEndBtn?.addEventListener('click', () => openSidebar(sidebarEnd));
+
+    // Gallery button - open gallery tab
+    menuGalleryBtn?.addEventListener('click', () => {
+        const galleryTab = document.querySelector('#gallery-placeholder, [data-tab="gallery"]');
+        if (galleryTab) {
+            galleryTab.click();
+        }
+        // Also trigger gallery open if there's a gallery controller
+        window.historyController?.openGallery?.();
+    });
+
+    // Close on overlay click
+    overlay?.addEventListener('click', closeAllSidebars);
+
+    // Close on swipe (basic swipe detection)
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].clientX;
+        const diff = touchEndX - touchStartX;
+
+        // RTL: Swipe left to close right sidebar, swipe right to close left sidebar
+        if (Math.abs(diff) > 100) {
+            if (diff > 0 && sidebarStart?.classList.contains('open')) {
+                closeAllSidebars();
+            } else if (diff < 0 && sidebarEnd?.classList.contains('open')) {
+                closeAllSidebars();
+            }
+        }
+    }, { passive: true });
+
+    // Add close buttons to sidebars dynamically
+    [sidebarStart, sidebarEnd].forEach(sidebar => {
+        if (sidebar && !sidebar.querySelector('.sidebar-close-btn')) {
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'sidebar-close-btn';
+            closeBtn.innerHTML = '✕';
+            closeBtn.addEventListener('click', closeAllSidebars);
+            sidebar.insertBefore(closeBtn, sidebar.firstChild);
+        }
+    });
+}
+
 // Auto-init on componentsLoaded
 
-export { initUI, showToast, initWindowManager, initFormHeaderUpdates };
+export { initUI, showToast, initWindowManager, initFormHeaderUpdates, initMobileSidebar };

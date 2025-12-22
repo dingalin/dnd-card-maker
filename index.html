@@ -25,10 +25,14 @@
   <link rel="stylesheet" href="./css/components/character-sheet.css">
   <link rel="stylesheet" href="./css/components/card-viewer.css">
   <link rel="stylesheet" href="./css/components/treasure-generator.css">
+  <link rel="stylesheet" href="./css/mobile.css">
 
 </head>
 
 <body>
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay" id="mobile-overlay"></div>
+
   <div id="app">
     <!-- Header Component -->
     <div id="header-placeholder"></div>
@@ -98,6 +102,22 @@
           <button id="confirm-ok-btn" class="btn-primary" data-i18n="modal.confirm">אישור</button>
         </div>
       </div>
+    </div>
+
+    <!-- Mobile Bottom Bar -->
+    <div class="mobile-bottom-bar" id="mobile-bottom-bar">
+      <button id="mobile-menu-start" class="mobile-bar-btn">
+        <span class="icon">⚙️</span>
+        <span>יצירה</span>
+      </button>
+      <button id="mobile-menu-gallery" class="mobile-bar-btn">
+        <span class="icon">🏛️</span>
+        <span>גלריה</span>
+      </button>
+      <button id="mobile-menu-end" class="mobile-bar-btn">
+        <span class="icon">✏️</span>
+        <span>עריכה</span>
+      </button>
     </div>
   </div>
 

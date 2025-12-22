@@ -90,20 +90,23 @@
         "colorPickerLabel": "בחר צבע רקע:"
     },
     "imageModels": {
-        "imagen3": "🌟 Gemini Imagen 3",
-        "flux": "GetImg: FLUX Schnell (מומלץ)"
+        "flux": "⚡ FLUX Schnell (מהיר)",
+        "zimage": "🎨 Z-Image (איכותי, איטי יותר)"
     },
     "imageStyles": {
         "realistic": "ריאליסטי (Realistic)",
-        "watercolor": "צבעי מים וקו (Watercolor & Line Art)",
+        "watercolor": "צבעי מים (Watercolor)",
         "oil": "ציור שמן (Oil Painting)",
         "sketch": "רישום עיפרון (Pencil Sketch)",
         "dark_fantasy": "פנטזיה אפלה (Dark Fantasy)",
+        "epic_fantasy": "פנטזיה אפית (Epic Fantasy)",
         "anime": "אנימה (Anime)",
-        "woodcut": "תחריט עץ (Woodcut)",
         "pixel": "פיקסל ארט (Pixel Art)",
-        "simple_icon": "אייקון פשוט (Simple Icon)",
-        "handdrawn": "רישום ביד (Hand-drawn)"
+        "stained_glass": "ויטראז' (Stained Glass)",
+        "simple_icon": "אייקון שטוח (Flat Icon)",
+        "ink_drawing": "דיו ביד (Ink Drawing)",
+        "silhouette": "סמל (Emblem)",
+        "synthwave": "סינת'וייב (Synthwave)"
     },
     "imageProcessing": {
         "natural": "רקע טבעי (Natural)",
@@ -252,6 +255,7 @@
         "ring": "טבעת",
         "boots": "מגפיים",
         "belt": "חגורה",
+        "gloves": "כפפות",
         "backpack": "תיק גב",
         "namePlaceholder": "שם הדמות",
         "itemMoved": "פריט הועבר!",

@@ -521,15 +521,15 @@ RESPONSE: Return ONLY the theme name (one word or two words exactly as written a
                 technique: 'clean cel shading, bold black outlines, flat color areas with subtle gradients, anime eye style',
                 finish: 'vibrant saturated colors, Studio Ghibli inspired, high quality anime illustration, clean vector-like finish'
             },
-            'woodcut': {
+            'epic_fantasy': {
                 primary: 'medieval woodcut print artwork, vintage woodblock illustration, old book engraving style',
                 technique: 'carved wood texture lines, black ink on paper, cross-hatched shading, hand-carved appearance',
                 finish: 'antique aged paper, historical artwork style, vintage printed aesthetic, monochrome ink'
             },
             'pixel': {
-                primary: 'pixel art sprite, retro 16-bit video game art, classic pixel artwork',
-                technique: 'crisp clean pixels, limited color palette, no anti-aliasing, dithering shading technique',
-                finish: 'lo-fi nostalgic aesthetic, flat color tones, iconic game asset style, sharp pixel edges'
+                primary: '8-bit pixel art, tiny pixel sprite, NES video game graphics, Gameboy color game asset',
+                technique: 'blocky square pixels visible, extremely low resolution pixelated image, only 32x32 pixels, chunky pixel blocks, retro gaming sprite',
+                finish: 'classic 8-bit Nintendo aesthetic, visible pixel grid, no smooth edges, no anti-aliasing, looks like old video game'
             },
             'stained_glass': {
                 primary: 'stained glass window artwork, cathedral glass art, Art Nouveau glass design',
@@ -537,9 +537,24 @@ RESPONSE: Return ONLY the theme name (one word or two words exactly as written a
                 finish: 'luminous backlit appearance, vibrant jewel tones, Gothic cathedral aesthetic, decorative border'
             },
             'simple_icon': {
-                primary: 'flat vector icon design, minimalist graphic symbol, clean simple illustration',
-                technique: 'solid flat colors, geometric shapes, no gradients, bold silhouette',
-                finish: 'professional icon quality, high contrast, clear readable symbol, app icon style'
+                primary: 'flat 2D vector icon, minimalist icon design, simple flat illustration, UI game icon',
+                technique: 'completely flat solid colors only, zero gradients, zero shading, bold simple shapes, thick black outline',
+                finish: 'mobile game UI icon style, clean geometric silhouette, high contrast, minimal detail'
+            },
+            'ink_drawing': {
+                primary: 'black ink illustration, hand-drawn pen and ink artwork, old fantasy book illustration',
+                technique: 'fine black ink lines, crosshatch shading, hand-drawn imperfections, quill pen strokes, detailed linework',
+                finish: 'vintage Dungeons and Dragons manual style, 1980s fantasy book illustration, black ink on parchment paper'
+            },
+            'silhouette': {
+                primary: 'heraldic emblem design, coat of arms symbol, medieval heraldry icon, simple emblem artwork',
+                technique: 'solid black graphic on white background, clean iconic shape, bold symbolic design, flat graphic emblem',
+                finish: 'royal crest style, knightly insignia, medieval guild symbol, simple bold icon, shield emblem aesthetic'
+            },
+            'synthwave': {
+                primary: 'synthwave neon artwork, retrowave 80s aesthetic, cyberpunk neon style',
+                technique: 'glowing neon lights, hot pink and cyan color scheme, grid lines, chrome reflections',
+                finish: 'retro futuristic atmosphere, vaporwave aesthetic, glowing edges, 1980s sci-fi movie poster style'
             }
         };
 
@@ -805,11 +820,45 @@ RESPONSE: Return ONLY the theme name (one word or two words exactly as written a
             response_format: 'b64'
         };
 
-        if (model === 'getimg-seedream') {
+        // Model selection - default is FLUX Schnell
+        if (model === 'getimg-zimage') {
+            // Z-Image uses Kie.ai API (GetImg doesn't support it properly)
+            console.log('🖼️ Using Z-Image Turbo via Kie.ai');
+            const useWorker = !getImgApiKey.startsWith('key-');
+
+            if (useWorker) {
+                try {
+                    // Kie.ai Z-Image has a 1000 character limit for prompts
+                    const truncatedPrompt = finalPrompt.length > 1000
+                        ? finalPrompt.substring(0, 997) + '...'
+                        : finalPrompt;
+
+                    console.log(`Z-Image prompt length: ${truncatedPrompt.length} chars`);
+
+                    const data = await this.callViaWorker('kie-zimage', {
+                        prompt: truncatedPrompt,
+                        aspect_ratio: '1:1'
+                    });
+
+                    if (data.image) {
+                        const imageUrl = `data:image/jpeg;base64,${data.image}`;
+                        const blob = await (await fetch(imageUrl)).blob();
+                        return BlobURLRegistry.register(URL.createObjectURL(blob));
+                    } else if (data.error) {
+                        throw new Error(data.error);
+                    }
+                } catch (error) {
+                    console.error('Kie.ai Z-Image Error:', error);
+                    throw error;
+                }
+            } else {
+                throw new Error('Z-Image requires Kie.ai API key (via worker proxy)');
+            }
+        } else if (model === 'getimg-seedream') {
             endpoint = 'https://api.getimg.ai/v1/seedream-v4/text-to-image';
         }
 
-        // Use Worker proxy if not a direct API key
+        // Use Worker proxy if not a direct API key (for FLUX/Seedream)
         const useWorkersForGetImg = !getImgApiKey.startsWith('key-');
 
         if (useWorkersForGetImg) {
@@ -827,13 +876,18 @@ RESPONSE: Return ONLY the theme name (one word or two words exactly as written a
                     // MEMORY LEAK FIX: Register blob URL for automatic cleanup
                     return BlobURLRegistry.register(URL.createObjectURL(blob));
                 } else if (data.error) {
-                    throw new Error(data.error);
+                    // Better error message for debugging
+                    const errorMsg = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
+                    console.error("GetImg API Error Details:", data.error);
+                    throw new Error(errorMsg);
                 } else {
+                    console.error("Unexpected response from Worker:", data);
                     throw new Error("Worker did not return an image");
                 }
             } catch (workerError) {
-                console.error("GetImg Proxy Error:", workerError);
-                throw workerError;
+                const errorMsg = workerError.message || JSON.stringify(workerError);
+                console.error("GetImg Proxy Error:", errorMsg);
+                throw new Error(`GetImg Error: ${errorMsg}`);
             }
         }
 

@@ -358,13 +358,25 @@ class StateManager {
         if (!this.state.cardData) return;
 
         const saveData = {
-            cardData: this.state.cardData,
+            cardData: { ...this.state.cardData },
             settings: this.state.settings,
             savedAt: new Date().toISOString()
         };
 
-        localStorage.setItem('dnd_current_card', JSON.stringify(saveData));
-        console.log('💾 Card saved to localStorage');
+        try {
+            localStorage.setItem('dnd_current_card', JSON.stringify(saveData));
+            console.log('💾 Card saved to localStorage');
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.warn('💾 localStorage quota exceeded, saving without image');
+                saveData.cardData.imageUrl = null;
+                try {
+                    localStorage.setItem('dnd_current_card', JSON.stringify(saveData));
+                } catch (e2) {
+                    console.error('💾 Failed to save card:', e2);
+                }
+            }
+        }
     }
 
     /**

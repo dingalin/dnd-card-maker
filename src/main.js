@@ -30,7 +30,7 @@ import './utils/DebugPanel.ts';
 import './utils/ZoomLock.js';
 
 // Legacy Init (for floating windows, bubbles)
-import { initUI, showToast, initWindowManager, initFormHeaderUpdates } from './ui-helpers.js';
+import { initUI, showToast, initWindowManager, initFormHeaderUpdates, initMobileSidebar } from './ui-helpers.js';
 
 // Global error handlers
 window.onerror = function (msg, url, line, col, error) {
@@ -165,6 +165,7 @@ async function initApp() {
     initUI(); // Slider bubbles, toasts
     initWindowManager(); // Floating windows
     initFormHeaderUpdates(); // Sync dropdown changes with stone menu buttons
+    initMobileSidebar(); // Mobile sidebar drawer toggle
 
     // 6. Restore Session
     const loadedSavedCard = stateManager.loadCurrentCard();

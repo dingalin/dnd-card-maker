@@ -709,12 +709,15 @@ export class GeneratorController {
         // Save key for future use
         localStorage.setItem('getimg_api_key', key);
 
+        // Get selected image model from dropdown (default to flux)
+        const model = document.getElementById('image-model')?.value || 'getimg-flux';
+
         // Get current template URL for AI theme detection
         const templateUrl = this.state.getState()?.settings?.style?.cardBackgroundUrl || null;
 
-        // Use GetImg with FLUX model - pass the card-matched color description and template URL
-        console.log("🎨 Generating image with GetImg/FLUX...");
-        return await this.gemini.generateImageGetImg(prompt, 'getimg-flux', style, key, styleOption, cardColor, colorDesc, templateUrl);
+        // Use GetImg with selected model - pass the card-matched color description and template URL
+        console.log(`🎨 Generating image with GetImg/${model}...`);
+        return await this.gemini.generateImageGetImg(prompt, model, style, key, styleOption, cardColor, colorDesc, templateUrl);
     }
 
 

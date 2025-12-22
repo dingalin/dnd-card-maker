@@ -478,9 +478,12 @@ class TreasureController {
             const currentState = this.state.getState();
             const templateUrl = currentState?.settings?.style?.cardBackgroundUrl || null;
 
+            // Get selected image model from dropdown (default to flux)
+            const imageModel = document.getElementById('image-model')?.value || 'getimg-flux';
+
             const imageResult = await gemini.generateImageGetImg(
                 visualPrompt,
-                'getimg-flux',  // Use FLUX model (same as GeneratorController)
+                imageModel,     // Use selected model from dropdown
                 imageStyle,     // Use user-selected style or 'realistic'
                 getImgKey,
                 styleOption,    // Use user-selected style option or 'natural'

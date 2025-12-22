@@ -818,6 +818,7 @@ export class CharacterController {
             'cape': { type: 'wondrous', subtype: 'Cloak', label: 'גלימה' },
             'boots': { type: 'wondrous', subtype: 'Boots', label: 'מגפיים' },
             'belt': { type: 'wondrous', subtype: 'Belt', label: 'חגורה' },
+            'gloves': { type: 'wondrous', subtype: 'Gloves', label: 'כפפות' },
             'ammo': { type: 'wondrous', subtype: 'Quiver', label: 'תחמושת' }
         };
     }
@@ -1008,6 +1009,7 @@ export class CharacterController {
             'cape': { type: 'wondrous', subtype: 'Cloak', label: 'גלימה' },
             'boots': { type: 'wondrous', subtype: 'Boots', label: 'מגפיים' },
             'belt': { type: 'wondrous', subtype: 'Belt', label: 'חגורה' }, // Changed to Wondrous
+            'gloves': { type: 'wondrous', subtype: 'Gloves', label: 'כפפות' },
             'ammo': { type: 'wondrous', label: 'תחמושת' }
         };
 
