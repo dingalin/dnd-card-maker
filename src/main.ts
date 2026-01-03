@@ -21,7 +21,6 @@ import { CharacterController } from './controllers/CharacterController.ts';
 import TreasureController from './controllers/TreasureController.ts';
 import { CardViewerService } from './services/CardViewerService.ts';
 import powerBudgetController from './controllers/PowerBudgetController.ts';
-import assemblyController from './controllers/AssemblyController.ts';
 import { initAbilitySelector } from './controllers/AbilitySelectorController.ts';
 import { initModeController } from './controllers/ModeController.ts';
 import { initDraggablePositioner } from './utils/DraggablePositioner.ts';
@@ -205,12 +204,6 @@ async function initApp() {
     // await initPowerBudgetPanel();
     // powerBudgetController.init();
     // window.powerBudgetController = powerBudgetController;
-
-    // Assembly Table: Initialize controller (lazy - only when tab is visited)
-    // But register it globally so TabManager can init on first visit
-    assemblyController.state = stateManager;
-    assemblyController.ui = uiManager;
-    window.assemblyController = assemblyController;
 
     // Ability Selector: Initialize the scroll-based ability picker
     const abilitySelectorController = initAbilitySelector();

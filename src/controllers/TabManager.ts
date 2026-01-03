@@ -1,27 +1,23 @@
 // @ts-nocheck
 import { CharacterController } from './CharacterController.ts';
-import assemblyController from './AssemblyController.ts';
 
 interface WindowGlobals {
     i18n?: any;
     characterController?: any;
     stateManager?: any;
     uiManager?: any;
-    assemblyController?: any;
 }
 
 export class TabManager {
     private tabs: NodeListOf<HTMLElement>;
     private contents: NodeListOf<HTMLElement>;
     private characterSheetLoaded: boolean;
-    private assemblyTableLoaded: boolean;
     private characterController: any;
 
     constructor() {
         this.tabs = document.querySelectorAll('.nav-tab');
         this.contents = document.querySelectorAll('.tab-content');
         this.characterSheetLoaded = false;
-        this.assemblyTableLoaded = false;
 
         this.init();
     }
@@ -69,11 +65,6 @@ export class TabManager {
         // Lazy Load Logic
         if (tabId === 'character-sheet' && !this.characterSheetLoaded) {
             await this.loadCharacterSheet();
-        }
-
-        // Assembly Table lazy init
-        if (tabId === 'assembly-table' && !this.assemblyTableLoaded) {
-            await this.loadAssemblyTable();
         }
     }
 
@@ -125,38 +116,5 @@ export class TabManager {
             console.error("Failed to load character sheet:", error);
         }
     }
-
-    async loadAssemblyTable() {
-        console.log("TabManager: Initializing Assembly Table...");
-        try {
-            // Assembly Table HTML is already loaded by component-loader
-            // We just need to initialize the controller
-
-            const globals = window as unknown as WindowGlobals;
-
-            // Ensure the controller has state and ui managers
-            if (globals.stateManager) {
-                assemblyController.state = globals.stateManager;
-            }
-            if (globals.uiManager) {
-                assemblyController.ui = globals.uiManager;
-            }
-
-            // Initialize the controller
-            assemblyController.init();
-
-            // Also register on window for debugging/other modules
-            globals.assemblyController = assemblyController;
-
-            this.assemblyTableLoaded = true;
-            console.log("TabManager: ✅ Assembly Table Controller Initialized");
-
-            // Update i18n for the assembly table
-            if (globals.i18n && globals.i18n.updateDOM) {
-                globals.i18n.updateDOM();
-            }
-        } catch (error) {
-            console.error("Failed to init assembly table:", error);
-        }
-    }
 }
+
