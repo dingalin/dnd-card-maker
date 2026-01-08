@@ -1,11 +1,62 @@
+import { UIManager, StickyNoteOptions } from '../../ui/UIManager';
+
+// Extend Window interface
+declare global {
+    interface Window {
+        i18n?: {
+            t: (key: string) => string;
+            getLocale: () => string;
+        };
+    }
+}
+
+// Types
+interface GeneratorController {
+    onGenerate: (e: Event) => void;
+    onRegenerateImage: () => void;
+    onRegenerateStats: () => void;
+    onGenerateBackground: () => void;
+    onSurprise: (e: Event) => void;
+    onAutoLayout: () => void;
+    onLassoTool: () => void;
+}
+
+interface PreviewManager {
+    updateProgress: (step: number, percent: number, message: string) => void;
+    resetProgress: () => void;
+}
+
+interface NoteUIOptions extends StickyNoteOptions {
+    subtypeText?: string;
+}
+
+interface GenerationParams {
+    type: string;
+    subtype: string;
+    level: string;
+    ability: string;
+    complexityMode: string;
+    useVisualContext: boolean;
+    overrides: {
+        attunement: boolean;
+        weaponDamage: string;
+        armorClass: string;
+        customVisualPrompt: string;
+    };
+}
+
 export class GeneratorUIManager {
-    constructor(controller, uiManager, previewManager) {
+    private controller: GeneratorController;
+    private globalUI: UIManager;
+    private preview: PreviewManager;
+
+    constructor(controller: GeneratorController, uiManager: UIManager, previewManager: PreviewManager) {
         this.controller = controller;
         this.globalUI = uiManager;
         this.preview = previewManager;
     }
 
-    setupListeners() {
+    setupListeners(): void {
         const form = document.getElementById('generator-form');
         const regenImageBtn = document.getElementById('regen-image-btn');
         const regenStatsBtn = document.getElementById('regen-stats-btn');
@@ -25,14 +76,14 @@ export class GeneratorUIManager {
         this.setupFormListeners();
     }
 
-    setupFormListeners() {
+    setupFormListeners(): void {
         // Real-time updates for Sticky Note
-        const levelSelect = document.getElementById('item-level');
-        const typeSelect = document.getElementById('item-type');
-        const subtypeSelect = document.getElementById('item-subtype');
-        const abilityInput = document.getElementById('item-ability');
+        const levelSelect = document.getElementById('item-level') as HTMLSelectElement | null;
+        const typeSelect = document.getElementById('item-type') as HTMLSelectElement | null;
+        const subtypeSelect = document.getElementById('item-subtype') as HTMLSelectElement | null;
+        const abilityInput = document.getElementById('item-ability') as HTMLInputElement | null;
 
-        const updateSticky = () => {
+        const updateSticky = (): void => {
             const level = levelSelect?.value || '';
             const type = typeSelect?.value || '';
             const subtype = subtypeSelect?.value || '';
@@ -57,8 +108,8 @@ export class GeneratorUIManager {
         if (abilityInput) abilityInput.addEventListener('input', updateSticky);
     }
 
-    getApiKey() {
-        const input = document.getElementById('api-key');
+    getApiKey(): string | null {
+        const input = document.getElementById('api-key') as HTMLInputElement | null;
         if (!input || !input.value.trim()) {
             this.globalUI.showToast(window.i18n?.t('toasts.enterApiKey') || 'Please enter API key', 'warning');
             return null;
@@ -68,38 +119,38 @@ export class GeneratorUIManager {
         return key;
     }
 
-    getGenerationParams(e) {
-        const form = document.getElementById('generator-form');
+    getGenerationParams(e?: SubmitEvent): GenerationParams {
+        const form = document.getElementById('generator-form') as HTMLFormElement;
         const formData = new FormData(form);
 
         // Read from form inputs directly (priority), then fallback to Sticky Note
-        const itemTypeSelect = document.getElementById('item-type');
-        const itemSubtypeSelect = document.getElementById('item-subtype');
-        const itemLevelSelect = document.getElementById('item-level');
+        const itemTypeSelect = document.getElementById('item-type') as HTMLSelectElement | null;
+        const itemSubtypeSelect = document.getElementById('item-subtype') as HTMLSelectElement | null;
+        const itemLevelSelect = document.getElementById('item-level') as HTMLSelectElement | null;
 
         // Sticky Note (fallback for when form elements might be empty)
-        const noteLevel = document.getElementById('note-level');
-        const noteType = document.getElementById('note-type');
-        const noteSubtype = document.getElementById('note-subtype');
+        const noteLevel = document.getElementById('note-level') as HTMLElement | null;
+        const noteType = document.getElementById('note-type') as HTMLElement | null;
+        const noteSubtype = document.getElementById('note-subtype') as HTMLElement | null;
 
         // Priority: Form input > Sticky Note > FormData
-        const type = itemTypeSelect?.value || noteType?.dataset?.value || formData.get('type');
-        const subtype = itemSubtypeSelect?.value || noteSubtype?.dataset?.value || formData.get('subtype');
-        const level = itemLevelSelect?.value || noteLevel?.dataset?.value || formData.get('level');
-        const ability = document.getElementById('item-ability')?.value?.trim() || formData.get('ability');
+        const type = itemTypeSelect?.value || noteType?.dataset?.value || formData.get('type') as string || '';
+        const subtype = itemSubtypeSelect?.value || noteSubtype?.dataset?.value || formData.get('subtype') as string || '';
+        const level = itemLevelSelect?.value || noteLevel?.dataset?.value || formData.get('level') as string || '';
+        const ability = (document.getElementById('item-ability') as HTMLInputElement | null)?.value?.trim() || formData.get('ability') as string || '';
 
         // Determine mode
-        const submitterId = e?.submitter ? e.submitter.id : 'generate-creative-btn';
+        const submitterId = e?.submitter ? (e.submitter as HTMLElement).id : 'generate-creative-btn';
         const complexityMode = (submitterId === 'generate-simple-btn') ? 'simple' : 'creative';
 
         // Context
-        const useVisualContext = document.getElementById('use-visual-context')?.checked;
+        const useVisualContext = (document.getElementById('use-visual-context') as HTMLInputElement | null)?.checked || false;
 
         // Manual Overrides
-        const attunement = document.getElementById('attunement')?.checked;
-        const weaponDamage = document.getElementById('weapon-damage')?.value?.trim();
-        const armorClass = document.getElementById('armor-class')?.value?.trim();
-        const customVisualPrompt = document.getElementById('custom-visual-prompt')?.value?.trim();
+        const attunement = (document.getElementById('attunement') as HTMLInputElement | null)?.checked || false;
+        const weaponDamage = (document.getElementById('weapon-damage') as HTMLInputElement | null)?.value?.trim() || '';
+        const armorClass = (document.getElementById('armor-class') as HTMLInputElement | null)?.value?.trim() || '';
+        const customVisualPrompt = (document.getElementById('custom-visual-prompt') as HTMLInputElement | null)?.value?.trim() || '';
 
         return {
             type,
@@ -117,15 +168,23 @@ export class GeneratorUIManager {
         };
     }
 
-    updateNoteUI(options) {
+    updateNoteUI(options: NoteUIOptions | string, ...args: string[]): void {
         // Support both old signature (level, type, subtype) and new object signature
-        let level, type, subtype, subtypeText, ability, style, attunement, damage, armorClass;
+        let level: string | undefined;
+        let type: string | undefined;
+        let subtype: string | undefined;
+        let subtypeText: string | undefined;
+        let ability: string | undefined;
+        let style: string | undefined;
+        let attunement: boolean | undefined;
+        let damage: string | undefined;
+        let armorClass: string | number | undefined;
 
         if (typeof options === 'string') {
             // Old signature: updateNoteUI(level, type, subtype)
             level = options;
-            type = arguments[1];
-            subtype = arguments[2];
+            type = args[0];
+            subtype = args[1];
         } else {
             // New signature: updateNoteUI({ level, type, subtype, subtypeText, ability, style, attunement, damage, armorClass })
             ({ level, type, subtype, subtypeText, ability, style, attunement, damage, armorClass } = options);
@@ -133,11 +192,9 @@ export class GeneratorUIManager {
 
         console.log('📝 updateNoteUI called with:', { level, type, subtype, subtypeText });
 
-        console.log('📝 updateNoteUI called with:', { level, type, subtype, subtypeText });
-
-        const noteLevel = document.getElementById('note-level');
-        const noteType = document.getElementById('note-type');
-        const noteSubtype = document.getElementById('note-subtype');
+        const noteLevel = document.getElementById('note-level') as HTMLElement | null;
+        const noteType = document.getElementById('note-type') as HTMLElement | null;
+        const noteSubtype = document.getElementById('note-subtype') as HTMLElement | null;
         const i18n = window.i18n;
 
         if (noteLevel && level) {
@@ -157,7 +214,7 @@ export class GeneratorUIManager {
 
             // Fallback map for Hebrew if i18n fails or isn't loaded yet
             if (i18n?.getLocale() === 'he') {
-                const hebrewTypes = {
+                const hebrewTypes: Record<string, string> = {
                     'weapon': 'נשק', 'armor': 'שריון', 'wondrous': 'חפץ פלא',
                     'potion': 'שיקוי', 'ring': 'טבעת', 'scroll': 'מגילה',
                     'staff': 'מטה', 'wand': 'שרביט'
@@ -205,16 +262,16 @@ export class GeneratorUIManager {
         });
 
         // Also update form inputs
-        const typeSelect = document.getElementById('item-type');
-        const levelSelect = document.getElementById('item-level');
-        const subtypeSelect = document.getElementById('item-subtype');
+        const typeSelect = document.getElementById('item-type') as HTMLSelectElement | null;
+        const levelSelect = document.getElementById('item-level') as HTMLSelectElement | null;
+        const subtypeSelect = document.getElementById('item-subtype') as HTMLSelectElement | null;
 
         if (typeSelect && type) typeSelect.value = type;
         if (levelSelect && level) levelSelect.value = level;
         if (subtypeSelect && subtype) subtypeSelect.value = subtype;
     }
 
-    setLoading(isLoading, message = '') {
+    setLoading(isLoading: boolean, message: string = ''): void {
         if (isLoading) {
             this.globalUI.showLoading();
             if (message) this.preview.updateProgress(0, 5, message);
@@ -224,16 +281,16 @@ export class GeneratorUIManager {
         }
     }
 
-    updateProgress(step, percent, message) {
+    updateProgress(step: number, percent: number, message: string): void {
         this.preview.updateProgress(step, percent, message);
     }
 
-    updateLayoutSliders(layoutOffset) {
+    updateLayoutSliders(layoutOffset: Record<string, unknown>): void {
         console.log('📐 updateLayoutSliders called with:', layoutOffset);
         for (const [key, value] of Object.entries(layoutOffset)) {
             if (typeof value === 'number') {
                 // Map layout offset keys to slider IDs
-                let sliderId;
+                let sliderId: string;
                 if (key === 'coreStats') {
                     sliderId = 'coreStats-offset';
                 } else if (key === 'imageYOffset') {
@@ -257,10 +314,10 @@ export class GeneratorUIManager {
                     sliderId = `${key}-offset`;
                 }
 
-                const slider = document.getElementById(sliderId);
+                const slider = document.getElementById(sliderId) as HTMLInputElement | null;
                 if (slider) {
                     console.log(`  Setting ${sliderId} to ${value}`);
-                    slider.value = value;
+                    slider.value = String(value);
                     // DON'T dispatch event - it causes listeners to update state back
                     // Just update the display label manually instead
                 }
@@ -274,10 +331,10 @@ export class GeneratorUIManager {
                     if (disp) disp.textContent = `${value}°`;
                 } else if (key === 'imageFade') {
                     const disp = document.getElementById('image-fade-val');
-                    if (disp) disp.textContent = value;
+                    if (disp) disp.textContent = String(value);
                 } else if (key === 'imageShadow') {
                     const disp = document.getElementById('image-shadow-val');
-                    if (disp) disp.textContent = value;
+                    if (disp) disp.textContent = String(value);
                 } else if (key === 'backgroundScale') {
                     const disp = document.getElementById('bg-scale-val');
                     if (disp) disp.textContent = value.toFixed(1);
@@ -286,13 +343,13 @@ export class GeneratorUIManager {
         }
     }
 
-    updateFontSizeDisplay(nameSize) {
+    updateFontSizeDisplay(nameSize: number): void {
         const display = document.getElementById('nameSize-display');
         if (display) display.textContent = `${nameSize}px`;
     }
 
-    setButtonState(btnId, disabled, text) {
-        const btn = document.getElementById(btnId);
+    setButtonState(btnId: string, disabled: boolean, text?: string): void {
+        const btn = document.getElementById(btnId) as HTMLButtonElement | null;
         if (btn) {
             btn.disabled = disabled;
             if (text) btn.textContent = text;

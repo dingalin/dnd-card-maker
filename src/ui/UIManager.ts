@@ -1,10 +1,56 @@
+// Extend Window interface to include i18n
+declare global {
+    interface Window {
+        i18n?: {
+            t: (key: string) => string;
+        };
+    }
+}
+
+// Types
+interface UIElements {
+    loadingOverlay: HTMLElement | null;
+    emptyState: HTMLElement | null;
+    skeletonOverlay: HTMLElement | null;
+    downloadBtn: HTMLButtonElement | null;
+    regenerateControls: HTMLElement | null;
+    contentEditor: HTMLElement | null;
+    errorDiv: HTMLElement | null;
+    toastContainer: HTMLElement | null;
+    stickyNote: HTMLElement | null;
+    confirmModal: HTMLElement | null;
+    confirmMessage: HTMLElement | null;
+    confirmOkBtn: HTMLButtonElement | null;
+    confirmCancelBtn: HTMLButtonElement | null;
+}
+
+export type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+export interface StickyNoteOptions {
+    level?: string | number;
+    type?: string;
+    subtype?: string;
+    ability?: string;
+    style?: string;
+    attunement?: boolean;
+    damage?: string;
+    armorClass?: string | number;
+}
+
+export interface ColorOption {
+    name: string;
+    hex: string;
+}
+
 export class UIManager {
+    private elements: UIElements;
+
     constructor() {
         this.elements = {
             loadingOverlay: document.getElementById('loading-overlay'),
             emptyState: document.getElementById('empty-state'),
             skeletonOverlay: document.getElementById('skeleton-overlay'),
-            downloadBtn: document.getElementById('download-btn'),
+            downloadBtn: document.getElementById('download-btn') as HTMLButtonElement | null,
             regenerateControls: document.getElementById('regenerate-controls'),
             contentEditor: document.getElementById('content-editor'),
             errorDiv: document.getElementById('error-message'),
@@ -12,14 +58,14 @@ export class UIManager {
             stickyNote: document.getElementById('sticky-note'),
             confirmModal: document.getElementById('confirmation-modal'),
             confirmMessage: document.querySelector('#confirmation-modal .modal-message'),
-            confirmOkBtn: document.getElementById('confirm-ok-btn'),
-            confirmCancelBtn: document.getElementById('confirm-cancel-btn')
+            confirmOkBtn: document.getElementById('confirm-ok-btn') as HTMLButtonElement | null,
+            confirmCancelBtn: document.getElementById('confirm-cancel-btn') as HTMLButtonElement | null
         };
     }
 
-    showLoading(message = null) {
+    showLoading(_message: string | null = null): void {
         const _loadingText = window.i18n?.t('preview.loading') || 'Loading...';
-        this.elements.loadingOverlay.classList.remove('hidden');
+        this.elements.loadingOverlay?.classList.remove('hidden');
         if (this.elements.emptyState) this.elements.emptyState.classList.add('hidden');
         if (this.elements.skeletonOverlay) this.elements.skeletonOverlay.classList.remove('hidden');
         if (this.elements.downloadBtn) this.elements.downloadBtn.disabled = true;
@@ -29,19 +75,19 @@ export class UIManager {
         if (this.elements.errorDiv) this.elements.errorDiv.classList.add('hidden');
     }
 
-    hideLoading() {
-        this.elements.loadingOverlay.classList.add('hidden');
+    hideLoading(): void {
+        this.elements.loadingOverlay?.classList.add('hidden');
         if (this.elements.skeletonOverlay) this.elements.skeletonOverlay.classList.add('hidden');
         if (this.elements.regenerateControls) this.elements.regenerateControls.classList.remove('hidden');
         if (this.elements.contentEditor) this.elements.contentEditor.classList.remove('hidden');
         if (this.elements.downloadBtn) this.elements.downloadBtn.disabled = false;
     }
 
-    showToast(message, type = 'info') {
+    showToast(message: string, type: ToastType = 'info'): void {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
 
-        const iconMap = {
+        const iconMap: Record<ToastType, string> = {
             'success': '✅',
             'error': '❌',
             'warning': '⚠️',
@@ -78,7 +124,7 @@ export class UIManager {
         }, 3000);
     }
 
-    updateStickyNote(options = {}) {
+    updateStickyNote(options: StickyNoteOptions = {}): void {
         if (!this.elements.stickyNote) return;
 
         const {
@@ -150,9 +196,9 @@ export class UIManager {
         this.elements.stickyNote.classList.remove('hidden');
     }
 
-    initColorPicker(colors, onSelect) {
+    initColorPicker(colors: ColorOption[], onSelect: (colorName: string) => void): void {
         const colorPalette = document.getElementById('color-palette');
-        const imageColorInput = document.getElementById('image-bg-color');
+        const imageColorInput = document.getElementById('image-bg-color') as HTMLInputElement | null;
 
         if (colorPalette && imageColorInput) {
             colorPalette.innerHTML = '';
@@ -175,7 +221,7 @@ export class UIManager {
             });
 
             // Default White
-            const defaultColor = colorPalette.querySelector('[data-name="White"]');
+            const defaultColor = colorPalette.querySelector('[data-name="White"]') as HTMLElement | null;
             if (defaultColor) {
                 defaultColor.classList.add('selected');
                 imageColorInput.value = 'White';
@@ -183,30 +229,33 @@ export class UIManager {
         }
     }
 
-    showConfirm(message, onConfirm) {
-        if (!this.elements.confirmModal) return;
+    showConfirm(message: string, onConfirm: () => void): void {
+        if (!this.elements.confirmModal || !this.elements.confirmOkBtn || !this.elements.confirmCancelBtn) return;
 
-        this.elements.confirmMessage.textContent = message;
+        if (this.elements.confirmMessage) {
+            this.elements.confirmMessage.textContent = message;
+        }
         this.elements.confirmModal.classList.remove('hidden');
 
         // Clean up old listeners to prevent multiple firings
-        const newOk = this.elements.confirmOkBtn.cloneNode(true);
-        const newCancel = this.elements.confirmCancelBtn.cloneNode(true);
+        const newOk = this.elements.confirmOkBtn.cloneNode(true) as HTMLButtonElement;
+        const newCancel = this.elements.confirmCancelBtn.cloneNode(true) as HTMLButtonElement;
 
-        this.elements.confirmOkBtn.parentNode.replaceChild(newOk, this.elements.confirmOkBtn);
-        this.elements.confirmCancelBtn.parentNode.replaceChild(newCancel, this.elements.confirmCancelBtn);
+        this.elements.confirmOkBtn.parentNode?.replaceChild(newOk, this.elements.confirmOkBtn);
+        this.elements.confirmCancelBtn.parentNode?.replaceChild(newCancel, this.elements.confirmCancelBtn);
 
         // Re-assign references
         this.elements.confirmOkBtn = newOk;
         this.elements.confirmCancelBtn = newCancel;
 
+        const modal = this.elements.confirmModal;
         this.elements.confirmOkBtn.addEventListener('click', () => {
-            this.elements.confirmModal.classList.add('hidden');
+            modal.classList.add('hidden');
             onConfirm();
         });
 
         this.elements.confirmCancelBtn.addEventListener('click', () => {
-            this.elements.confirmModal.classList.add('hidden');
+            modal.classList.add('hidden');
         });
     }
 }

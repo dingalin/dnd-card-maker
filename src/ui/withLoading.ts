@@ -3,18 +3,42 @@
  * Provides consistent loading state management for async operations
  */
 
-import { UI } from '../config/index.js';
+import { UI } from '../config/index';
+
+// Extend Window interface to include i18n
+declare global {
+    interface Window {
+        i18n?: {
+            t: (key: string) => string;
+        };
+    }
+}
+
+// Types
+export interface LoadingOptions {
+    loadingText?: string;
+    showSpinner?: boolean;
+}
+
+interface OriginalState {
+    text: string | null;
+    disabled: boolean;
+}
+
+export interface LoadingStateController {
+    start: (text?: string) => void;
+    update: (text: string) => void;
+    stop: () => void;
+}
 
 /**
  * Wrap a button's async action with loading state management
- * @param {HTMLButtonElement} button - Button element
- * @param {Function} asyncFn - Async function to execute
- * @param {object} options - Configuration options
- * @param {string} options.loadingText - Text to show during loading
- * @param {boolean} options.showSpinner - Whether to add spinner class
- * @returns {Promise<*>} Result of asyncFn
  */
-export async function withLoading(button, asyncFn, options = {}) {
+export async function withLoading<T>(
+    button: HTMLButtonElement | null,
+    asyncFn: () => Promise<T>,
+    options: LoadingOptions = {}
+): Promise<T> {
     const {
         loadingText = window.i18n?.t('common.loading') || 'Loading...',
         showSpinner = true
@@ -46,15 +70,13 @@ export async function withLoading(button, asyncFn, options = {}) {
 
 /**
  * Create a loading state manager for a specific element
- * @param {string} elementId - ID of the button/element
- * @returns {object} Loading state controller
  */
-export function createLoadingState(elementId) {
-    const element = document.getElementById(elementId);
-    let originalState = null;
+export function createLoadingState(elementId: string): LoadingStateController {
+    const element = document.getElementById(elementId) as HTMLButtonElement | null;
+    let originalState: OriginalState | null = null;
 
     return {
-        start(text) {
+        start(text?: string): void {
             if (!element) return;
             originalState = {
                 text: element.textContent,
@@ -65,13 +87,13 @@ export function createLoadingState(elementId) {
             element.classList.add('loading');
         },
 
-        update(text) {
+        update(text: string): void {
             if (element) {
                 element.textContent = text;
             }
         },
 
-        stop() {
+        stop(): void {
             if (!element || !originalState) return;
             element.disabled = originalState.disabled;
             element.textContent = originalState.text;
@@ -83,10 +105,8 @@ export function createLoadingState(elementId) {
 
 /**
  * Show global loading overlay
- * @param {boolean} show - Whether to show or hide
- * @param {string} message - Optional loading message
  */
-export function setGlobalLoading(show, message = null) {
+export function setGlobalLoading(show: boolean, message: string | null = null): void {
     const overlay = document.getElementById('loading-overlay');
     const text = document.getElementById('loading-text');
 
@@ -104,13 +124,13 @@ export function setGlobalLoading(show, message = null) {
 
 /**
  * Debounce function execution
- * @param {Function} fn - Function to debounce
- * @param {number} delay - Delay in ms
- * @returns {Function} Debounced function
  */
-export function debounce(fn, delay = UI.DEBOUNCE_MS) {
-    let timeoutId;
-    return (...args) => {
+export function debounce<T extends (...args: unknown[]) => void>(
+    fn: T,
+    delay: number = UI.DEBOUNCE_MS
+): (...args: Parameters<T>) => void {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    return (...args: Parameters<T>): void => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => fn(...args), delay);
     };

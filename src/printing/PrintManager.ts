@@ -1,4 +1,43 @@
+// Extend Window interface
+declare global {
+    interface Window {
+        printManager: PrintManager;
+        areComponentsLoaded?: boolean;
+        i18n?: {
+            t: (key: string) => string;
+        };
+    }
+}
+
+// Types
+interface PrintSettings {
+    cardWidth: number;
+    cardHeight: number;
+    gap: number;
+    paperSize: 'a4' | 'letter';
+    orientation: 'portrait' | 'landscape';
+    scale: number;
+    calibration: number;
+    doubleSided: boolean;
+}
+
+interface CardToPrint {
+    thumbnail?: string;
+    backThumbnail?: string;
+    cardData?: {
+        imageUrl?: string;
+        backThumbnail?: string;
+        capturedBackImage?: string;
+    };
+}
+
+type SettingKey = keyof PrintSettings;
+
 export class PrintManager {
+    private modal: HTMLElement | null;
+    private cards: CardToPrint[];
+    private settings: PrintSettings;
+
     constructor() {
         this.modal = null;
         this.cards = [];
@@ -21,7 +60,7 @@ export class PrintManager {
         }
     }
 
-    init() {
+    init(): void {
         this.modal = document.getElementById('print-modal');
         if (!this.modal) {
             console.error("PrintManager: #print-modal not found");
@@ -32,27 +71,33 @@ export class PrintManager {
         console.log("🖨️ PrintManager Initialized");
     }
 
-    bindEvents() {
+    bindEvents(): void {
         // Close / Cancel
-        document.getElementById('cancel-print-btn').onclick = () => this.closeModal();
+        const cancelBtn = document.getElementById('cancel-print-btn');
+        if (cancelBtn) cancelBtn.onclick = () => this.closeModal();
 
         // Print
-        document.getElementById('do-print-btn').onclick = () => {
-            this.handlePrint();
-        };
+        const printBtn = document.getElementById('do-print-btn');
+        if (printBtn) {
+            printBtn.onclick = () => {
+                this.handlePrint();
+            };
+        }
 
         // Inputs
-        const bindInput = (id, settingKey, isNumber = false) => {
-            const el = document.getElementById(id);
+        const bindInput = (id: string, settingKey: SettingKey, isNumber: boolean = false): void => {
+            const el = document.getElementById(id) as HTMLInputElement | null;
             if (!el) return;
-            el.addEventListener('input', (e) => {
-                let val = isNumber ? parseFloat(e.target.value) : e.target.value;
-                this.settings[settingKey] = val;
+            el.addEventListener('input', (e: Event) => {
+                const target = e.target as HTMLInputElement;
+                const val = isNumber ? parseFloat(target.value) : target.value;
+                (this.settings as Record<string, unknown>)[settingKey] = val;
 
                 // --- Aspect Ratio Logic ---
-                const isLock = document.getElementById('print-lock-ratio')?.checked;
+                const lockCheckbox = document.getElementById('print-lock-ratio') as HTMLInputElement | null;
+                const isLock = lockCheckbox?.checked;
 
-                if (isLock && isNumber) {
+                if (isLock && isNumber && typeof val === 'number') {
                     const ratio = 88 / 63; // Standard Card Ratio ~1.396
                     if (settingKey === 'cardWidth') {
                         // Width changed -> update Height
@@ -68,22 +113,25 @@ export class PrintManager {
 
                 // Sync slider/input pairs
                 if (id.includes('slider')) {
-                    const input = document.getElementById(id.replace('slider', 'input'));
-                    if (input) input.value = val;
+                    const input = document.getElementById(id.replace('slider', 'input')) as HTMLInputElement | null;
+                    if (input) input.value = String(val);
                 } else if (id.includes('input')) {
-                    const slider = document.getElementById(id.replace('input', 'slider'));
-                    if (slider) slider.value = val;
+                    const slider = document.getElementById(id.replace('input', 'slider')) as HTMLInputElement | null;
+                    if (slider) slider.value = String(val);
                 }
 
                 // Special display updates
                 if (settingKey === 'scale') {
-                    document.getElementById('print-scale-display').textContent = `${Math.round(val * 100)}%`;
+                    const display = document.getElementById('print-scale-display');
+                    if (display) display.textContent = `${Math.round(Number(val) * 100)}%`;
                 }
                 if (settingKey === 'calibration') {
-                    document.getElementById('print-calibration-display').textContent = `${Math.round(val * 100)}%`;
+                    const display = document.getElementById('print-calibration-display');
+                    if (display) display.textContent = `${Math.round(Number(val) * 100)}%`;
                 }
                 if (settingKey === 'gap') {
-                    document.getElementById('print-gap-display').textContent = val;
+                    const display = document.getElementById('print-gap-display');
+                    if (display) display.textContent = String(val);
                 }
 
                 this.renderPreview();
@@ -100,22 +148,29 @@ export class PrintManager {
         bindInput('print-paper-size', 'paperSize');
 
         // Orientation Buttons
-        document.getElementById('print-orient-p').onclick = () => {
-            this.settings.orientation = 'portrait';
-            this.updateOrientationUI();
-            this.renderPreview();
-        };
-        document.getElementById('print-orient-l').onclick = () => {
-            this.settings.orientation = 'landscape';
-            this.updateOrientationUI();
-            this.renderPreview();
-        };
+        const orientP = document.getElementById('print-orient-p');
+        const orientL = document.getElementById('print-orient-l');
+        if (orientP) {
+            orientP.onclick = () => {
+                this.settings.orientation = 'portrait';
+                this.updateOrientationUI();
+                this.renderPreview();
+            };
+        }
+        if (orientL) {
+            orientL.onclick = () => {
+                this.settings.orientation = 'landscape';
+                this.updateOrientationUI();
+                this.renderPreview();
+            };
+        }
 
         // Size Preset Buttons
         document.querySelectorAll('.size-preset-btn').forEach(btn => {
-            btn.onclick = () => {
-                const width = parseFloat(btn.dataset.width);
-                const height = parseFloat(btn.dataset.height);
+            const button = btn as HTMLButtonElement;
+            button.onclick = () => {
+                const width = parseFloat(button.dataset.width || '63');
+                const height = parseFloat(button.dataset.height || '88');
 
                 this.settings.cardWidth = width;
                 this.settings.cardHeight = height;
@@ -126,43 +181,43 @@ export class PrintManager {
 
                 // Update active state
                 document.querySelectorAll('.size-preset-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+                button.classList.add('active');
 
                 this.renderPreview();
             };
         });
 
         // Double-Sided Checkbox
-        const doubleSidedCheckbox = document.getElementById('print-double-sided');
+        const doubleSidedCheckbox = document.getElementById('print-double-sided') as HTMLInputElement | null;
         if (doubleSidedCheckbox) {
-            doubleSidedCheckbox.addEventListener('change', (e) => {
-                this.settings.doubleSided = e.target.checked;
+            doubleSidedCheckbox.addEventListener('change', (e: Event) => {
+                this.settings.doubleSided = (e.target as HTMLInputElement).checked;
                 console.log('🃏 Double-sided mode:', this.settings.doubleSided);
                 this.renderPreview();
             });
         }
     }
 
-    syncInput(baseId, value) {
-        const slider = document.getElementById(`${baseId}-slider`);
-        const input = document.getElementById(`${baseId}-input`);
-        if (slider) slider.value = value;
-        if (input) input.value = value;
+    syncInput(baseId: string, value: number): void {
+        const slider = document.getElementById(`${baseId}-slider`) as HTMLInputElement | null;
+        const input = document.getElementById(`${baseId}-input`) as HTMLInputElement | null;
+        if (slider) slider.value = String(value);
+        if (input) input.value = String(value);
     }
 
-    updateOrientationUI() {
+    updateOrientationUI(): void {
         const pBtn = document.getElementById('print-orient-p');
         const lBtn = document.getElementById('print-orient-l');
         if (this.settings.orientation === 'portrait') {
-            pBtn.classList.add('active');
-            lBtn.classList.remove('active');
+            pBtn?.classList.add('active');
+            lBtn?.classList.remove('active');
         } else {
-            pBtn.classList.remove('active');
-            lBtn.classList.add('active');
+            pBtn?.classList.remove('active');
+            lBtn?.classList.add('active');
         }
     }
 
-    openPrintModal(cards) {
+    openPrintModal(cards: CardToPrint[]): void {
         this.cards = cards;
         if (!this.modal) return;
 
@@ -170,14 +225,16 @@ export class PrintManager {
         this.renderPreview();
     }
 
-    closeModal() {
+    closeModal(): void {
         if (this.modal) this.modal.classList.add('hidden');
     }
 
-    renderPreview() {
+    renderPreview(): void {
         const paper = document.getElementById('print-paper-preview');
         const grid = document.getElementById('print-grid');
         const info = document.getElementById('print-info');
+
+        if (!paper || !grid || !info) return;
 
         // Paper Dims (mm)
         let paperW = 210;
@@ -308,11 +365,12 @@ export class PrintManager {
             paper.appendChild(calibration);
         }
     }
-    handlePrint() {
+
+    handlePrint(): void {
         console.log("🖨️ Preparing to print...");
 
         // 1. Create Layout Style for Print
-        let style = document.getElementById('print-dynamic-style');
+        let style = document.getElementById('print-dynamic-style') as HTMLStyleElement | null;
         if (!style) {
             style = document.createElement('style');
             style.id = 'print-dynamic-style';
@@ -402,7 +460,7 @@ export class PrintManager {
 
         // 7. Cleanup
         setTimeout(() => {
-            printSection.remove();
+            printSection?.remove();
         }, 1000);
     }
 }

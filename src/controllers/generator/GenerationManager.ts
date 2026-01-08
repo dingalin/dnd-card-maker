@@ -1,12 +1,153 @@
-import { getRarityFromLevel, blobToBase64 } from '../../utils.ts';
-import { enrichItemDetails } from '../../utils/item-enrichment.ts';
-import { validateItemBalance } from '../../utils/balancing-validator.ts';
-import { sampleCardBackgroundColor } from '../../utils/ColorSampler.ts';
-import { calculatePriceFromDescription } from '../../services/PricingService.ts';
-import GeminiService from '../../gemini-service.ts';
+import { getRarityFromLevel, blobToBase64 } from '../../utils';
+import { enrichItemDetails } from '../../utils/item-enrichment';
+import { validateItemBalance } from '../../utils/balancing-validator';
+import { sampleCardBackgroundColor } from '../../utils/ColorSampler';
+import { calculatePriceFromDescription } from '../../services/PricingService';
+import GeminiService from '../../gemini-service';
+
+// Extend Window interface
+declare global {
+    interface Window {
+        i18n?: {
+            t: (key: string) => string;
+            getLocale: () => string;
+        };
+        OFFICIAL_ITEMS: Record<string, Record<string, string[]>>;
+    }
+}
+
+// Types
+type ProgressCallback = (step: number, percent: number, message: string) => void;
+
+interface GenerationOverrides {
+    attunement?: boolean;
+    weaponDamage?: string;
+    armorClass?: string;
+    customVisualPrompt?: string;
+    ability?: string;
+    manualDamage?: string;
+    manualAC?: string;
+}
+
+interface GenerationParams {
+    type: string;
+    subtype?: string;
+    level: string;
+    ability?: string;
+    complexityMode?: string;
+    useVisualContext?: boolean;
+    overrides?: GenerationOverrides;
+    skipImage?: boolean;
+    existingImageUrl?: string;
+    imageOnly?: boolean;
+}
+
+interface AutoEquipDetail {
+    level: string;
+    complexityMode?: string;
+    type: string;
+    subtype?: string;
+}
+
+interface AssemblyAbility {
+    id: string;
+    name: string;
+    [key: string]: unknown;
+}
+
+interface AssemblyElement {
+    dice?: string;
+    element: string;
+    icon?: string;
+}
+
+interface AssemblyBase {
+    category: string;
+    nameHe?: string;
+    nameEn?: string;
+    damage?: string;
+    damageType?: string;
+    damageTypeHe?: string;
+    ac?: number;
+}
+
+interface AssemblyModifiers {
+    attunement?: boolean;
+}
+
+interface AssemblyBuildData {
+    base: AssemblyBase;
+    rarity: string;
+    enchantmentBonus: number;
+    element?: AssemblyElement;
+    abilities: AssemblyAbility[];
+    modifiers: AssemblyModifiers;
+    itemName?: string;
+    locale: string;
+}
+
+interface ItemDetails {
+    name?: string;
+    type?: string;
+    subtype?: string;
+    rarity?: string;
+    rarityHe?: string;
+    gold?: string;
+    visualPrompt?: string;
+    abilityDesc?: string;
+    weaponDamage?: string;
+    damageType?: string;
+    armorClass?: string | number;
+    armorBonus?: number;
+    typeHe?: string;
+    specialDamage?: string;
+    spellAbility?: string;
+    requiresAttunement?: boolean;
+    assemblyAbilities?: AssemblyAbility[];
+    assemblyElement?: AssemblyElement;
+    [key: string]: unknown;
+}
+
+interface CardData extends ItemDetails {
+    imageUrl?: string;
+    originalParams?: {
+        level: string;
+        type: string;
+        subtype?: string;
+        rarity: string;
+        ability?: string;
+        abilities?: string[];
+    };
+}
+
+interface GenerationResult {
+    cardData: CardData;
+    generatedSubtype?: string | null;
+}
+
+interface StateManager {
+    getState: () => {
+        lastContext?: string;
+        settings?: {
+            style?: {
+                cardBackgroundUrl?: string;
+            };
+        };
+    };
+    updateStyle: (key: string, value: string) => void;
+}
+
+interface BalanceResult {
+    isValid: boolean;
+    issues?: string[];
+    fixedItem?: Partial<ItemDetails>;
+}
 
 export class GenerationManager {
-    constructor(apiKey, stateManager) {
+    private gemini: GeminiService;
+    private state: StateManager;
+
+    constructor(apiKey: string, stateManager: StateManager) {
         this.gemini = new GeminiService(apiKey);
         this.state = stateManager;
     }
@@ -14,13 +155,13 @@ export class GenerationManager {
     /**
      * Standard Single Item Generation
      */
-    async generateItem(params, onProgress) {
+    async generateItem(params: GenerationParams, onProgress?: ProgressCallback): Promise<GenerationResult> {
         const { type, subtype, level, ability, complexityMode, useVisualContext, overrides, skipImage, existingImageUrl, imageOnly } = params;
 
         const locale = window.i18n?.getLocale() || 'he';
 
         // 1. Determine Rarity
-        let rarity;
+        let rarity: string;
         let effectiveComplexity = complexityMode;
 
         if (level === 'mundane') {
@@ -31,10 +172,10 @@ export class GenerationManager {
         }
 
         // 2. Prepare Context (Image)
-        let contextImage = null;
+        let contextImage: string | null = null;
         if (useVisualContext && this.state.getState().lastContext) {
             onProgress?.(1, 15, window.i18n?.t('preview.processingImage') || 'Processing image...');
-            contextImage = this.state.getState().lastContext;
+            contextImage = this.state.getState().lastContext || null;
         }
 
         // 3. Resolve Random Subtype
@@ -43,7 +184,7 @@ export class GenerationManager {
 
         if (!finalSubtype && window.OFFICIAL_ITEMS[type]) {
             const categories = window.OFFICIAL_ITEMS[type];
-            const allSubtypes = [];
+            const allSubtypes: string[] = [];
             for (const cat in categories) {
                 if (Array.isArray(categories[cat])) allSubtypes.push(...categories[cat]);
             }
@@ -55,7 +196,7 @@ export class GenerationManager {
 
         console.log(`GenerationManager: Level=${level}, Rarity=${rarity}, Mode=${effectiveComplexity}, Subtype=${finalSubtype}, ImageOnly=${imageOnly}`);
 
-        let itemDetails;
+        let itemDetails: ItemDetails;
 
         if (imageOnly) {
             // Image-only mode: generate just the visual prompt, skip text details
@@ -63,9 +204,9 @@ export class GenerationManager {
 
             const visualPrompt = await this.gemini.generateVisualPromptOnly(
                 type,
-                finalSubtype,
+                finalSubtype || '',
                 rarity,
-                ability,
+                ability || '',
                 locale
             );
 
@@ -85,11 +226,11 @@ export class GenerationManager {
             itemDetails = await this.gemini.generateItemDetails(
                 level,
                 type,
-                finalSubtype,
+                finalSubtype || '',
                 rarity,
-                ability,
+                ability || '',
                 contextImage,
-                effectiveComplexity,
+                effectiveComplexity || 'creative',
                 locale
             );
 
@@ -101,11 +242,11 @@ export class GenerationManager {
         }
 
         // 5. Enrich & Backfill
-        enrichItemDetails(itemDetails, type, finalSubtype, locale);
+        enrichItemDetails(itemDetails, type, finalSubtype || '', locale);
 
         // 6. Balance Validation
-        const balanceResult = validateItemBalance(itemDetails, { autoFix: true, mode: effectiveComplexity });
-        if (!balanceResult.isValid) {
+        const balanceResult: BalanceResult = validateItemBalance(itemDetails, { autoFix: true, mode: effectiveComplexity });
+        if (!balanceResult.isValid && balanceResult.fixedItem) {
             console.log('⚖️ Balance auto-fix applied:', balanceResult.issues);
             Object.assign(itemDetails, balanceResult.fixedItem);
         }
@@ -181,7 +322,7 @@ export class GenerationManager {
         }
 
         // 11. Construct Result
-        const newCardData = {
+        const newCardData: CardData = {
             ...itemDetails,
             gold: itemDetails.gold || '1000',
             imageUrl: persistentImageUrl,
@@ -198,12 +339,13 @@ export class GenerationManager {
     /**
      * Auto-Equip flow (Low complexity, strict override inheritance)
      */
-    async generateAutoEquipItem(detail, overrides) {
+    async generateAutoEquipItem(detail: AutoEquipDetail, overrides: GenerationOverrides): Promise<CardData> {
         const { level, complexityMode: userComplexityMode, type, subtype } = detail;
         const locale = window.i18n?.getLocale() || 'he';
 
         // Complexity/Rarity logic
-        let rarity, complexityMode;
+        let rarity: string;
+        let complexityMode: string;
         if (level === 'mundane') {
             rarity = 'common';
             complexityMode = 'mundane';
@@ -213,10 +355,10 @@ export class GenerationManager {
         }
 
         // Generate Item Details
-        const itemDetails = await this.gemini.generateItemDetails(
+        const itemDetails: ItemDetails = await this.gemini.generateItemDetails(
             level === 'mundane' ? '1-4' : level,
             type,
-            subtype,
+            subtype || '',
             rarity,
             overrides.ability || '',
             null,
@@ -233,11 +375,11 @@ export class GenerationManager {
         }
 
         // Enrich
-        enrichItemDetails(itemDetails, type, subtype, locale);
+        enrichItemDetails(itemDetails, type, subtype || '', locale);
 
         // Balance
-        const balanceResult = validateItemBalance(itemDetails, { autoFix: true, mode: complexityMode });
-        if (!balanceResult.isValid) {
+        const balanceResult: BalanceResult = validateItemBalance(itemDetails, { autoFix: true, mode: complexityMode });
+        if (!balanceResult.isValid && balanceResult.fixedItem) {
             Object.assign(itemDetails, balanceResult.fixedItem);
         }
 
@@ -253,7 +395,7 @@ export class GenerationManager {
         return {
             ...itemDetails,
             gold: itemDetails.gold || '100',
-            imageUrl: persistentImageUrl,
+            imageUrl: persistentImageUrl || undefined,
             visualPrompt: finalVisualPrompt,
             originalParams: { level, type, subtype, rarity }
         };
@@ -262,7 +404,7 @@ export class GenerationManager {
     /**
      * Assembly Table flow (User-defined abilities)
      */
-    async generateAssemblyItem(buildData, onProgress) {
+    async generateAssemblyItem(buildData: AssemblyBuildData, onProgress?: ProgressCallback): Promise<CardData> {
         const { base, rarity, enchantmentBonus, element, abilities, modifiers, itemName, locale } = buildData;
 
         const type = base.category === 'weapon' ? 'weapon' :
@@ -272,7 +414,7 @@ export class GenerationManager {
         const subtype = locale === 'he' ? base.nameHe : base.nameEn;
 
         // Level Map
-        const levelMap = { 'Common': '1-4', 'Uncommon': '1-4', 'Rare': '5-10', 'Very Rare': '11-16', 'Legendary': '17+' };
+        const levelMap: Record<string, string> = { 'Common': '1-4', 'Uncommon': '1-4', 'Rare': '5-10', 'Very Rare': '11-16', 'Legendary': '17+' };
         const level = levelMap[rarity] || '1-4';
 
         // Build Prompt
@@ -293,8 +435,8 @@ export class GenerationManager {
 
         onProgress?.(1, 30, window.i18n?.t('preview.writingStory') || 'Writing story...');
 
-        const itemDetails = await this.gemini.generateItemDetails(
-            level, type, subtype, rarity.toLowerCase(),
+        const itemDetails: ItemDetails = await this.gemini.generateItemDetails(
+            level, type, subtype || '', rarity.toLowerCase(),
             abilitiesPrompt, null, 'assembly', locale
         );
 
@@ -317,10 +459,11 @@ export class GenerationManager {
         itemDetails.requiresAttunement = modifiers.attunement;
 
         // Rarity Translation
-        const rarityHe = {
+        const rarityHeMap: Record<string, string> = {
             'Common': 'נפוץ', 'Uncommon': 'לא נפוץ', 'Rare': 'נדיר',
             'Very Rare': 'נדיר מאוד', 'Legendary': 'אגדי'
-        }[rarity] || 'לא נפוץ';
+        };
+        const rarityHe = rarityHeMap[rarity] || 'לא נפוץ';
         itemDetails.rarityHe = locale === 'he' ? rarityHe : rarity;
 
         // Visual Prompt
@@ -340,16 +483,17 @@ export class GenerationManager {
         return {
             ...itemDetails,
             gold: itemDetails.gold || '1000',
-            imageUrl: persistentImageUrl,
+            imageUrl: persistentImageUrl || undefined,
             visualPrompt,
             originalParams: { level, type, subtype, rarity, abilities: abilities.map(a => a.id) }
         };
     }
 
-    async generateImage(prompt, abilityDesc = '', itemSubtype = '') {
-        const bgUrl = this.state.getState()?.settings?.style?.cardBackgroundUrl;
+    async generateImage(prompt: string, abilityDesc: string = '', itemSubtype: string = ''): Promise<string | null> {
+        const state = this.state.getState();
+        const bgUrl = state?.settings?.style?.cardBackgroundUrl;
         let cardColor = '#ffffff';
-        let colorDesc = null;
+        let colorDesc: string | null = null;
 
         try {
             if (bgUrl) {
@@ -369,9 +513,9 @@ export class GenerationManager {
             return null;
         }
 
-        const style = document.getElementById('image-style')?.value || 'realistic';
-        const styleOption = document.getElementById('image-style-option')?.value || 'natural';
-        const model = document.getElementById('image-model')?.value || 'getimg-flux';
+        const style = (document.getElementById('image-style') as HTMLSelectElement | null)?.value || 'realistic';
+        const styleOption = (document.getElementById('image-style-option') as HTMLSelectElement | null)?.value || 'natural';
+        const model = (document.getElementById('image-model') as HTMLSelectElement | null)?.value || 'getimg-flux';
 
         console.log('🖼️ GenerationManager.generateImage - styleOption:', styleOption, 'style:', style, 'model:', model);
         if (abilityDesc) {
@@ -385,19 +529,19 @@ export class GenerationManager {
         return await this.gemini.generateImage(prompt, model, style, getImgKey, styleOption, cardColor, colorDesc, bgUrl, abilityDesc, itemSubtype);
     }
 
-    async generateBackground(theme, style, model, getImgKey) {
+    async generateBackground(theme: string, style: string, model: string, getImgKey: string): Promise<string | null> {
         return await this.gemini.generateCardBackground(theme, style, getImgKey, model);
     }
 
-    _normalizeRarity(itemDetails, locale, originalRarity) {
-        const rarityTranslations = {
+    private _normalizeRarity(itemDetails: ItemDetails, locale: string, originalRarity: string): void {
+        const rarityTranslations: Record<string, string> = {
             'Common': 'נפוץ', 'Uncommon': 'לא נפוץ', 'Rare': 'נדיר',
             'Very Rare': 'נדיר מאוד', 'Legendary': 'אגדי', 'Artifact': 'ארטיפקט'
         };
 
         if (locale === 'he') {
             const currentRarity = itemDetails.rarityHe || itemDetails.rarity;
-            if (rarityTranslations[currentRarity]) {
+            if (currentRarity && rarityTranslations[currentRarity]) {
                 itemDetails.rarityHe = rarityTranslations[currentRarity];
             } else if (!currentRarity || /[a-zA-Z]/.test(currentRarity)) {
                 itemDetails.rarityHe = rarityTranslations[originalRarity] || itemDetails.rarityHe || 'לא נפוץ';
@@ -405,7 +549,7 @@ export class GenerationManager {
         }
     }
 
-    _applyOverrides(itemDetails, overrides, type) {
+    private _applyOverrides(itemDetails: ItemDetails, overrides: GenerationOverrides, type: string): void {
         if (!overrides) return;
 
         if (overrides.attunement) {
