@@ -361,8 +361,10 @@ export class EditorController {
             'center-fade': 'centerFade',
             'name-width': 'nameWidth',
             'type-width': 'typeWidth',
+            'rarity-width': 'rarityWidth',
             'coreStats-width': 'coreStatsWidth',
-            'stats-width': 'statsWidth'
+            'stats-width': 'statsWidth',
+            'gold-width': 'goldWidth'
         };
 
         // Back-side sliders - route to back.offsets

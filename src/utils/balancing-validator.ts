@@ -24,40 +24,40 @@ export interface ValidationOptions {
     mode?: 'simple' | 'creative' | 'mundane';
 }
 
-// Official D&D 5e Rarity Limits (Wide ranges to allow AI creativity)
+// Official D&D 5e Rarity Limits (Based on DMG guidelines)
 export const RARITY_STANDARDS: { [key: string]: RarityStandard } = {
     'Common': {
         maxBonus: 0,
         maxSpellLevel: 0,          // Cantrips only or no spells
-        goldRange: { min: 25, max: 150 },
+        goldRange: { min: 50, max: 100 },  // DMG: 50-100
         maxExtraDamageDice: 0,
         hebrewName: 'נפוץ'
     },
     'Uncommon': {
         maxBonus: 1,
         maxSpellLevel: 2,          // 1st-2nd level spells
-        goldRange: { min: 150, max: 600 },  // Wide range for variety
+        goldRange: { min: 100, max: 500 },  // DMG: 101-500
         maxExtraDamageDice: 1,
         hebrewName: 'לא נפוץ'
     },
     'Rare': {
         maxBonus: 2,
         maxSpellLevel: 4,          // 3rd-4th level spells
-        goldRange: { min: 1000, max: 6000 },
+        goldRange: { min: 500, max: 5000 },  // DMG: 501-5000
         maxExtraDamageDice: 2,
         hebrewName: 'נדיר'
     },
     'Very Rare': {
         maxBonus: 3,
         maxSpellLevel: 6,          // 5th-6th level spells
-        goldRange: { min: 10000, max: 50000 },
+        goldRange: { min: 5000, max: 50000 },  // DMG: 5001-50000
         maxExtraDamageDice: 3,
         hebrewName: 'נדיר מאוד'
     },
     'Legendary': {
         maxBonus: 4,
         maxSpellLevel: 8,          // 7th-8th level spells
-        goldRange: { min: 50000, max: 200000 },
+        goldRange: { min: 50000, max: 200000 },  // DMG: 50001+
         maxExtraDamageDice: 4,
         hebrewName: 'אגדי'
     },
@@ -137,18 +137,17 @@ export function validateItemBalance(item: any, options: ValidationOptions = {}):
     }
 
     // 1. Validate Gold Price
+    // Note: Only enforce MINIMUM gold, not maximum. 
+    // Expensive base items (e.g., Plate Armor = 1500gp) are valid even at low rarity.
     const gold = parseInt(item.gold, 10) || 0;
     if (gold < standards.goldRange.min) {
         issues.push(`Gold too low for ${rarity}: ${gold} < ${standards.goldRange.min}`);
         if (autoFix) {
             fixedItem.gold = standards.goldRange.min;
         }
-    } else if (gold > standards.goldRange.max) {
-        issues.push(`Gold too high for ${rarity}: ${gold} > ${standards.goldRange.max}`);
-        if (autoFix) {
-            fixedItem.gold = Math.min(gold, standards.goldRange.max);
-        }
     }
+    // REMOVED: Gold "too high" check - expensive base items are valid.
+    // A mundane Plate Armor (1500gp) should not be capped to 150gp just because it's "Common".
 
     // 2. Validate Weapon Bonus
     const bonus = extractBonus(item.weaponDamage);

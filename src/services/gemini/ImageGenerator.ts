@@ -32,7 +32,9 @@ export async function generateImageGetImg(
     userColor: string = '#ffffff',
     colorDescription: string | null = null,
     templateImageUrl: string | null = null,
-    detectTemplateTheme: ((url: string) => Promise<string>) | null = null
+    detectTemplateTheme: ((url: string) => Promise<string>) | null = null,
+    abilityDesc: string = '',
+    itemSubtype: string = ''
 ): Promise<string> {
     const { password } = geminiConfig;
 
@@ -51,11 +53,19 @@ export async function generateImageGetImg(
     // Use the smart color description if provided, otherwise fall back to hex lookup
     const colorName = colorDescription || getColorName(userColor);
 
-    const elementalEnhancement = getElementalEnhancement(visualPrompt);
+    // Combine visualPrompt and abilityDesc to detect elemental effects
+    // This ensures abilities like "נזק ברק" show lightning in the image
+    const combinedPromptForElements = `${visualPrompt} ${abilityDesc}`;
+    const elementalEnhancement = getElementalEnhancement(combinedPromptForElements);
     const rarityQuality = getRarityQuality(visualPrompt);
 
     // === ITEM TYPE DETECTION & SPECIALIZED PROMPTS ===
-    const { itemTypeEnhancement, compositionGuide } = getItemTypeEnhancement(visualPrompt);
+    // PRIORITY: itemSubtype comes FIRST to ensure correct item type
+    // This prevents AI's visualPrompt from overriding the actual item type
+    const promptForTypeDetection = itemSubtype
+        ? `${itemSubtype} ${visualPrompt}`
+        : visualPrompt;
+    const { itemTypeEnhancement, compositionGuide } = getItemTypeEnhancement(promptForTypeDetection);
 
     // === BACKGROUND CONFIGURATION ===
     const backgroundPrompt = await buildBackgroundPrompt(
@@ -146,15 +156,20 @@ function getItemTypeEnhancement(visualPrompt: string): ItemEnhancement {
     } else if (promptLower.includes('spear') || promptLower.includes('רומח')) {
         itemTypeEnhancement = 'long war spear, deadly pointed head, wrapped shaft grip';
         compositionGuide = 'angled to show spear tip detail and length';
-    } else if (promptLower.includes('hammer') || promptLower.includes('mace') || promptLower.includes('פטיש')) {
-        itemTypeEnhancement = 'heavy war hammer, reinforced striking head, powerful design';
-        compositionGuide = 'showing the weight and impact potential of the head';
+    } else if (promptLower.includes('hammer') || promptLower.includes('פטיש') || promptLower.includes('warhammer')) {
+        // HAMMER/WARHAMMER - rectangular/square head like Thor's hammer
+        itemTypeEnhancement = 'heavy war hammer weapon, large rectangular metal striking head, thick sturdy handle, powerful crushing weapon, Thor-like hammer design';
+        compositionGuide = 'showing the weight and impact potential of the rectangular head';
+    } else if (promptLower.includes('mace') || promptLower.includes('אלה') || promptLower.includes('אלת')) {
+        // MACE - round/spherical head with flanges or spikes, shorter handle
+        itemTypeEnhancement = 'medieval flanged mace weapon, spherical bulbous metal head with protruding flanges, short sturdy grip handle, crushing bludgeoning weapon, morning star style';
+        compositionGuide = 'showing the round flanged head with spikes or ridges';
+    } else if (promptLower.includes('club')) {
+        itemTypeEnhancement = 'primitive wooden club, thick heavy end, simple bludgeoning weapon';
+        compositionGuide = 'showing the thick weighted end';
     } else if (promptLower.includes('sickle') || promptLower.includes('מגל')) {
         itemTypeEnhancement = 'curved harvesting sickle, sharp crescent blade, wooden handle, druidic tool';
         compositionGuide = 'showing the curved blade arc and edge';
-    } else if (promptLower.includes('אלה') || promptLower.includes('club')) {
-        itemTypeEnhancement = 'spiked war mace, heavy metal head, crushing weapon design';
-        compositionGuide = 'showing the impact head with spikes or flanges';
     } else if (promptLower.includes('crossbow') || promptLower.includes('arbalet') || promptLower.includes('קשתון')) {
         itemTypeEnhancement = 'mechanical crossbow, intricate trigger mechanism, loaded bolt';
         compositionGuide = 'three-quarter view showing mechanism detail';

@@ -3,6 +3,13 @@ import TextRenderer from './TextRenderer.ts';
 import VisualEffects from './VisualEffects.ts';
 import ImageRenderer from './ImageRenderer.ts';
 import { FRONT_FONT_SIZES } from '../config/CardTextConfig';
+import { translateSpellText } from '../services/SpellTranslationService';
+
+// Preload common icons via TextRenderer
+['fire', 'cold', 'lightning', 'thunder', 'acid', 'poison', 'necrotic', 'radiant', 'force', 'psychic', 'spell'].forEach(
+    iconName => TextRenderer.preloadIcon(iconName)
+);
+
 
 export const FrontCardRenderer = {
     /**
@@ -202,6 +209,8 @@ export const FrontCardRenderer = {
         }
 
         // 4. Core Stats
+        let currentY = offsets.coreStats; // Track Y position for stacking
+
         if (coreStatsText) {
             const coreSize = sizes.coreStatsSize || (sizes.statsSize * 1.3);
             ctx.font = getFont('coreStats', coreSize);
@@ -210,32 +219,158 @@ export const FrontCardRenderer = {
                 ctx,
                 coreStatsText,
                 width / 2,
-                offsets.coreStats,
+                currentY,
                 offsets.coreStatsWidth,
                 { ...drawOpts, elementName: 'coreStats' }
             );
+            currentY += coreSize * 1.1; // Move down for next line
+            currentY += coreSize * 1.1; // Move down for next line
         }
 
-        // 5. Quick Stats / Description
+        // DEBUG: Log quick-glance fields received by renderer
+        console.log('🎨 FrontCardRenderer received quick-glance:', {
+            specialDamage: data.specialDamage || '(none)',
+            spellAbility: data.spellAbility || '(none)'
+        });
+
+        // 4.5 Special Damage (e.g., "+1d4 נפשי") - Yellow/Gold color
+        if (data.specialDamage && data.specialDamage.trim()) {
+            const specialSize = (sizes.statsSize || 28);
+
+            // Detect icon using TextRenderer's mapping
+            let iconName = '';
+            let displayText = data.specialDamage;
+            for (const [type, icon] of Object.entries(TextRenderer.DAMAGE_TYPE_ICONS)) {
+                if (data.specialDamage.includes(type) && !type.match(/^[a-z]+$/)) {
+                    iconName = icon;
+                    displayText = data.specialDamage.replace(type, '').trim();
+                    break;
+                }
+            }
+
+            // Use centralized drawTextWithIcon
+            TextRenderer.drawTextWithIcon(
+                ctx,
+                displayText || data.specialDamage,
+                width / 2,
+                currentY,
+                {
+                    iconName,
+                    iconPosition: 'right',
+                    fontSize: specialSize,
+                    iconScale: 1.5,
+                    maxWidth: offsets.statsWidth,
+                    fontFamily: offsets.fontFamily,
+                    fontStyles: styles,
+                    elementName: 'specialDamage',
+                    fillStyle: '#b8860b',
+                    drawOpts
+                }
+            );
+
+            currentY += specialSize * 1.2;
+        }
+
+        // 4.6 Spell Ability (e.g., "1/יום: Fireball") - Purple color
+        if (data.spellAbility && data.spellAbility.trim()) {
+            // Translate spell names to Hebrew
+            const translatedSpellAbility = translateSpellText(data.spellAbility);
+            const spellSize = (sizes.statsSize || 28);
+
+            // Use centralized drawTextWithIcon
+            TextRenderer.drawTextWithIcon(
+                ctx,
+                translatedSpellAbility,
+                width / 2,
+                currentY,
+                {
+                    iconName: 'spell',
+                    iconPosition: 'right',
+                    fontSize: spellSize,
+                    iconScale: 1.5,
+                    maxWidth: offsets.statsWidth,
+                    fontFamily: offsets.fontFamily,
+                    fontStyles: styles,
+                    elementName: 'spellAbility',
+                    fillStyle: '#6a0dad',
+                    drawOpts
+                }
+            );
+
+            currentY += spellSize * 1.2;
+        }
+
+
+        // 5. Quick Stats / Description (for items without damage/AC)
         let statsText = data.quickStats;
         if (statsText) {
-            // Use TextRenderer to clean
             const locale = window.i18n?.getLocale() || 'he';
             statsText = TextRenderer.cleanStatsText(statsText, locale);
         }
 
         if (statsText) {
-            ctx.font = getFont('stats', sizes.statsSize);
-            ctx.fillStyle = '#1a1a1a';
-            TextRenderer.wrapTextCentered(
-                ctx,
-                statsText,
-                width / 2,
-                offsets.stats || 800,
-                offsets.statsWidth,
-                sizes.statsSize * 1.2,
-                { glow: styles.statsGlow } // Minimal options for wrapText, maybe expand TextRenderer if needed
-            );
+            // Use offsets.stats for proper height slider control
+            const statsY = offsets.stats > 0 ? offsets.stats : currentY + 20;
+
+            // Known Hebrew spell names
+            const knownHebrewSpells = [
+                'חזיז ברק', 'חזיז מנחה', 'חזיז אש', 'כדור אש', 'קרן כפור',
+                'אש פיות', 'אורות מרקדים', 'ידיים בוערות', 'קליע קסם',
+                'ריפוי פצעים', 'מגן', 'היעלמות', 'צעד ערפילי', 'מעוף',
+                'האצה', 'האטה', 'אחיזת אדם', 'הפגת קסם', 'לחש נגד'
+            ];
+
+            // Split stats into lines
+            const lines = statsText.split('\n').filter(line => line.trim());
+            const lineHeight = sizes.statsSize * 1.3;
+            let currentLineY = statsY;
+
+            for (const line of lines) {
+                let displayLine = line;
+                let iconName = '';
+
+                // Check if this line is a spell
+                const isSpellLine = line.includes('/יום') ||
+                    line.match(/[A-Z][a-z]+/) ||
+                    knownHebrewSpells.some(spell => line.includes(spell)) ||
+                    (!line.match(/\d+d\d+/) && !line.match(/\+\d+d/) && line.match(/[\u0590-\u05FF]{4,}/));
+
+                if (isSpellLine) {
+                    iconName = 'spell';
+                    displayLine = translateSpellText(line);
+                } else if (line.match(/\d+d\d+/) || line.match(/\+\d+d/)) {
+                    // Check for damage types using TextRenderer's mapping
+                    for (const [type, icon] of Object.entries(TextRenderer.DAMAGE_TYPE_ICONS)) {
+                        if (line.includes(type) && !type.match(/^[a-z]+$/)) { // Only Hebrew types
+                            iconName = icon;
+                            displayLine = line.replace(type, '').trim();
+                            break;
+                        }
+                    }
+                }
+
+                // Use centralized drawTextWithIcon function
+                TextRenderer.drawTextWithIcon(
+                    ctx,
+                    displayLine,
+                    width / 2,
+                    currentLineY,
+                    {
+                        iconName,
+                        iconPosition: 'right',
+                        fontSize: sizes.statsSize,
+                        iconScale: 2.5,
+                        maxWidth: offsets.statsWidth,
+                        fontFamily: offsets.fontFamily,
+                        fontStyles: styles,
+                        elementName: 'stats',
+                        fillStyle: '#1a1a1a',
+                        drawOpts
+                    }
+                );
+
+                currentLineY += lineHeight;
+            }
         }
 
         // 6. Gold
@@ -251,16 +386,24 @@ export const FrontCardRenderer = {
         const textX = startX + iconSize + spacing + (metrics.width / 2);
         const goldY = 920 + offsets.gold;
 
-        // Draw Icon
+        // Draw Icon (scales with goldSize)
         VisualEffects.drawGoldIcon(ctx, startX + iconSize / 2, goldY - (sizes.goldSize * 0.4), iconSize);
 
-        // Draw Text
+        // Draw Text with width limit via drawStyledText (for auto-scaling)
         ctx.fillStyle = '#d4af37';
-        // Simulating heavy stroke for gold
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 4;
-        ctx.strokeText(goldValue, textX, goldY);
-        ctx.fillText(goldValue, textX, goldY);
+        // Stroke first for outline effect
+        ctx.strokeText(goldValue, textX, goldY, offsets.goldWidth);
+        // Then fill
+        TextRenderer.drawStyledText(
+            ctx,
+            goldValue,
+            textX,
+            goldY,
+            offsets.goldWidth,
+            { ...drawOpts, elementName: 'gold' }
+        );
         ctx.lineWidth = 1;
     },
 

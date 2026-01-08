@@ -51,6 +51,10 @@ export interface CardData {
     versatileDamage?: string;
     weaponProperties?: string[];
 
+    // Quick-glance stats (shown on front of card)
+    specialDamage?: string;   // Extra elemental damage (e.g., "+1d4 נפשי")
+    spellAbility?: string;    // Spell summary (e.g., "1/יום: Augury")
+
     // Back side (V1 style)
     abilityName?: string;
     abilityDesc?: string;

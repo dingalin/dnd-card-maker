@@ -1,16 +1,17 @@
 /**
- * Shared utility functions for D&D Card Creator
- */
-
-/**
  * Get rarity based on character level range
+ * Based on DMG guidelines:
+ * - Common/Uncommon: 1-4 (low levels, minor magic)
+ * - Rare: 5-10 (mid levels, significant magic)
+ * - Very Rare: 11-16 (high levels, powerful magic)
+ * - Legendary: 17+ (epic levels, legendary items)
  */
 export function getRarityFromLevel(level: string): string {
-    if (level === '1-4') return 'common';
-    if (level === '5-10') return 'uncommon';
-    if (level === '11-16') return 'rare';
+    if (level === '1-4') return 'uncommon';  // Changed from 'common' - allow minor magic at low levels
+    if (level === '5-10') return 'rare';     // Changed from 'uncommon'
+    if (level === '11-16') return 'very rare'; // NEW - was 'rare'
     if (level === '17+') return 'legendary';
-    return 'common';
+    return 'uncommon';
 }
 
 /**

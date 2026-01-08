@@ -417,23 +417,34 @@ export function enrichItemDetails(itemDetails: ItemDetails, type: string, finalS
 
             // Armor AC
             if (type === 'armor' && officialStats.ac) {
-                // CRITICAL: officialStats.ac is stored as STRING in dnd-data.js!
-                // Must parse as integer to avoid string concatenation bug ("17" + 0 = "170")
-                let baseAC = parseInt(officialStats.ac, 10) || 0;
                 let armorBonus = 0;
+                let totalAC = 0;
 
-                // Extract +X bonus from ability description or other fields
-                const bonusMatch = itemDetails.abilityDesc?.match(/\+(\d+)\s*(לדרגת שריון|to AC|AC|לשריון|armor class)/i) ||
-                    itemDetails.abilityDesc?.match(/מעניק\s*\+(\d+)/i);
-                if (bonusMatch) {
-                    armorBonus = parseInt(bonusMatch[1], 10);
-                    console.log("ItemEnrichment: Extracted armor bonus:", armorBonus);
+                // SKIP if armorClass was already set correctly by ItemGenerator's updateArmorClassWithBonus
+                const existingAC = parseInt(String(itemDetails.armorClass), 10) || 0;
+                if (existingAC >= 10) {
+                    console.log("ItemEnrichment: Keeping existing armorClass:", existingAC, "(already valid)");
+                    totalAC = existingAC;
+                    armorBonus = itemDetails.armorBonus || 0;
+                } else {
+                    // CRITICAL: officialStats.ac is stored as STRING in dnd-data.js!
+                    // Must parse as integer to avoid string concatenation bug ("17" + 0 = "170")
+                    const baseAC = parseInt(officialStats.ac, 10) || 0;
+
+                    // Extract +X bonus from ability description or other fields
+                    const bonusMatch = itemDetails.abilityDesc?.match(/\+(\d+)\s*(לדרגת שריון|to AC|AC|לשריון|armor class)/i) ||
+                        itemDetails.abilityDesc?.match(/מעניק\s*\+(\d+)/i);
+                    if (bonusMatch) {
+                        armorBonus = parseInt(bonusMatch[1], 10);
+                        console.log("ItemEnrichment: Extracted armor bonus:", armorBonus);
+                    }
+
+                    // Total AC = Base + Bonus
+                    totalAC = baseAC + armorBonus;
+                    itemDetails.armorClass = totalAC;
+                    itemDetails.armorBonus = armorBonus; // Store for display
+                    console.log("ItemEnrichment: Set armorClass:", totalAC, "(base", baseAC, "+ bonus", armorBonus, ")");
                 }
-
-                // Total AC = Base + Bonus
-                const totalAC = baseAC + armorBonus;
-                itemDetails.armorClass = totalAC;
-                itemDetails.armorBonus = armorBonus; // Store for display
 
                 // Core stats shows "+X" indicator if there's a bonus
                 if (armorBonus > 0) {
@@ -455,7 +466,7 @@ export function enrichItemDetails(itemDetails: ItemDetails, type: string, finalS
                     }
                 }
 
-                console.log("ItemEnrichment: Set armor AC:", totalAC, "Bonus:", armorBonus, "DexMod:", officialStats.dexMod);
+                console.log("ItemEnrichment: Final armor AC:", totalAC, "Bonus:", armorBonus, "DexMod:", officialStats.dexMod);
             }
 
             // Weapon properties
@@ -560,7 +571,13 @@ export function enrichItemDetails(itemDetails: ItemDetails, type: string, finalS
         console.log(`💰 Parsed: rarity="${rarity}" -> normalized="${normalizedRarity}", magicBonus=${magicBonus}`);
 
         // Calculate price if we have base price OR magic bonus (always for weapons/armor)
-        if (basePrice > 0 || magicBonus > 0 || (type === 'weapon' || type === 'armor')) {
+        // BUT: Skip if gold was already set to a high value by PricingService
+        const existingGold = parseInt(String(itemDetails.gold), 10) || 0;
+        const skipPriceCalc = existingGold > 500; // PricingService already calculated; don't overwrite
+
+        if (skipPriceCalc) {
+            console.log(`💰 Keeping PricingService gold: ${existingGold} GP (skipping enrichment calc)`);
+        } else if (basePrice > 0 || magicBonus > 0 || (type === 'weapon' || type === 'armor')) {
             const calculatedPrice = calculateItemPrice(basePrice, magicBonus, normalizedRarity);
             itemDetails.gold = calculatedPrice;
             console.log(`💰 Set item gold to: ${calculatedPrice} GP (base=${basePrice}, bonus=+${magicBonus}, rarity=${normalizedRarity})`);

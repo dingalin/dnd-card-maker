@@ -591,3 +591,309 @@
 #treasure-generation-status {
     margin-top: 1rem;
 }
+
+/* ====================================
+   NEW ADVANCED TREASURE GENERATOR STYLES
+   ==================================== */
+
+/* Mode Tabs (4 modes) */
+.treasure-mode-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.25rem;
+    margin-bottom: 1.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.25rem;
+    border-radius: 12px;
+}
+
+.treasure-mode-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.6rem 0.4rem;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.treasure-mode-tab .icon {
+    font-size: 1.3rem;
+}
+
+.treasure-mode-tab:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.treasure-mode-tab.active {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+/* Slider Display */
+.slider-display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+}
+
+.slider-display .slider {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.slider-display .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.5);
+}
+
+.slider-display .slider-value {
+    min-width: 30px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #fbbf24;
+}
+
+/* Info Box */
+.info-box {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem;
+}
+
+.info-box p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.4;
+}
+
+/* Treasure Options Section */
+.treasure-options-section {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.treasure-options-section h4 {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Preview Header */
+.treasure-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.total-value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.2));
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.total-value .label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.total-value .value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fbbf24;
+}
+
+.total-value .currency {
+    font-size: 0.85rem;
+    color: rgba(251, 191, 36, 0.8);
+}
+
+/* Coins Display (5 columns) */
+.coins-display {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.coin-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    min-width: 50px;
+}
+
+.coin-stack .coin-icon {
+    font-size: 1.5rem;
+}
+
+.coin-stack .coin-amount {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #e5e7eb;
+}
+
+.coin-stack .coin-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+}
+
+/* Gems and Art Display */
+.gems-art-display {
+    background: rgba(128, 90, 213, 0.1);
+    border: 1px solid rgba(128, 90, 213, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.gems-art-display h4 {
+    color: #a78bfa;
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+}
+
+.gems-art-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.gem-item,
+.art-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.gem-item {
+    border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.art-item {
+    border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.gem-item .value,
+.art-item .value {
+    color: #fbbf24;
+    font-weight: bold;
+}
+
+/* Merchant NPC Card */
+.merchant-card {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(29, 78, 216, 0.2));
+    border: 2px solid rgba(59, 130, 246, 0.4);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.merchant-card h4 {
+    color: #60a5fa;
+    margin-bottom: 0.75rem;
+}
+
+.merchant-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.merchant-info .merchant-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e5e7eb;
+}
+
+.merchant-info .merchant-race {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: capitalize;
+}
+
+.merchant-info .merchant-personality,
+.merchant-info .merchant-quirk {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.25rem 0;
+    border-right: 2px solid rgba(59, 130, 246, 0.4);
+    padding-right: 0.5rem;
+}
+
+/* Shop inventory items in cards grid */
+.treasure-card.shop-item {
+    aspect-ratio: 3/4;
+}
+
+.treasure-card.shop-item .price-badge {
+    position: absolute;
+    bottom: 3.5rem;
+    right: 0.5rem;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.9), rgba(217, 119, 6, 0.9));
+    color: #1f2937;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Quantity badge for shop items */
+.treasure-card .quantity-badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}

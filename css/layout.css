@@ -70,6 +70,15 @@ body::before {
     align-items: start;
     box-sizing: border-box;
     overflow-x: hidden;
+    overflow-y: auto;
+
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.main-layout::-webkit-scrollbar {
+    display: none;
 }
 
 .secondary-actions-grid {
@@ -110,6 +119,14 @@ body::before {
     flex-direction: column;
     gap: 4px;
     /* Tight gap */
+
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.sidebar-start::-webkit-scrollbar {
+    display: none;
 }
 
 /* Compact internal elements */
@@ -185,6 +202,14 @@ body::before {
     /* Updated: Align to top */
     box-sizing: border-box;
     margin-top: 0;
+
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.sidebar-end::-webkit-scrollbar {
+    display: none;
 }
 
 .sidebar-end>h2 {
@@ -199,8 +224,17 @@ body::before {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.3);
+    scrollbar-width: none;
+    /* Hide scrollbar completely */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    overflow-anchor: none;
+    /* Prevent auto-scrolling when slider values change */
+}
+
+/* Hide webkit scrollbar */
+.sidebar-end #sidebar-end-scroll-area::-webkit-scrollbar {
+    display: none;
 }
 
 /* === LTR (Left-to-Right) Layout Support === */

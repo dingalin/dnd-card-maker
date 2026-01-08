@@ -52,7 +52,7 @@ export const FRONT_FONT_SIZES = {
  * Front card text widths (in pixels)
  */
 export const FRONT_WIDTHS = {
-    rarityWidth: 97,
+    rarityWidth: 500,
     typeWidth: 450,
     nameWidth: 450,
     coreStatsWidth: 537,
@@ -161,17 +161,17 @@ export const BACK_POSITION_LIMITS: Record<string, SliderLimit> = {
 };
 
 export const FONT_SIZE_LIMITS: Record<string, SliderLimit> = {
-    // Front
-    nameSize: { min: 16, max: 120, default: FRONT_FONT_SIZES.nameSize },
-    typeSize: { min: 12, max: 72, default: FRONT_FONT_SIZES.typeSize },
-    raritySize: { min: 12, max: 72, default: FRONT_FONT_SIZES.raritySize },
-    coreStatsSize: { min: 16, max: 96, default: FRONT_FONT_SIZES.coreStatsSize },
-    statsSize: { min: 12, max: 72, default: FRONT_FONT_SIZES.statsSize },
-    goldSize: { min: 12, max: 72, default: FRONT_FONT_SIZES.goldSize },
-    // Back
-    abilityNameSize: { min: 16, max: 96, default: BACK_FONT_SIZES.abilityNameSize },
-    mechSize: { min: 12, max: 64, default: BACK_FONT_SIZES.mechSize },
-    loreSize: { min: 12, max: 64, default: BACK_FONT_SIZES.loreSize },
+    // Front - NO LIMITS
+    nameSize: { min: 1, max: 999, default: FRONT_FONT_SIZES.nameSize },
+    typeSize: { min: 1, max: 999, default: FRONT_FONT_SIZES.typeSize },
+    raritySize: { min: 1, max: 999, default: FRONT_FONT_SIZES.raritySize },
+    coreStatsSize: { min: 1, max: 999, default: FRONT_FONT_SIZES.coreStatsSize },
+    statsSize: { min: 1, max: 999, default: FRONT_FONT_SIZES.statsSize },
+    goldSize: { min: 1, max: 999, default: FRONT_FONT_SIZES.goldSize },
+    // Back - NO LIMITS
+    abilityNameSize: { min: 1, max: 999, default: BACK_FONT_SIZES.abilityNameSize },
+    mechSize: { min: 1, max: 999, default: BACK_FONT_SIZES.mechSize },
+    loreSize: { min: 1, max: 999, default: BACK_FONT_SIZES.loreSize },
 };
 
 // ============================================================================

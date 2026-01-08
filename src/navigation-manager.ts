@@ -126,7 +126,8 @@ class NavigationManager {
 
         if (this.scrollContainer) {
             this.scrollContainer.classList.remove('active');
-            const sections = this.scrollContainer.querySelectorAll('.scroll-section');
+            // Support both scroll-section and accordion-content
+            const sections = this.scrollContainer.querySelectorAll('.scroll-section, .accordion-content');
             sections.forEach(s => s.classList.add('hidden'));
         }
 
@@ -162,10 +163,10 @@ if (typeof window !== 'undefined') {
         });
         window.sidebarNav.init();
 
-        // 3. Left Sidebar Navigation (Edit & Design)
+        // 3. Left Sidebar Navigation (Edit & Design) - Accordion style
         window.sidebarEndNav = new NavigationManager({
             containerId: 'sidebar-end-scroll-area',
-            scopeSelector: '.sidebar-end .stone-menu',
+            scopeSelector: '.sidebar-end',  // Changed: buttons are now inside accordion-items, not stone-menu
             bodyClass: 'left-menu-open'
         });
         window.sidebarEndNav.init();

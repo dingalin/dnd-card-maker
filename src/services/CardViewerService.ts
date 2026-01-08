@@ -179,6 +179,7 @@ class CardViewerServiceClass {
         // Front Face
         const frontFace = document.createElement('div');
         frontFace.className = 'card-viewer-front';
+        console.log('📸 Creating front face with image:', this.currentCard!.frontImage?.substring(0, 100));
         frontFace.innerHTML = `<img src="${this.currentCard!.frontImage}" alt="Card Front" style="width:100%; height:100%; object-fit:cover; border-radius:12px;" />`;
 
         // Back Face

@@ -2,6 +2,7 @@ import { getRarityFromLevel, blobToBase64 } from '../../utils.ts';
 import { enrichItemDetails } from '../../utils/item-enrichment.ts';
 import { validateItemBalance } from '../../utils/balancing-validator.ts';
 import { sampleCardBackgroundColor } from '../../utils/ColorSampler.ts';
+import { calculatePriceFromDescription } from '../../services/PricingService.ts';
 import GeminiService from '../../gemini-service.ts';
 
 export class GenerationManager {
@@ -91,6 +92,12 @@ export class GenerationManager {
                 effectiveComplexity,
                 locale
             );
+
+            console.log('📦 GenerationManager received itemDetails:', {
+                name: itemDetails.name,
+                specialDamage: itemDetails.specialDamage || '(missing)',
+                spellAbility: itemDetails.spellAbility || '(missing)'
+            });
         }
 
         // 5. Enrich & Backfill
@@ -103,7 +110,46 @@ export class GenerationManager {
             Object.assign(itemDetails, balanceResult.fixedItem);
         }
 
-        // 7. Rarity Normalization (Hebrew/English compat)
+        // 7. FINAL AC FIX - Ensure armor has correct AC after all processing
+        if (type === 'armor' && itemDetails.typeHe?.includes('שריון')) {
+            const currentAC = parseInt(String(itemDetails.armorClass), 10) || 0;
+            if (currentAC < 10) {
+                // Force correct AC calculation
+                let baseAC = 18; // Default to Plate
+                const typeHeLower = (itemDetails.typeHe || '').toLowerCase();
+                if (typeHeLower.includes('עור') && !typeHeLower.includes('מחוזק')) baseAC = 11;
+                else if (typeHeLower.includes('שרשראות')) baseAC = 16;
+                else if (typeHeLower.includes('קשקשים')) baseAC = 14;
+                else if (typeHeLower.includes('לוחות')) baseAC = 18;
+
+                // Detect bonus from abilityDesc
+                const bonusMatch = (itemDetails.abilityDesc || '').match(/\+(\d)/);
+                const bonus = bonusMatch ? parseInt(bonusMatch[1], 10) : 0;
+
+                const correctAC = baseAC + bonus;
+                console.log(`🛡️ FINAL FIX: armorClass ${currentAC} -> ${correctAC} (base ${baseAC} + bonus ${bonus})`);
+                itemDetails.armorClass = correctAC;
+                itemDetails.armorBonus = bonus;
+            }
+        }
+
+        // 8. RECALCULATE PRICE - Don't trust AI's price, calculate from base + abilities
+        if (itemDetails.typeHe && itemDetails.abilityDesc) {
+            const calculatedPrice = calculatePriceFromDescription(
+                itemDetails.abilityDesc,
+                itemDetails.typeHe,
+                rarity
+            );
+
+            // Only use calculated price if it's reasonable (> 0)
+            if (calculatedPrice > 0) {
+                const oldPrice = parseInt(String(itemDetails.gold), 10) || 0;
+                console.log(`💰 PRICE FIX: ${oldPrice} -> ${calculatedPrice} (calculated from abilities)`);
+                itemDetails.gold = String(calculatedPrice);
+            }
+        }
+
+        // 9. Rarity Normalization (Hebrew/English compat)
         this._normalizeRarity(itemDetails, locale, rarity);
 
         // 8. Apply Manual Overrides
@@ -120,7 +166,7 @@ export class GenerationManager {
 
         if (!skipImage) {
             onProgress?.(3, 60, window.i18n?.t('preview.drawing') || 'Drawing...');
-            const imageUrl = await this.generateImage(finalVisualPrompt);
+            const imageUrl = await this.generateImage(finalVisualPrompt, itemDetails.abilityDesc || '', finalSubtype || type);
 
             if (imageUrl) {
                 persistentImageUrl = imageUrl;
@@ -197,7 +243,7 @@ export class GenerationManager {
 
         // Generate Image
         const finalVisualPrompt = itemDetails.visualPrompt || `${type} ${subtype || ''}`;
-        const imageUrl = await this.generateImage(finalVisualPrompt);
+        const imageUrl = await this.generateImage(finalVisualPrompt, itemDetails.abilityDesc || '', subtype || type);
 
         let persistentImageUrl = imageUrl; // Can be null
         if (imageUrl && imageUrl.startsWith('blob:')) {
@@ -283,7 +329,7 @@ export class GenerationManager {
         if (element) visualPrompt += `, ${element.element} enchantment, ${element.icon} effects`;
 
         onProgress?.(2, 60, window.i18n?.t('preview.drawing') || 'Drawing...');
-        const imageUrl = await this.generateImage(visualPrompt);
+        const imageUrl = await this.generateImage(visualPrompt, abilitiesPrompt || itemDetails.abilityDesc || '', subtype || type);
 
         let persistentImageUrl = imageUrl;
         if (imageUrl && imageUrl.startsWith('blob:')) {
@@ -300,7 +346,7 @@ export class GenerationManager {
         };
     }
 
-    async generateImage(prompt) {
+    async generateImage(prompt, abilityDesc = '', itemSubtype = '') {
         const bgUrl = this.state.getState()?.settings?.style?.cardBackgroundUrl;
         let cardColor = '#ffffff';
         let colorDesc = null;
@@ -328,9 +374,15 @@ export class GenerationManager {
         const model = document.getElementById('image-model')?.value || 'getimg-flux';
 
         console.log('🖼️ GenerationManager.generateImage - styleOption:', styleOption, 'style:', style, 'model:', model);
+        if (abilityDesc) {
+            console.log('🔮 Image will include ability effects from:', abilityDesc.substring(0, 50));
+        }
+        if (itemSubtype) {
+            console.log('📦 Item type priority:', itemSubtype);
+        }
 
-        // Pass all parameters including templateImageUrl for theme-aware background generation
-        return await this.gemini.generateImage(prompt, model, style, getImgKey, styleOption, cardColor, colorDesc, bgUrl);
+        // Pass all parameters including itemSubtype to ensure correct item type in image
+        return await this.gemini.generateImage(prompt, model, style, getImgKey, styleOption, cardColor, colorDesc, bgUrl, abilityDesc, itemSubtype);
     }
 
     async generateBackground(theme, style, model, getImgKey) {

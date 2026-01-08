@@ -18,12 +18,49 @@ export interface ErrorHandlerOptions {
     level?: ErrorLevel;
     showToast?: boolean;
     rethrow?: boolean;
+    useLocale?: boolean;  // Use i18n locale key instead of raw message
 }
 
 declare global {
     interface Window {
-        uiManager?: any; // To be typed later
+        uiManager?: any;
+        i18n?: any;
     }
+}
+
+/**
+ * Classify error to get appropriate locale key
+ */
+export function classifyError(error: Error | string | unknown): string {
+    const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+
+    // Network errors
+    if (message.includes('network') || message.includes('fetch') || message.includes('failed to fetch') || message.includes('net::')) {
+        return 'toasts.networkError';
+    }
+
+    // API key issues
+    if (message.includes('api key') || message.includes('apikey') || message.includes('unauthorized') || message.includes('401')) {
+        return 'toasts.apiKeyInvalid';
+    }
+
+    // Rate limiting
+    if (message.includes('rate limit') || message.includes('too many') || message.includes('429')) {
+        return 'toasts.rateLimitExceeded';
+    }
+
+    // Server errors
+    if (message.includes('500') || message.includes('502') || message.includes('503') || message.includes('server error')) {
+        return 'toasts.serverError';
+    }
+
+    // Timeout
+    if (message.includes('timeout') || message.includes('timed out') || message.includes('aborted')) {
+        return 'toasts.timeout';
+    }
+
+    // Return null to use original message
+    return '';
 }
 
 /**
@@ -33,14 +70,15 @@ export function handleError(error: Error | string | unknown, context: string, op
     const {
         level = ErrorLevel.ERROR,
         showToast = true,
-        rethrow = false
+        rethrow = false,
+        useLocale = true
     } = options;
 
-    const message = error instanceof Error ? error.message : String(error);
+    const rawMessage = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : null;
 
-    // Console logging with context
-    const logMessage = `[${context}] ${message}`;
+    // Console logging with context (always use raw message)
+    const logMessage = `[${context}] ${rawMessage}`;
 
     switch (level) {
         case ErrorLevel.INFO:
@@ -56,9 +94,18 @@ export function handleError(error: Error | string | unknown, context: string, op
             console.error(logMessage, stack);
     }
 
-    // UI feedback
+    // UI feedback - try to use user-friendly message
     if (showToast && window.uiManager) {
-        window.uiManager.showToast(message, level === ErrorLevel.WARNING ? 'warning' : 'error');
+        let displayMessage = rawMessage;
+
+        if (useLocale && window.i18n) {
+            const localeKey = classifyError(error);
+            if (localeKey) {
+                displayMessage = window.i18n.t(localeKey);
+            }
+        }
+
+        window.uiManager.showToast(displayMessage, level === ErrorLevel.WARNING ? 'warning' : 'error');
     }
 
     // Optional rethrow

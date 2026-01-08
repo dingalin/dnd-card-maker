@@ -341,3 +341,60 @@ button:hover .icon-img-sm {
     text-overflow: ellipsis;
     box-sizing: border-box;
 }
+
+/* === Accordion Styles for Sidebar-End === */
+.accordion-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.accordion-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.accordion-header {
+    position: relative;
+}
+
+.accordion-header .accordion-arrow {
+    font-size: 10px;
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    opacity: 0.6;
+}
+
+.accordion-header.active .accordion-arrow {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    padding: 0 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0 0 8px 8px;
+    margin-bottom: 4px;
+}
+
+/* Explicitly hide accordion content when hidden class is present */
+.accordion-content.hidden {
+    display: none !important;
+}
+
+.accordion-content:not(.hidden) {
+    display: block;
+    max-height: 2000px;
+    /* Large enough to show all content */
+    padding: 12px 8px;
+    overflow-y: auto;
+    overflow-anchor: none;
+}
+
+/* Style scroll-section/accordion-content consistently */
+.accordion-content .control-group,
+.scroll-section .control-group {
+    margin-bottom: 12px;
+}

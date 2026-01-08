@@ -162,7 +162,7 @@ export default class GeminiService {
      * Generate item image using GetImg/FLUX
      * Optimized for fantasy items with smart background matching
      */
-    async generateImage(visualPrompt: string, model: string, style: string, getImgApiKey: string, styleOption: string = 'natural', userColor: string = '#ffffff', colorDescription: string | null = null, templateImageUrl: string | null = null) {
+    async generateImage(visualPrompt: string, model: string, style: string, getImgApiKey: string, styleOption: string = 'natural', userColor: string = '#ffffff', colorDescription: string | null = null, templateImageUrl: string | null = null, abilityDesc: string = '', itemSubtype: string = '') {
         // Create a bound detectTemplateTheme function for the ImageGenerator
         const detectTheme = (url: string) => this.detectTemplateTheme(url);
 
@@ -176,7 +176,9 @@ export default class GeminiService {
             userColor,
             colorDescription,
             templateImageUrl,
-            detectTheme
+            detectTheme,
+            abilityDesc,
+            itemSubtype
         );
     }
 

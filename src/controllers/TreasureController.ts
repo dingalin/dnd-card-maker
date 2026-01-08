@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * TreasureController - Handles the Treasure Generator tab
- * Manages both automatic (CR-based) and manual treasure generation
+ * Manages Monster Loot, Hoard, Shop, and Quest Reward generation modes
  */
 
 import {
@@ -15,6 +15,10 @@ import {
 import { enrichItemDetails } from '../utils/item-enrichment.ts';
 import i18n from '../i18n.ts';
 import CardRenderer from '../card-renderer.ts';
+import { lootGenerator, LootResult, MonsterLootResult, HoardResult } from '../services/LootGenerator.ts';
+import { shopGenerator, ShopInventoryResult } from '../services/ShopGenerator.ts';
+import { getAllMonsterTypes } from '../config/monster-loot-profiles.ts';
+import { getAllShopTypes, getAllTiers } from '../config/shop-profiles.ts';
 
 interface WindowGlobals {
     i18n?: any;
@@ -22,14 +26,19 @@ interface WindowGlobals {
     treasureController?: any;
 }
 
+// Generation mode type
+type GenerationMode = 'monster' | 'hoard' | 'shop' | 'quest';
+
 export default class TreasureController {
     public state: any;
     public ui: any;
     public generator: any;
-    public currentMode: 'auto' | 'manual';
+    public currentMode: GenerationMode;
     public treasureList: any[];
     public generatedCards: any[];
     public isGenerating: boolean;
+    public lastLootResult: LootResult | null;
+    public lastShopResult: ShopInventoryResult | null;
 
     constructor(stateManager: any, uiManager: any, generatorController: any) {
         this.state = stateManager;
@@ -37,58 +46,63 @@ export default class TreasureController {
         this.generator = generatorController;
 
         // Internal state
-        this.currentMode = 'auto';
+        this.currentMode = 'monster';  // Default to monster mode
         this.treasureList = []; // For manual mode
         this.generatedCards = []; // Generated treasure cards
         this.isGenerating = false;
+        this.lastLootResult = null;
+        this.lastShopResult = null;
 
         this.setupListeners();
     }
 
     setupListeners() {
-        // Mode toggle
-        const autoBtn = document.getElementById('treasure-mode-auto');
-        const manualBtn = document.getElementById('treasure-mode-manual');
+        // Mode tabs (4 modes: monster, hoard, shop, quest)
+        const modeTabs = document.querySelectorAll('.treasure-mode-tab');
+        modeTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const mode = (e.currentTarget as HTMLElement).getAttribute('data-mode') as GenerationMode;
+                if (mode) this.switchToMode(mode);
+            });
+        });
 
-        if (autoBtn) {
-            autoBtn.addEventListener('click', () => this.switchMode('auto'));
-        }
-        if (manualBtn) {
-            manualBtn.addEventListener('click', () => this.switchMode('manual'));
-        }
-
-        // Counter controls
-        const decreaseBtn = document.getElementById('item-count-decrease');
-        const increaseBtn = document.getElementById('item-count-increase');
-
-        if (decreaseBtn) {
-            decreaseBtn.addEventListener('click', () => this.updateItemCount(-1));
-        }
-        if (increaseBtn) {
-            increaseBtn.addEventListener('click', () => this.updateItemCount(1));
+        // Monster mode controls
+        const monsterCrSlider = document.getElementById('monster-cr') as HTMLInputElement;
+        if (monsterCrSlider) {
+            monsterCrSlider.addEventListener('input', () => {
+                const display = document.getElementById('monster-cr-display');
+                if (display) display.textContent = monsterCrSlider.value;
+            });
         }
 
-        // Generate treasure button (auto mode)
-        const generateBtn = document.getElementById('generate-treasure-btn');
-        if (generateBtn) {
-            generateBtn.addEventListener('click', () => this.generateAutoTreasure());
+        // Quest mode controls
+        const questLevelSlider = document.getElementById('quest-party-level') as HTMLInputElement;
+        if (questLevelSlider) {
+            questLevelSlider.addEventListener('input', () => {
+                const display = document.getElementById('quest-party-level-display');
+                if (display) display.textContent = questLevelSlider.value;
+            });
         }
 
-        // Manual mode controls
-        const addItemBtn = document.getElementById('add-item-to-list-btn');
-        if (addItemBtn) {
-            addItemBtn.addEventListener('click', () => this.addItemToList());
+        // Generate buttons for each mode
+        const generateMonsterBtn = document.getElementById('generate-monster-loot-btn');
+        if (generateMonsterBtn) {
+            generateMonsterBtn.addEventListener('click', () => this.generateMonsterLoot());
         }
 
-        const generateAllBtn = document.getElementById('generate-all-cards-btn');
-        if (generateAllBtn) {
-            generateAllBtn.addEventListener('click', () => this.generateManualTreasure());
+        const generateHoardBtn = document.getElementById('generate-hoard-btn');
+        if (generateHoardBtn) {
+            generateHoardBtn.addEventListener('click', () => this.generateHoard());
         }
 
-        // Item type change for subtype population
-        const itemTypeSelect = document.getElementById('manual-item-type');
-        if (itemTypeSelect) {
-            itemTypeSelect.addEventListener('change', () => this.populateSubtypes());
+        const generateShopBtn = document.getElementById('generate-shop-btn');
+        if (generateShopBtn) {
+            generateShopBtn.addEventListener('click', () => this.generateShopInventory());
+        }
+
+        const generateQuestBtn = document.getElementById('generate-quest-btn');
+        if (generateQuestBtn) {
+            generateQuestBtn.addEventListener('click', () => this.generateQuestReward());
         }
 
         // Action buttons
@@ -102,14 +116,400 @@ export default class TreasureController {
             clearBtn.addEventListener('click', () => this.clearTreasure());
         }
 
-        // Initialize subtypes
-        this.populateSubtypes();
-
-        // Subscribe to locale changes to refresh dropdowns
+        // Subscribe to locale changes
         if (i18n && (i18n as any).onLocaleChange) {
             (i18n as any).onLocaleChange(() => {
-                this.populateSubtypes();
+                // Refresh UI on locale change
             });
+        }
+    }
+
+    // Switch between 4 generation modes
+    switchToMode(mode: GenerationMode) {
+        this.currentMode = mode;
+
+        // Update tab buttons
+        const modeTabs = document.querySelectorAll('.treasure-mode-tab');
+        modeTabs.forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.getAttribute('data-mode') === mode) {
+                tab.classList.add('active');
+            }
+        });
+
+        // Show/hide section based on mode
+        const sections = ['monster', 'hoard', 'shop', 'quest'];
+        sections.forEach(sectionName => {
+            const section = document.getElementById(`treasure-${sectionName}-section`);
+            if (section) {
+                section.classList.toggle('hidden', sectionName !== mode);
+            }
+        });
+    }
+
+    // ==========================================
+    // MONSTER LOOT GENERATION
+    // ==========================================
+    async generateMonsterLoot() {
+        if (this.isGenerating) return;
+        this.isGenerating = true;
+        this.showGenerationStatus(true);
+        this.updateGenerationStatus('יוצר שלל מפלצת...');
+
+        try {
+            // Get parameters
+            const monsterType = (document.getElementById('monster-type') as HTMLSelectElement)?.value || 'humanoid';
+            const cr = parseInt((document.getElementById('monster-cr') as HTMLInputElement)?.value || '5');
+            const includeHoard = (document.getElementById('monster-include-hoard') as HTMLInputElement)?.checked || false;
+            const includeCoins = (document.getElementById('monster-include-coins') as HTMLInputElement)?.checked !== false;
+
+            // Generate loot using LootGenerator
+            const loot = lootGenerator.generateMonsterLoot(monsterType, cr, includeHoard);
+            this.lastLootResult = loot;
+
+            // Clear previous results
+            this.clearTreasurePreview();
+
+            // Display coins if included
+            if (includeCoins && loot.coins.totalGoldValue > 0) {
+                this.displayCoins(loot.coins);
+            }
+
+            // Display gems and art objects
+            if (loot.gems.length > 0 || loot.artObjects.length > 0) {
+                this.displayGemsAndArt(loot.gems, loot.artObjects);
+            }
+
+            // Display total value
+            this.displayTotalValue(loot.totalValue);
+
+            // Generate cards for magic items
+            if (loot.magicItems.length > 0) {
+                await this.generateCardsFromMagicItems(loot.magicItems);
+            } else {
+                this.showNoMagicItemsMessage();
+            }
+
+            this.showTreasureActions(true);
+        } catch (error) {
+            console.error('Error generating monster loot:', error);
+        } finally {
+            this.isGenerating = false;
+            this.showGenerationStatus(false);
+        }
+    }
+
+    // ==========================================
+    // HOARD GENERATION
+    // ==========================================
+    async generateHoard() {
+        if (this.isGenerating) return;
+        this.isGenerating = true;
+        this.showGenerationStatus(true);
+        this.updateGenerationStatus('יוצר אוצר מלא (DMG)...');
+
+        try {
+            const crRange = (document.getElementById('hoard-cr-range') as HTMLSelectElement)?.value || 'CR_5_10';
+            const cr = this.crRangeToNumber(crRange);
+
+            const hoard = lootGenerator.generateHoard(cr);
+            this.lastLootResult = hoard;
+
+            this.clearTreasurePreview();
+
+            // Display coins
+            this.displayCoins(hoard.coins);
+
+            // Display gems and art
+            if (hoard.gems.length > 0 || hoard.artObjects.length > 0) {
+                this.displayGemsAndArt(hoard.gems, hoard.artObjects);
+            }
+
+            this.displayTotalValue(hoard.totalValue);
+
+            if (hoard.magicItems.length > 0) {
+                await this.generateCardsFromMagicItems(hoard.magicItems);
+            } else {
+                this.showNoMagicItemsMessage();
+            }
+
+            this.showTreasureActions(true);
+        } catch (error) {
+            console.error('Error generating hoard:', error);
+        } finally {
+            this.isGenerating = false;
+            this.showGenerationStatus(false);
+        }
+    }
+
+    crRangeToNumber(crRange: string): number {
+        switch (crRange) {
+            case 'CR_0_4': return 2;
+            case 'CR_5_10': return 7;
+            case 'CR_11_16': return 13;
+            case 'CR_17_PLUS': return 20;
+            default: return 7;
+        }
+    }
+
+    // ==========================================
+    // SHOP INVENTORY GENERATION
+    // ==========================================
+    async generateShopInventory() {
+        if (this.isGenerating) return;
+        this.isGenerating = true;
+        this.showGenerationStatus(true);
+        this.updateGenerationStatus('יוצר מלאי חנות...');
+
+        try {
+            const shopType = (document.getElementById('shop-type') as HTMLSelectElement)?.value || 'blacksmith';
+            const tier = (document.getElementById('shop-tier') as HTMLSelectElement)?.value || 'town';
+            const includeMerchant = (document.getElementById('shop-include-merchant') as HTMLInputElement)?.checked !== false;
+
+            console.log('[Shop] Generating inventory for:', shopType, 'tier:', tier);
+
+            const shop = shopGenerator.generateInventory(shopType, tier as any, includeMerchant);
+            this.lastShopResult = shop;
+
+            console.log('[Shop] Generated inventory:', shop.inventory.length, 'items');
+            console.log('[Shop] Items:', shop.inventory);
+
+            this.clearTreasurePreview();
+
+            // Display merchant NPC
+            if (shop.merchant) {
+                this.displayMerchant(shop.merchant);
+            }
+
+            // Display total stock value
+            this.displayTotalValue(shop.totalStockValue);
+
+            // Separate magical items from mundane items
+            const magicalItems = shop.inventory.filter(item => item.isMagical);
+            const mundaneItems = shop.inventory.filter(item => !item.isMagical);
+
+            console.log('[Shop] Mundane items:', mundaneItems.length, ', Magical items:', magicalItems.length);
+
+            // Always display all items first as simple cards
+            if (shop.inventory.length > 0) {
+                this.displayShopInventory(shop.inventory);
+            } else {
+                this.showNoMagicItemsMessage();
+            }
+
+            // If there are magical items, also generate full cards for them
+            if (magicalItems.length > 0) {
+                this.updateGenerationStatus(`יוצר ${magicalItems.length} חפצים קסומים...`);
+
+                // Convert shop items to magic item format
+                const magicItemsForGeneration = magicalItems.map(item => ({
+                    name: item.name,
+                    item: item.name,
+                    rarity: item.rarity,
+                    type: item.type
+                }));
+
+                await this.generateCardsFromMagicItems(magicItemsForGeneration);
+            }
+
+            this.showTreasureActions(true);
+        } catch (error) {
+            console.error('Error generating shop inventory:', error);
+        } finally {
+            this.isGenerating = false;
+            this.showGenerationStatus(false);
+        }
+    }
+
+    // ==========================================
+    // QUEST REWARD GENERATION
+    // ==========================================
+    async generateQuestReward() {
+        if (this.isGenerating) return;
+        this.isGenerating = true;
+        this.showGenerationStatus(true);
+        this.updateGenerationStatus('יוצר תגמול קווסט...');
+
+        try {
+            const partyLevel = parseInt((document.getElementById('quest-party-level') as HTMLInputElement)?.value || '5');
+            const difficulty = (document.getElementById('quest-difficulty') as HTMLSelectElement)?.value || 'medium';
+            const includeGold = (document.getElementById('quest-include-gold') as HTMLInputElement)?.checked !== false;
+
+            // Calculate reward based on difficulty
+            const difficultyMultiplier = { easy: 0.5, medium: 1, hard: 2, deadly: 4 }[difficulty] || 1;
+            const cr = Math.min(partyLevel * difficultyMultiplier, 30);
+
+            // Generate loot similar to monster but with better chances
+            const loot = lootGenerator.generateMonsterLoot('humanoid', cr, true);
+            this.lastLootResult = loot;
+
+            this.clearTreasurePreview();
+
+            if (includeGold) {
+                // Boost gold for quest rewards
+                loot.coins.gp = Math.floor(loot.coins.gp * 1.5);
+                loot.coins.totalGoldValue = loot.coins.totalGoldValue * 1.5;
+                this.displayCoins(loot.coins);
+            }
+
+            this.displayTotalValue(loot.totalValue * 1.5);
+
+            if (loot.magicItems.length > 0) {
+                await this.generateCardsFromMagicItems(loot.magicItems);
+            }
+
+            this.showTreasureActions(true);
+        } catch (error) {
+            console.error('Error generating quest reward:', error);
+        } finally {
+            this.isGenerating = false;
+            this.showGenerationStatus(false);
+        }
+    }
+
+    // ==========================================
+    // DISPLAY HELPERS
+    // ==========================================
+    displayCoins(coins: any) {
+        const coinsDisplay = document.getElementById('treasure-coins-display');
+        if (!coinsDisplay) return;
+
+        coinsDisplay.classList.remove('hidden');
+
+        const setCoinAmount = (id: string, amount: number) => {
+            const stack = document.getElementById(id);
+            if (stack) {
+                const amountEl = stack.querySelector('.coin-amount');
+                if (amountEl) amountEl.textContent = amount.toLocaleString();
+                stack.style.display = amount > 0 ? 'flex' : 'none';
+            }
+        };
+
+        setCoinAmount('coin-cp', coins.cp);
+        setCoinAmount('coin-sp', coins.sp);
+        setCoinAmount('coin-ep', coins.ep);
+        setCoinAmount('coin-gp', coins.gp);
+        setCoinAmount('coin-pp', coins.pp);
+    }
+
+    displayGemsAndArt(gems: any[], artObjects: any[]) {
+        const container = document.getElementById('treasure-gems-art');
+        const grid = document.getElementById('gems-art-grid');
+        if (!container || !grid) return;
+
+        container.classList.remove('hidden');
+        grid.innerHTML = '';
+
+        gems.forEach(gem => {
+            const item = document.createElement('div');
+            item.className = 'gem-item';
+            item.innerHTML = `
+                <span>💎 ${gem.nameHe || gem.name}</span>
+                <span class="value">${gem.value}gp</span>
+            `;
+            grid.appendChild(item);
+        });
+
+        artObjects.forEach(art => {
+            const item = document.createElement('div');
+            item.className = 'art-item';
+            item.innerHTML = `
+                <span>🎨 ${art.nameHe || art.name}</span>
+                <span class="value">${art.value}gp</span>
+            `;
+            grid.appendChild(item);
+        });
+    }
+
+    displayTotalValue(value: number) {
+        const totalValue = document.getElementById('treasure-total-value');
+        const valueAmount = document.getElementById('treasure-value-amount');
+        if (totalValue && valueAmount) {
+            totalValue.classList.remove('hidden');
+            valueAmount.textContent = Math.floor(value).toLocaleString();
+        }
+    }
+
+    displayMerchant(merchant: any) {
+        const card = document.getElementById('merchant-npc-card');
+        if (!card) return;
+
+        card.classList.remove('hidden');
+
+        const setField = (id: string, value: string) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+
+        setField('merchant-name', merchant.name);
+        setField('merchant-race', merchant.race);
+        setField('merchant-personality', `🎭 ${merchant.personality}`);
+        setField('merchant-quirk', `✨ ${merchant.quirk}`);
+    }
+
+    displayShopInventory(inventory: any[]) {
+        const grid = document.getElementById('treasure-cards-grid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+
+        inventory.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = `treasure-card shop-item`;
+            card.innerHTML = `
+                <div class="card-overlay">
+                    <div class="card-name">${item.name}</div>
+                    <div class="card-type">${item.type}</div>
+                </div>
+                <div class="rarity-badge rarity-${item.rarity}">${item.rarity}</div>
+                <div class="price-badge">${item.shopPrice}gp</div>
+                ${item.quantity > 1 ? `<div class="quantity-badge">${item.quantity}</div>` : ''}
+            `;
+
+            card.style.background = 'linear-gradient(145deg, rgba(30, 30, 40, 0.9), rgba(20, 20, 30, 0.95))';
+            grid.appendChild(card);
+        });
+    }
+
+    showNoMagicItemsMessage() {
+        const grid = document.getElementById('treasure-cards-grid');
+        if (!grid) return;
+
+        grid.innerHTML = `
+            <div class="empty-treasure-message">
+                <span class="icon">🎲</span>
+                <p>לא נמצאו חפצים קסומים בשלל זה</p>
+            </div>
+        `;
+    }
+
+    async generateCardsFromMagicItems(magicItems: any[]) {
+        const grid = document.getElementById('treasure-cards-grid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+        this.generatedCards = [];
+
+        for (let i = 0; i < magicItems.length; i++) {
+            this.addLoadingCard(i);
+        }
+
+        for (let i = 0; i < magicItems.length; i++) {
+            const item = magicItems[i];
+            try {
+                const itemConfig = {
+                    type: item.type || 'wondrous',
+                    subtype: item.item || item.name,
+                    rarity: item.rarity,
+                    level: this.rarityToLevel(item.rarity),
+                    theme: ''
+                };
+
+                await this.generateSingleItem(itemConfig, i);
+            } catch (error) {
+                console.error(`Error generating card ${i}:`, error);
+                this.replaceLoadingCardWithError(i);
+            }
         }
     }
 
@@ -405,27 +805,19 @@ export default class TreasureController {
     async generateSingleItem(itemConfig: any, index: number) {
         const { type, subtype, rarity, theme, enemyType } = itemConfig;
 
-        // Add a loading card placeholder
-        this.addLoadingCard(index);
+        // Note: Loading card is already added by generateCardsFromMagicItems
+        // Don't add it again here
 
         try {
-            // Dispatch event to GeneratorController for actual item generation
-            /*
-            const generateEvent = new CustomEvent('treasure-generate-item', {
-                detail: {
-                    type,
-                    subtype: subtype || this.getRandomSubtype(type),
-                    level: rarity,
-                    ability: theme,
-                    enemyType,
-                    targetIndex: index,
-                    complexityMode: 'creative'
-                }
+            // Use the existing generator infrastructure with timeout
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Generation timeout after 60s')), 60000);
             });
-            */
 
-            // Use the existing generator infrastructure
-            const result = await this.generateItemViaAPI(itemConfig);
+            const result = await Promise.race([
+                this.generateItemViaAPI(itemConfig),
+                timeoutPromise
+            ]) as any;
 
             // Replace loading card with actual card
             this.replaceLoadingCard(index, result);
@@ -525,7 +917,7 @@ export default class TreasureController {
             // Get selected image model from dropdown (default to flux)
             const imageModel = (document.getElementById('image-model') as HTMLSelectElement)?.value || 'getimg-flux';
 
-            const imageResult = await gemini.generateImageGetImg(
+            const imageResult = await gemini.generateImage(
                 visualPrompt,
                 imageModel,     // Use selected model from dropdown
                 imageStyle,     // Use user-selected style or 'realistic'
@@ -551,10 +943,28 @@ export default class TreasureController {
             typeHe: itemDetails.typeHe
         });
 
-        // Build full card data structure
+        // Build full card data structure (V2 format with front and back)
         const cardData = {
             id: Date.now() + Math.random(),
+            timestamp: Date.now(),
             name: itemDetails.name || subtype || 'חפץ',
+            // V2 STRUCTURE - Required for proper State handling
+            front: {
+                title: itemDetails.name || subtype || 'חפץ',
+                type: itemDetails.typeHe || this.getTypeName(itemConfig.type),
+                rarity: this.getRarityLabel(itemConfig.rarity),
+                imageUrl: imageUrl,
+                imageStyle: 'natural',
+                quickStats: itemDetails.quickStats || itemDetails.description || '',
+                gold: itemDetails.gold || '-',
+                badges: itemDetails.gold ? [itemDetails.gold] : []
+            },
+            back: {
+                title: itemDetails.abilityName || itemDetails.ability?.name || '',
+                mechanics: itemDetails.abilityDesc || itemDetails.ability?.description || '',
+                lore: itemDetails.lore || itemDetails.description || ''
+            },
+            // Legacy fields for backward compatibility (some renderers look here)
             rarityHe: this.getRarityLabel(itemConfig.rarity),
             typeHe: itemDetails.typeHe || this.getTypeName(itemConfig.type),
             // STATS FIELDS - Required by CardRenderer.drawText
@@ -571,11 +981,6 @@ export default class TreasureController {
             quickStats: itemDetails.quickStats || itemDetails.description || '',
             gold: itemDetails.gold || '-',
             image: imageUrl,
-            back: {
-                title: itemDetails.abilityName || itemDetails.ability?.name || '',
-                mechanics: itemDetails.abilityDesc || itemDetails.ability?.description || '',
-                lore: itemDetails.lore || itemDetails.description || ''
-            },
             // Visual settings
             visualPrompt: visualPrompt,
             type: itemConfig.type,
@@ -830,7 +1235,7 @@ export default class TreasureController {
             };
 
             // Force render back side
-            await tempRenderer.renderCard(renderData, renderOptions);
+            await tempRenderer.renderBack(renderData, renderOptions);
 
             const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
             canvas.remove();
@@ -856,13 +1261,23 @@ export default class TreasureController {
     /**
      * View full card details
      */
-    viewCard(itemData: any) {
+    async viewCard(itemData: any) {
         // Use global card viewer service
+        console.log('🎴 TreasureController.viewCard called with:', {
+            cardThumbnail: itemData.cardThumbnail?.substring?.(0, 50),
+            imageUrl: itemData.imageUrl?.substring?.(0, 50),
+            image: itemData.image?.substring?.(0, 50)
+        });
+
         if ((window as any).cardViewerService) {
-            (window as any).cardViewerService.viewCard({
-                ...itemData,
-                // Ensure visual prompt is passed
-                visualPrompt: itemData.visualPrompt
+            // Render the back side before opening the viewer
+            const backImage = await this.renderCardBackThumbnail(itemData);
+
+            (window as any).cardViewerService.show({
+                frontImage: itemData.cardThumbnail || itemData.imageUrl || itemData.image,
+                backImage: backImage,
+                cardData: itemData,
+                sourceElement: null
             });
         }
     }
@@ -917,8 +1332,39 @@ export default class TreasureController {
      * Clear preview area
      */
     clearTreasurePreview() {
-        // Implementation depends on if we have a separate preview area
-        // Currently we render directly to grid
+        // Hide coins display
+        const coinsDisplay = document.getElementById('treasure-coins-display');
+        if (coinsDisplay) coinsDisplay.classList.add('hidden');
+
+        // Hide gems and art display
+        const gemsArt = document.getElementById('treasure-gems-art');
+        if (gemsArt) gemsArt.classList.add('hidden');
+
+        // Hide total value
+        const totalValue = document.getElementById('treasure-total-value');
+        if (totalValue) totalValue.classList.add('hidden');
+
+        // Hide merchant NPC card
+        const merchantCard = document.getElementById('merchant-npc-card');
+        if (merchantCard) merchantCard.classList.add('hidden');
+
+        // Hide actions
+        this.showTreasureActions(false);
+
+        // Clear the cards grid
+        const grid = document.getElementById('treasure-cards-grid');
+        if (grid) {
+            grid.innerHTML = `
+                <div class="empty-treasure-message">
+                    <span class="icon">🎲</span>
+                    <p>בחר מצב ולחץ על הכפתור כדי להתחיל</p>
+                </div>
+            `;
+        }
+
+        // Clear data
+        this.lastLootResult = null;
+        this.lastShopResult = null;
     }
 
     /**

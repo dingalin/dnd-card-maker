@@ -323,8 +323,11 @@ export class RenderController {
             setSlider('stats-offset', fo.stats);
             setSlider('gold-offset', fo.gold);
             setSlider('name-width', fo.nameWidth);
+            setSlider('type-width', fo.typeWidth);
+            setSlider('rarity-width', fo.rarityWidth);
             setSlider('coreStats-width', fo.coreStatsWidth);
             setSlider('stats-width', fo.statsWidth);
+            setSlider('gold-width', fo.goldWidth);
         }
 
         // Sync BACK side offsets

@@ -5,6 +5,9 @@
 
 import { API } from '../../config/index';
 import { GeminiConfig } from '../../types/api';
+import { balanceGuide } from '../../config/balance-guide';
+import { calculatePriceFromDescription } from '../PricingService';
+
 
 // Cloudflare Worker URL for secure API access
 const WORKER_URL = API.WORKER_URL;
@@ -32,6 +35,8 @@ interface ItemGenerationResult {
     damageType: null;
     armorClass: number | null;
     quickStats: string;
+    specialDamage?: string;  // Extra elemental damage for front card
+    spellAbility?: string;   // Spell summary for front card
     visualPrompt: string;
     [key: string]: any;
 }
@@ -186,12 +191,16 @@ export async function generateItemDetails(
     if (contextImage) {
         prompt += `
       VISUAL CONTEXT PROVIDED:
-      The user has provided an image(attached).Use this image as the primary inspiration for the item's appearance, theme, and flavor.
-            - Describe the item based on what you see in the image.
-      - If the image shows a specific material(e.g., bone, crystal, gold), use that.
-      - If the image implies a specific element(e.g., fire, ice, necrotic), use that.
+      An image is attached. Use it as INSPIRATION for the item's appearance and theme.
+      - The image suggests a visual style - use it for the item's description and visual prompt.
+      - If the image implies a specific element (e.g., fire, ice, necrotic), USE that element for damage.
+      - IMPORTANT: The visual context should NOT limit other abilities!
+        You can STILL add on-hit effects (prone, frighten, bleed), special features (keen, returning), advantages, etc.
+        The element from the image is for DAMAGE TYPE only, not the entire ability set.
+      - Example: An ice-themed image = cold damage, BUT you can still add "knock prone on hit" or "critical on 19-20"
       `;
     }
+
 
     prompt += buildOutputStructure(isHebrew);
 
@@ -272,9 +281,23 @@ export async function generateItemDetails(
         fixDiceNotationRTL(parsedResult);
 
         // Validate and adjust price
-        validateAndAdjustPrice(parsedResult, rarity);
+        validateAndAdjustPrice(parsedResult, rarity, subtype);
+
+        // Update AC in quickStats if there's a bonus (e.g., Plate 18 -> 19 if +1)
+        updateArmorClassWithBonus(parsedResult);
+
+        // Clean quickStats if it contains garbage data (like duplicate dice notation)
+        validateAndCleanQuickStats(parsedResult, complexityMode);
+
+        // Extract quick-glance fields from abilityDesc if AI didn't populate them
+        extractQuickGlanceFields(parsedResult);
 
         console.log('✨ AI generated item:', parsedResult.name, '| Price:', parsedResult.gold, 'GP');
+        console.log('🎯 Quick-glance fields BEFORE return:', {
+            specialDamage: parsedResult.specialDamage || '(empty)',
+            spellAbility: parsedResult.spellAbility || '(empty)',
+            abilityDesc: (parsedResult.abilityDesc || '').substring(0, 80)
+        });
 
         return parsedResult;
     } catch (error: any) {
@@ -346,18 +369,27 @@ function buildBoundariesInstruction(rarity: string, isHebrew: boolean): string {
             allowedAbilities: [
                 'extra 1d4 elemental damage',
                 'resistance to 1 damage type',
-                'advantage on 1 type of check',
+                'advantage on 1 type of check (initiative, perception, stealth)',
                 '1/day spell (level 1-2)',
+                'push 5ft/10ft on hit',
+                'reduce target speed by 10 on hit',
+                'weapon returns to hand when thrown',
+                'sheds light 20/40 ft',
                 'PURE +X (no ability at all)'
             ],
             abilitiesHe: [
                 'נזק יסודי נוסף 1d4',
                 'עמידות לסוג נזק אחד',
-                'יתרון לסוג בדיקה אחד',
+                'יתרון לבדיקה (יוזמה, תפיסה, התגנבות)',
                 'כישוף 1/יום (רמה 1-2)',
+                'דחיפה 5/10 רגל בפגיעה',
+                'האטת מהירות -10 בפגיעה',
+                'נשק חוזר ליד כשנזרק',
+                'מאיר 20/40 רגל',
                 'טהור +X (ללא יכולת)'
             ]
         },
+
         'Rare': {
             maxBonus: 2,
             allowedDamageTypes: ['fire', 'cold', 'lightning', 'radiant', 'necrotic', 'אש', 'קור', 'ברק', 'זוהר', 'נמק'],
@@ -368,7 +400,11 @@ function buildBoundariesInstruction(rarity: string, isHebrew: boolean): string {
                 'resistance to 2 damage types',
                 '1/day spell (level 3-4)',
                 '1/day active ability (recharge at dawn)',
-                'permanent passive (e.g., darkvision)',
+                'permanent passive (e.g., darkvision 60ft)',
+                'knock prone on hit (STR DC 13 save)',
+                'frighten target on hit (WIS DC 13 save)',
+                'bleed damage (1d4/turn until healed)',
+                'critical hit on 19-20',
                 'PURE +X'
             ],
             abilitiesHe: [
@@ -376,10 +412,15 @@ function buildBoundariesInstruction(rarity: string, isHebrew: boolean): string {
                 'עמידות ל-2 סוגי נזק',
                 'כישוף 1/יום (רמה 3-4)',
                 'יכולת פעילה 1/יום (נטען בזריחה)',
-                'פסיבי קבוע (כמו ראיית חושך)',
+                'פסיבי קבוע (כמו ראיית חושך 60 רגל)',
+                'הפלה בפגיעה (הצלת כוח DC 13)',
+                'הפחדה בפגיעה (הצלת חוכמה DC 13)',
+                'דימום (1d4/סיבוב עד לריפוי)',
+                'קריטי ב-19-20',
                 'טהור +X'
             ]
         },
+
         'Very Rare': {
             maxBonus: 3,
             allowedDamageTypes: ['fire', 'cold', 'lightning', 'radiant', 'necrotic', 'force', 'psychic'],
@@ -440,12 +481,26 @@ function buildBoundariesInstruction(rarity: string, isHebrew: boolean): string {
 
     const bounds = rarityBoundaries[rarity] || rarityBoundaries['Uncommon'];
 
+    // Get dynamic balance rules from balanceGuide service
+    const balanceRules = balanceGuide.generatePromptRules();
+
     return isHebrew ? `
     === גבולות יצירה (חובה לעמוד בהם!) ===
     נדירות: ${rarity}
     - בונוס מקסימלי לנשק/שריון: +${bounds.maxBonus}
     - סוגי נזק יסודי מותרים: ${bounds.allowedDamageTypes.length > 0 ? bounds.allowedDamageTypes.join(', ') : 'אין (פריט Common)'}
     - רמת כישוף מקסימלית: ${bounds.spellLevelMax}
+    
+    === 🏋️ כללי שיקויי כוח ענקים (חובה!) ===
+    אם אתה יוצר שיקוי שמעלה כוח, חייב לעקוב אחרי הטבלה הבאה:
+    • כוח 21 (Hill Giant) = Uncommon = 200gp
+    • כוח 23 (Stone/Frost Giant) = Rare = 800gp
+    • כוח 25 (Fire Giant) = Rare = 1,500gp
+    • כוח 27 (Cloud Giant) = Very Rare = 27,000gp ⚠️
+    • כוח 29 (Storm Giant) = Legendary = 50,000gp
+    
+    ❌ אסור ליצור שיקוי עם כוח 27 אם הנדירות היא Uncommon!
+    ❌ אם הנדירות היא Uncommon, כוח מקסימלי הוא 21.
     
     === תכונות/יכולות מותרות לנדירות הזו ===
     ${bounds.abilitiesHe.map(a => `• ${a}`).join('\n    ')}
@@ -469,6 +524,17 @@ function buildBoundariesInstruction(rarity: string, isHebrew: boolean): string {
     - Maximum weapon/armor bonus: +${bounds.maxBonus}
     - Allowed elemental damage types: ${bounds.allowedDamageTypes.length > 0 ? bounds.allowedDamageTypes.join(', ') : 'None (Common item)'}
     - Maximum spell level: ${bounds.spellLevelMax}
+    
+    === 🏋️ GIANT STRENGTH POTION RULES (MANDATORY!) ===
+    If you create a potion that sets Strength score, you MUST follow this table:
+    • Strength 21 (Hill Giant) = Uncommon = 200gp
+    • Strength 23 (Stone/Frost Giant) = Rare = 800gp
+    • Strength 25 (Fire Giant) = Rare = 1,500gp
+    • Strength 27 (Cloud Giant) = Very Rare = 27,000gp ⚠️
+    • Strength 29 (Storm Giant) = Legendary = 50,000gp
+    
+    ❌ DO NOT create a Strength 27 potion if rarity is Uncommon!
+    ❌ For Uncommon rarity, maximum Strength is 21.
     
     === ALLOWED ABILITIES FOR THIS RARITY ===
     ${bounds.allowedAbilities.map(a => `• ${a}`).join('\n    ')}
@@ -539,40 +605,240 @@ function buildMainPrompt(itemDescription: string, outputLanguage: string, level:
   - If Type is 'Wondrous Item' and no specific subtype is given, it can be anything.
   - If the Type is 'Armor'(and not Shield / Helmet), you MUST create BODY ARMOR(Chest / Torso).
   - If the Type is 'Weapon', create a weapon.
+  
+  === D&D 5e MECHANICS WHITELIST (USE ONLY THESE!) ===
+  
+  SAVING THROWS (6 only):
+  - Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma
+  - Format: "DC X [Ability] saving throw" (e.g., "DC 15 Wisdom saving throw")
+  
+  ABILITY CHECKS:
+  - Strength (Athletics), Dexterity (Acrobatics, Sleight of Hand, Stealth)
+  - Intelligence (Arcana, History, Investigation, Nature, Religion)
+  - Wisdom (Animal Handling, Insight, Medicine, Perception, Survival)
+  - Charisma (Deception, Intimidation, Performance, Persuasion)
+  
+  CONDITIONS (official 5e only):
+  - blinded, charmed, deafened, frightened, grappled, incapacitated
+  - invisible, paralyzed, petrified, poisoned, prone, restrained, stunned, unconscious
+  
+  HEBREW COMBAT TERMS (USE THESE!):
+  - Critical Hit = פגיעה קריטית (NOT "פגיעות מנצחות"!)
+  - Attack Roll = הטלת התקפה
+  - Saving Throw = בדיקת הצלה / זריקת הצלה
+  - Damage = נזק
+  - Hit = פגיעה
+  - Miss = החטאה
+  - Advantage = יתרון
+  - Disadvantage = חיסרון
+  
+  DURATION FORMATS:
+  - "1 round", "1 minute" (=10 rounds), "10 minutes", "1 hour", "8 hours", "24 hours", "until dispelled"
+  - Concentration: "up to X minutes (concentration)"
+  
+  RECHARGE FORMATS:
+  - "1/day", "3/day", "once per short rest", "once per long rest", "recharge at dawn"
+  - "X charges, regains Y at dawn"
+  
+  ❌ FORBIDDEN MECHANICS (DO NOT USE!):
+  - "Saving throw against [damage type]" (saves are vs effects, not damage types!)
+  - Ability scores above 30
+  - Percentage-based effects ("50% chance to...")
+  - Video game terms ("cooldown", "level up", "mana")
+  - Non-5e conditions (staggered, dazed, slowed - unless specific spell effect)
     `;
 }
 
 // Build output structure
 function buildOutputStructure(isHebrew: boolean): string {
     return `
-  Return ONLY a JSON object with this exact structure(no markdown, just raw JSON):
+  Return ONLY a JSON object with this exact structure (no markdown, just raw JSON):
   ${isHebrew ? `{
-    "name": "STRICT RULES: 1-3 Hebrew words MAX. Use ONLY creative nicknames.",
+    "name": "1-3 Hebrew words. FORBIDDEN: Do NOT use item type words like חרב/גרזן/שריון/טבעת/שיקוי in name! Use creative nicknames like: להב הקפאון, ניב הסערה, אגרוף הברזל, עין הדרקון",
     "typeHe": "Hebrew Type (e.g. נשק, שריון, שיקוי, טבעת)",
-    "rarityHe": "Hebrew Rarity - Use these exact translations: Common=נפוץ, Uncommon=לא נפוץ, Rare=נדיר, Very Rare=נדיר מאוד, Legendary=אגדי, Artifact=ארטיפקט",
-    "abilityName": "HEBREW Ability Name",
-    "abilityDesc": "COMPLETE HEBREW mechanical description (max 50 words)",
+    "rarityHe": "Hebrew Rarity: נפוץ/לא נפוץ/נדיר/נדיר מאוד/אגדי",
+    "abilityName": "HEBREW Ability Name (2-4 words)",
+    "abilityDesc": "HEBREW full mechanical description (max 50 words). Use D&D 5e standard terminology.",
     "description": "Hebrew Fluff Description (max 20 words)",
-    "gold": "Estimated price in GP (number only, e.g. 500)",
-    "weaponDamage": "COMPLETE damage string in HEBREW",
-    "damageType": "Always null (deprecated)",
-    "armorClass": "AC value (number) if armor, else null",
-    "quickStats": "HEBREW ONLY - EXTREMELY CONCISE essence (1-3 Hebrew words MAX, e.g. נגטות רעל, +2 התקפה)",
-    "visualPrompt": "CRITICAL: A SHORT, CONCISE ENGLISH description (max 18 words) for image generation"
-  }` : `{
-    "name": "STRICT RULES: 1-3 English words MAX. Use ONLY creative nicknames.",
+    "gold": "NUMBER ONLY (e.g. 500, 2500, 15000)",
+    "weaponDamage": "Base weapon damage ONLY! Format: XdY+Z [HEBREW damage type]. Do NOT include extra elemental damage here!",
+    "damageType": null,
+    "armorClass": "Number if armor, null otherwise",
+    "specialDamage": "REQUIRED if item deals extra elemental damage! Extract from abilityDesc. Format: '+XdY סוג' (e.g., '+1d4 נפשי', '+1d6 אש'). Leave empty ONLY if no extra damage.",
+    "spellAbility": "REQUIRED if item has spell/ability! Extract from abilityDesc. Format: 'פעם/יום: [Hebrew spell name]' (e.g., 'פעם/יום: זיהוי', '2/יום: אור'). Leave empty ONLY if no spell.",
+
+    "quickStats": "LEAVE EMPTY for weapons/armor!",
+    "visualPrompt": "ENGLISH description for image (max 18 words)"
+  }
+  
+  === CRITICAL: FIELD SEPARATION RULES ===
+  If abilityDesc says "פגיעה גורמת 1d4 נזק נפשי נוסף" then specialDamage MUST be "+1d4 נפשי"
+  If abilityDesc says "פעם ביום להטיל Identify" then spellAbility MUST be "פעם/יום: Identify"
+  NEVER leave specialDamage empty if the ability adds elemental damage!
+  NEVER leave spellAbility empty if the ability grants a spell!
+  
+  === DAMAGE TYPE TRANSLATIONS (MUST USE HEBREW!) ===
+  | English      | Hebrew   |
+  |--------------|----------|
+  | slashing     | חותך     |
+  | piercing     | דוקר     |
+  | bludgeoning  | מוחץ     |
+  | fire         | אש       |
+  | cold         | קור      |
+  | lightning    | ברק      |
+  | thunder      | רעם      |
+  | acid         | חומצה    |
+  | poison       | רעל      |
+  | necrotic     | נמק      |
+  | radiant      | זוהר     |
+  | force        | כוח      |
+  | psychic      | נפשי     |
+  
+  ❌ FORBIDDEN: פירסינג, סלאשינג, בלאדג'ונינג (NO English transliterations!)
+  ✅ CORRECT: דוקר, חותך, מוחץ
+  
+  === CONDITION TRANSLATIONS (MUST USE HEBREW!) ===
+  | English      | Hebrew (USE THIS!)   |
+  |--------------|----------------------|
+  | Charmed      | מוקסם                |
+  | Frightened   | מפוחד                |
+  | Stunned      | המום                 |
+  | Prone        | שרוע                 |
+  | Blinded      | מעוור                |
+  | Paralyzed    | משותק                |
+  | Poisoned     | מורעל                |
+  | Restrained   | מרותק                |
+  | Incapacitated| מנוטרל               |
+  
+  ❌ WRONG: מכושפת, מוקפאת, מהולמת
+  ✅ CORRECT: מוקסם (Charmed), מפוחד (Frightened), המום (Stunned)
+
+  
+  === HEBREW SPELL TERMINOLOGY ===
+  ❌ WRONG: "לזרוק לחש" (literal translation of "cast")
+  ✅ CORRECT: "להטיל לחש" / "להטיל [spell name]"
+  
+  === SPELL NAMES - USE HEBREW ONLY! ===
+  | English         | Hebrew (USE THIS!)  |
+  |-----------------|---------------------|
+  | Faerie Fire     | אש פיות            |
+  | Dancing Lights  | אורות מרקדים       |
+  | Burning Hands   | ידיים בוערות       |
+  | Cure Wounds     | ריפוי פצעים        |
+  | Magic Missile   | קליע קסם           |
+  | Shield          | מגן                |
+  | Invisibility    | היעלמות            |
+  | Misty Step      | צעד ערפילי         |
+  | Hold Person     | אחיזת אדם          |
+  | Fireball        | כדור אש            |
+  | Lightning Bolt  | חזיז ברק           |
+  | Fly             | מעוף               |
+  | Haste           | האצה               |
+  | Ray of Frost    | קרן כפור           |
+  | Guiding Bolt    | חזיז מנחה          |
+  | Bless           | ברכה               |
+  | Command         | פקודה              |
+  | Identify        | זיהוי              |
+  | Detect Magic    | גילוי קסם          |
+  | Light           | אור                |
+  
+  ❌ FORBIDDEN: Using English spell names! (NO "Faerie Fire", "Burning Hands", etc.)
+  ✅ CORRECT: "1/יום: אש פיות" NOT "1/יום: Faerie Fire"
+
+  
+  === EXAMPLE OUTPUT (Rare +2 Ice Longsword) ===
+  {
+    "name": "להב הקרח",
+    "typeHe": "נשק (חרב ארוכה)",
+    "rarityHe": "נדיר",
+    "abilityName": "קור נצחי",
+    "abilityDesc": "פגיעה גורמת 1d6 נזק קור נוסף. 1/יום: הטל קרן כפור (DC 14).",
+    "description": "חרב עתיקה חושלה בלב קרחון. להבה תמיד קפוא.",
+    "gold": "3500",
+    "weaponDamage": "1d8+2 חותך",
+    "damageType": null,
+    "armorClass": null,
+    "specialDamage": "+1d6 קור",
+    "spellAbility": "1/יום: קרן כפור (DC 14)",
+
+    "quickStats": "",
+    "visualPrompt": "ice-covered longsword, frozen blade with frost crystals, glowing blue, fantasy weapon"
+  }
+  
+  === EXAMPLE OUTPUT (Rare +1 Plate Armor) ===
+  {
+    "name": "מגן הצל",
+    "typeHe": "שריון לוחות (כבד)",
+    "rarityHe": "נדיר",
+    "abilityName": "הגנת צללים",
+    "abilityDesc": "מעניק +1 לשריון. פעם ביום, כתגובה לפגיעה, אפשר להפעיל צעד ערפילי.",
+    "description": "שריון עתיק שנטבל בצללי עולם אחר.",
+    "gold": "2500",
+    "weaponDamage": null,
+    "damageType": null,
+    "armorClass": 19,
+    "specialDamage": "",
+    "spellAbility": "1/יום: צעד ערפילי",
+    "quickStats": "",
+    "visualPrompt": "dark gothic plate armor with shadow tendrils, mysterious purple glow"
+  }
+  
+  ⚠️ ARMOR RULE: For armor, put TOTAL AC (base+bonus) in "armorClass" field, and leave "quickStats" EMPTY!
+  - Plate +1 = armorClass: 19, quickStats: ""
+  - DO NOT put AC in quickStats for armor - it will cause duplicate display!
+  
+  ` : `{
+    "name": "1-3 English words. FORBIDDEN: Do NOT use item type words like Sword/Axe/Armor/Ring/Potion in name! Use creative nicknames like: Frostbite, Stormfang, Iron Fist, Dragon's Eye",
     "typeHe": "English Type (e.g. Weapon, Armor, Potion, Ring)",
-    "rarityHe": "English Rarity - Use these exact terms: Common, Uncommon, Rare, Very Rare, Legendary, Artifact",
-    "abilityName": "English Ability Name",
-    "abilityDesc": "COMPLETE English mechanical description (max 50 words)",
+    "rarityHe": "English Rarity: Common/Uncommon/Rare/Very Rare/Legendary",
+    "abilityName": "English Ability Name (2-4 words)",
+    "abilityDesc": "English mechanical description (max 50 words). Use D&D 5e standard terminology.",
     "description": "English Fluff Description (max 20 words)",
-    "gold": "Estimated price in GP (number only, e.g. 500)",
-    "weaponDamage": "COMPLETE damage string in ENGLISH",
-    "damageType": "Always null (deprecated)",
-    "armorClass": "AC value (number) if armor, else null",
-    "quickStats": "EXTREMELY CONCISE essence (1-3 words MAX)",
-    "visualPrompt": "CRITICAL: A SHORT, CONCISE description (max 18 words) for image generation"
+    "gold": "NUMBER ONLY (e.g. 500, 2500, 15000)",
+    "weaponDamage": "Format: XdY+Z [damage type] (e.g. 1d8+2 slashing, 1d6 cold)",
+    "damageType": null,
+    "armorClass": "Number if armor, null otherwise",
+    "specialDamage": "EXTRA elemental damage ONLY (e.g., '+1d4 cold', '+1d6 fire'). EMPTY if none!",
+    "spellAbility": "Spell/ability summary for front (e.g., '1/day: Cast Fireball'). EMPTY if none!",
+    "quickStats": "LEAVE EMPTY for weapons/armor! Only for special effects.",
+    "visualPrompt": "ENGLISH description for image (max 18 words)"
+  }
+  
+  === EXAMPLE OUTPUT (Rare +2 Ice Longsword) ===
+  {
+    "name": "Frostbite",
+    "typeHe": "Weapon (Longsword)",
+    "rarityHe": "Rare",
+    "abilityName": "Eternal Cold",
+    "abilityDesc": "Hits deal an extra 1d6 cold damage. 1/day: Cast Ray of Frost (DC 14).",
+    "description": "An ancient blade forged in a glacier's heart. Always frozen.",
+    "gold": "3500",
+    "weaponDamage": "1d8+2 slashing",
+    "damageType": null,
+    "armorClass": null,
+    "specialDamage": "+1d6 cold",
+    "spellAbility": "1/day: Cast Ray of Frost (DC 14)",
+    "quickStats": "",
+    "visualPrompt": "ice-covered longsword, frozen blade with frost crystals, glowing blue, fantasy weapon"
   }`}
+  
+  === SELF-VALIDATION (CRITICAL!) ===
+  BEFORE returning your JSON, verify these consistency rules:
+  
+  1. ARMOR CLASS (CRITICAL!):
+     - For ARMOR items: Use "armorClass" field with TOTAL AC number (base + bonus)
+     - Plate base=18, so +1 Plate = armorClass: 19
+     - Leave "quickStats" EMPTY for armor! Do NOT put AC there!
+  
+  2. DAMAGE TYPE: If abilityDesc mentions a damage type (fire/cold/necrotic/etc):
+     - specialDamage MUST use the SAME type
+     - Example: If abilityDesc says "נזק נמק", then specialDamage = "+1d4 נמק" (NOT אש!)
+  
+  3. SPELL NAMES: Must be in Hebrew for Hebrew output
+  
+  4. PRICE: Plate Armor = 1500+ GP base, add magic bonus value
+  
+  If you find ANY inconsistency, FIX IT before outputting the JSON!
     `;
 }
 
@@ -602,35 +868,276 @@ async function processContextImage(contextImage: string): Promise<{ base64Data: 
 }
 
 // Validate and adjust price based on rarity
-function validateAndAdjustPrice(parsedResult: ItemGenerationResult, rarity: string): void {
-    const priceRanges: { [key: string]: { min: number; max: number } } = {
-        'Common': { min: 25, max: 150 },
-        'Uncommon': { min: 150, max: 600 },
-        'Rare': { min: 1000, max: 6000 },
-        'Very Rare': { min: 10000, max: 50000 },
-        'Legendary': { min: 50000, max: 200000 }
-    };
+function validateAndAdjustPrice(parsedResult: ItemGenerationResult, rarity: string, subtype?: string): void {
+    // Calculate price based on item abilities (using imported PricingService)
 
-    const range = priceRanges[rarity] || priceRanges['Uncommon'];
+    // Use subtype if available and not random, otherwise fallback to Hebrew type
+    const itemTypeForPricing = (subtype && subtype !== 'random') ? subtype : (parsedResult.typeHe || '');
 
-    if (parsedResult.gold) {
-        let price = parseInt(parsedResult.gold, 10);
+    // Calculate price based on item abilities
+    console.log('💰 Pricing Debug:', {
+        abilityDesc: parsedResult.abilityDesc?.substring(0, 50),
+        typeHe: parsedResult.typeHe,
+        subtype: subtype,
+        usingForPricing: itemTypeForPricing,
+        rarity: rarity
+    });
 
-        if (!isNaN(price)) {
-            // Only fix EXTREME outliers
-            if (price < range.min * 0.5) {
-                console.log(`⚠️ Price ${price} way too low for ${rarity}, adjusting to min: ${range.min}`);
-                price = range.min;
-            } else if (price > range.max * 1.5) {
-                console.log(`⚠️ Price ${price} way too high for ${rarity}, adjusting to max: ${range.max}`);
-                price = range.max;
+    const calculatedPrice = calculatePriceFromDescription(
+        parsedResult.abilityDesc || '',
+        itemTypeForPricing,
+        rarity
+    );
+
+    // Use the calculated price if it's valid
+    if (calculatedPrice > 0) {
+        const oldPrice = parsedResult.gold;
+        parsedResult.gold = String(calculatedPrice);
+        console.log(`💰 Price calculated: ${oldPrice} -> ${calculatedPrice} (based on abilities)`);
+    } else {
+        // Fallback to rarity-based ranges if calculation fails
+        const priceRanges: { [key: string]: { min: number; max: number } } = {
+            'Common': { min: 25, max: 150 },
+            'Uncommon': { min: 150, max: 600 },
+            'Rare': { min: 1000, max: 6000 },
+            'Very Rare': { min: 10000, max: 50000 },
+            'Legendary': { min: 50000, max: 200000 }
+        };
+
+        const range = priceRanges[rarity] || priceRanges['Uncommon'];
+
+        if (parsedResult.gold) {
+            let price = parseInt(parsedResult.gold, 10);
+
+            if (!isNaN(price)) {
+                // Only fix EXTREME outliers
+                if (price < range.min * 0.5) {
+                    console.log(`⚠️ Price ${price} way too low for ${rarity}, adjusting to min: ${range.min} `);
+                    price = range.min;
+                } else if (price > range.max * 1.5) {
+                    console.log(`⚠️ Price ${price} way too high for ${rarity}, adjusting to max: ${range.max} `);
+                    price = range.max;
+                }
+
+                // Round to nearest 10
+                price = Math.round(price / 10) * 10;
+                parsedResult.gold = String(price);
             }
-
-            // Round to nearest 10
-            price = Math.round(price / 10) * 10;
-            parsedResult.gold = String(price);
         }
     }
+}
+
+/**
+ * Update Armor Class in quickStats based on magic bonus
+ * Example: If parsedResult says "AC 18" but bonus is +1, update to "AC 19"
+ */
+function updateArmorClassWithBonus(parsedResult: ItemGenerationResult): void {
+    // Skip if not armor
+    if (!parsedResult.typeHe?.includes('שריון')) return;
+
+    // 1. Detect magic bonus from description
+    const bonusMatch = parsedResult.abilityDesc?.match(/\+(\d)\s+(?:לדרג"ש|לדרגת|לדירוג|לשכבת|AC|armor|shield|bonus|לשריון)/i) ||
+        parsedResult.abilityDesc?.match(/(?:משפר|מעניק|מקבל|bonus).*?\+(\d)/i);
+
+    const bonus = bonusMatch ? parseInt(bonusMatch[1], 10) : 0;
+
+    // 2. Determine base AC from armor type
+    let baseAC = 18; // Default to Plate
+    const typeHe = parsedResult.typeHe?.toLowerCase() || '';
+    if (typeHe.includes('עור') && !typeHe.includes('מחוזק')) baseAC = 11; // Leather
+    else if (typeHe.includes('עור מחוזק') || typeHe.includes('studded')) baseAC = 12;
+    else if (typeHe.includes('שרשראות') || typeHe.includes('chain')) baseAC = 16;
+    else if (typeHe.includes('קשקשים') || typeHe.includes('scale')) baseAC = 14;
+    else if (typeHe.includes('לוחות חצי') || typeHe.includes('half plate')) baseAC = 15;
+    else if (typeHe.includes('לוחות') || typeHe.includes('plate')) baseAC = 18;
+    else if (typeHe.includes('מגן') || typeHe.includes('shield')) baseAC = 2; // Shield bonus
+
+    const correctAC = baseAC + bonus;
+
+    // 3. Fix armorClass field if it's wrong
+    const currentArmorClass = typeof parsedResult.armorClass === 'number'
+        ? parsedResult.armorClass
+        : parseInt(String(parsedResult.armorClass), 10) || 0;
+
+    // If armorClass is just the bonus (e.g., 1, 2, 4) instead of total AC, fix it
+    if (currentArmorClass < 10 || currentArmorClass !== correctAC) {
+        console.log(`🛡️ Fixing armorClass: ${currentArmorClass} -> ${correctAC} (base ${baseAC} + bonus ${bonus})`);
+        parsedResult.armorClass = correctAC;
+    }
+
+    // Also set armorBonus for proper display in FrontCardRenderer
+    if (bonus > 0) {
+        (parsedResult as any).armorBonus = bonus;
+        console.log(`🛡️ Setting armorBonus: ${bonus}`);
+    }
+
+    // 4. Also fix quickStats if it has AC
+    if (parsedResult.quickStats) {
+        const acMatch = parsedResult.quickStats.match(/(\d+)\s*(?:AC|דרג"ש)/i);
+        if (acMatch) {
+            const qsAC = parseInt(acMatch[1], 10);
+            if (qsAC < 10 || qsAC !== correctAC) {
+                console.log(`🛡️ Fixing quickStats AC: ${qsAC} -> ${correctAC}`);
+                parsedResult.quickStats = parsedResult.quickStats.replace(
+                    acMatch[0],
+                    `${correctAC} דרג"ש`
+                );
+            }
+        }
+    }
+}
+
+
+
+/**
+ * Validate and clean quickStats field
+ * Removes garbage data like duplicate dice notation or invalid content
+ */
+function validateAndCleanQuickStats(parsedResult: ItemGenerationResult, complexityMode: string): void {
+    if (!parsedResult.quickStats) return;
+
+    const quickStats = parsedResult.quickStats.trim();
+
+    // 1. If quickStats is just dice notation (e.g., "1ק8", "1d8"), it's duplicate of weaponDamage - clear it
+    // Match patterns like: 1d6, 2d8+2, 1ק8, 1 ק 8, etc.
+    // Also catches Hebrew letters that might be misinterpreted as dice
+    const cleanedStats = quickStats.replace(/\s/g, '');
+
+    // Check for dice-only pattern (XdY or XקY with optional +Z)
+    const diceOnlyPattern = /^[\d]+[dקDכ][\d]+([+\-][\d]+)?$/i;
+
+    // Also check if it looks like damage dice without type (just numbers and d/ק)
+    const looksLikeDice = /^[\d]+[dקDכ][\d]+/.test(cleanedStats) && cleanedStats.length < 10;
+
+    if (diceOnlyPattern.test(cleanedStats) || looksLikeDice) {
+        console.log(`⚠️ quickStats "${quickStats}" appears to be duplicate dice notation, clearing it`);
+        parsedResult.quickStats = '';
+        return;
+    }
+
+    // 2. If in 'simple' or 'mundane' mode and weaponDamage exists, quickStats should usually be empty
+    if ((complexityMode === 'simple' || complexityMode === 'mundane') && parsedResult.weaponDamage) {
+        // Check if quickStats is essentially the same as weaponDamage
+        const normalizedQuick = quickStats.replace(/[\s,]/g, '').toLowerCase();
+        const normalizedDamage = (parsedResult.weaponDamage || '').replace(/[\s,]/g, '').toLowerCase();
+
+        if (normalizedQuick === normalizedDamage || normalizedDamage.includes(normalizedQuick)) {
+            console.log(`⚠️ quickStats duplicates weaponDamage, clearing it`);
+            parsedResult.quickStats = '';
+            return;
+        }
+    }
+
+    // 3. If quickStats is too long (more than 30 chars), it might be description not stats - truncate
+    if (quickStats.length > 30) {
+        console.log(`⚠️ quickStats too long (${quickStats.length} chars), truncating`);
+        parsedResult.quickStats = quickStats.substring(0, 27) + '...';
+    }
+}
+
+/**
+ * Extract quick-glance fields from abilityDesc if AI didn't populate them
+ * Uses simple word-based parsing instead of complex regex for Hebrew compatibility
+ */
+function extractQuickGlanceFields(parsedResult: ItemGenerationResult): void {
+    console.log('🔍 [EXTRACT] Start - abilityDesc:', (parsedResult.abilityDesc || '').substring(0, 60));
+
+    const abilityDesc = parsedResult.abilityDesc || '';
+    if (!abilityDesc) return;
+
+    const parts: string[] = [];
+
+    // === DAMAGE EXTRACTION ===
+    const damageTypes = ['אש', 'קור', 'ברק', 'רעם', 'חומצה', 'רעל', 'נמק', 'זוהר', 'כוח', 'נפשי'];
+    const diceMatch = abilityDesc.match(/(\d+d\d+)/);
+
+    if (diceMatch) {
+        const dice = diceMatch[1];
+        console.log('🎲 [EXTRACT] Found dice:', dice);
+
+        for (const dmgType of damageTypes) {
+            if (abilityDesc.includes(dmgType)) {
+                // Include damage type so cleanStatsText preserves dice
+                const damageText = `+${dice} ${dmgType}`;
+                parts.push(damageText);
+                parsedResult.specialDamage = damageText;
+                console.log('✅ [EXTRACT] Damage:', damageText);
+
+                // Fix quickStats if it has wrong damage type
+                if (parsedResult.quickStats) {
+                    for (const wrongType of damageTypes) {
+                        if (wrongType !== dmgType && parsedResult.quickStats.includes(wrongType)) {
+                            console.log(`🔧 [EXTRACT] Fixing quickStats: replacing "${wrongType}" with "${dmgType}"`);
+                            parsedResult.quickStats = parsedResult.quickStats.replace(wrongType, dmgType);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    // === SPELL EXTRACTION ===
+    // Try to extract Hebrew spell name first (e.g., "הטל 'אורות מרקדים'" or "הטל את הלחש 'קלע קסם'")
+    // Then fall back to English spell names
+    let spellName = '';
+
+    // Pattern 1: Any quoted spell name in text (single or double quotes, Hebrew quotes)
+    // This handles: "הטל את הלחש 'קלע קסם'" or "הטל 'אורות מרקדים'"
+    const quotedMatch = abilityDesc.match(/[''"']([^''"']+)[''"']/);
+    if (quotedMatch) {
+        spellName = quotedMatch[1].trim();
+        console.log('📜 [EXTRACT] Found quoted spell:', spellName);
+    }
+
+    // Pattern 2: Hebrew spell name directly after הטל (skip "את הלחש" if present)
+    // Matches 1-3 Hebrew words after הטל
+    if (!spellName) {
+        const hebrewSpellMatch = abilityDesc.match(/הטל(?:\s+את\s+הלחש)?\s+([\u0590-\u05FF]+(?:\s+[\u0590-\u05FF]+){0,2})/);
+        if (hebrewSpellMatch) {
+            const match = hebrewSpellMatch[1].trim();
+            // Skip if it's just "את" or "הלחש" filler words
+            if (!match.match(/^(את|הלחש|לחש)$/) && match.length >= 2) {
+                spellName = match;
+                console.log('📜 [EXTRACT] Found Hebrew spell:', spellName);
+            }
+        }
+    }
+
+
+    // Pattern 3: English spell name (fallback for old format)
+    if (!spellName) {
+        const englishSpellMatch = abilityDesc.match(/הטל[^A-Z]*([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)?)/);
+        if (englishSpellMatch) {
+            spellName = englishSpellMatch[1].trim();
+            console.log('📜 [EXTRACT] Found English spell:', spellName);
+        }
+    }
+
+
+    if (spellName) {
+        let spellText = spellName;
+        if (abilityDesc.includes('פעם ביום') || abilityDesc.includes('1/יום')) {
+            spellText = `1/יום: ${spellName}`;
+        } else if (abilityDesc.includes('2/יום')) {
+            spellText = `2/יום: ${spellName}`;
+        } else if (abilityDesc.includes('3/יום')) {
+            spellText = `3/יום: ${spellName}`;
+        }
+
+        parts.push(spellText);
+        parsedResult.spellAbility = spellText; // Keep for legacy
+        console.log('✅ [EXTRACT] Spell:', spellText);
+    }
+
+
+    // === POPULATE quickStats ===
+    if (parts.length > 0 && (!parsedResult.quickStats || !parsedResult.quickStats.trim())) {
+        parsedResult.quickStats = parts.join('\n');
+        console.log('✅ [EXTRACT] Set quickStats:', parsedResult.quickStats);
+    }
+
+    console.log('🔍 [EXTRACT] End - quickStats:', parsedResult.quickStats || '(none)');
 }
 
 /**

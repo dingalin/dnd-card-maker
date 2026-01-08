@@ -1,690 +1,699 @@
 <aside class="sidebar-end glass-panel">
     <h2 data-i18n="editSidebar.title">עריכה ועיצוב</h2>
 
-    <!-- Stone Menu Navigation -->
-    <div class="stone-menu">
-        <!-- Edit Content Button -->
-        <div class="stone-btn" data-target="edit-content">
-            <div class="btn-content">
-                <img src="assets/icons/icon-edit.png" class="icon-img" alt="Edit">
-                <span class="label" data-i18n="editSidebar.editContent">עריכת תוכן</span>
-            </div>
-        </div>
+    <!-- Accordion-style menu with content under each button -->
+    <div id="sidebar-end-scroll-area" class="no-scrollbar-style accordion-menu">
 
-        <!-- Text Design Button -->
-        <div class="stone-btn" data-target="text-design">
-            <div class="btn-content">
-                <span class="icon">🎨</span>
-                <span class="label" data-i18n="editSidebar.textDesign">עיצוב טקסט</span>
-            </div>
-        </div>
-
-        <!-- Image Tuning Button -->
-        <div class="stone-btn" data-target="image-tuning">
-            <div class="btn-content">
-                <span class="icon">🖼️</span>
-                <span class="label" data-i18n="editSidebar.imageTuning">כיוונון תמונה</span>
-            </div>
-        </div>
-
-        <!-- Card Background Button -->
-        <div class="stone-btn" data-target="card-background">
-            <div class="btn-content">
-                <span class="icon">🎴</span>
-                <span class="label" data-i18n="editSidebar.cardBackground">רקע הקלף</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scroll Content Area (Hidden by default, revealed by buttons) -->
-    <div id="sidebar-end-scroll-area" class="no-scrollbar-style">
-
-        <!-- 1. Edit Content Section -->
-        <div id="edit-content" class="scroll-section hidden">
-            <h3 data-i18n="editSidebar.editContent">עריכת תוכן</h3>
-
-            <!-- ===== FRONT SIDE CONTROLS ===== -->
-            <div id="front-controls" class="space-y-4">
-                <h4 class="text-amber-400 text-sm font-bold border-b border-amber-600 pb-1 mb-3"
-                    data-i18n="editContent.frontSide">צד קדמי</h4>
-
-                <!-- 1. Rarity (Top) -->
-                <div class="control-group">
-                    <label for="edit-rarity" class="text-sm font-medium text-gray-300 mb-1 block"
-                        data-i18n="editContent.rarity">1. נדירות</label>
-                    <div class="flex gap-2 items-center mb-2">
-                        <input type="text" id="edit-rarity"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
-                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
-                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
-                                data-target="raritySize">-</button>
-                            <span class="font-value text-xs w-8 text-center text-white"
-                                id="raritySize-display">24px</span>
-                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
-                                data-target="raritySize">+</button>
-                        </div>
-                        <div class="flex flex-col gap-1 shrink-0">
-                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
-                                <input type="checkbox" id="style-bold-rarity"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs font-bold text-gray-400">B</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="הילה">
-                                <input type="checkbox" id="style-glow-rarity"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
-                                <input type="checkbox" id="style-italic-rarity"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs italic text-gray-400">I</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="צל">
-                                <input type="checkbox" id="style-shadow-rarity"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-gray-400">S</span>
-                            </label>
-                        </div>
-                    </div>
-                    <label for="rarity-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
-                        (height):</label>
-                    <input type="range" id="rarity-offset" min="-100" max="200" value="50" class="flex-1">
-                </div>
-
-                <!-- 2. Type -->
-                <div class="control-group">
-                    <label for="edit-type" class="text-sm font-medium text-gray-300 mb-1 block"
-                        data-i18n="editContent.type">2. סוג</label>
-                    <div class="flex gap-2 items-center mb-2">
-                        <input type="text" id="edit-type"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
-                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
-                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
-                                data-target="typeSize">-</button>
-                            <span class="font-value text-xs w-8 text-center text-white"
-                                id="typeSize-display">24px</span>
-                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
-                                data-target="typeSize">+</button>
-                        </div>
-                        <div class="flex flex-col gap-1 shrink-0">
-                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
-                                <input type="checkbox" id="style-bold-type"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs font-bold text-gray-400">B</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="הילה">
-                                <input type="checkbox" id="style-glow-type"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
-                                <input type="checkbox" id="style-italic-type"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs italic text-gray-400">I</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="צל">
-                                <input type="checkbox" id="style-shadow-type"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-gray-400">S</span>
-                            </label>
-                        </div>
-                    </div>
-                    <label for="type-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
-                        (height):</label>
-                    <input type="range" id="type-offset" min="-100" max="200" value="71" class="flex-1">
-                    <div class="flex items-center gap-2 mt-1">
-                        <label for="type-width" class="text-xs text-gray-400"
-                            data-i18n="editContent.width">Width:</label>
-                        <input type="range" id="type-width" min="200" max="700" value="450" class="flex-1">
-                    </div>
-                </div>
-
-                <!-- 3. Name -->
-                <div class="control-group">
-                    <label for="edit-name" class="text-sm font-medium text-gray-300 mb-1 block"
-                        data-i18n="editContent.name">3. שם החפץ</label>
-                    <div class="flex gap-2 items-center mb-2">
-                        <input type="text" id="edit-name"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
-                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
-                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
-                                data-target="nameSize">-</button>
-                            <span class="font-value text-xs w-8 text-center text-white"
-                                id="nameSize-display">60px</span>
-                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
-                                data-target="nameSize">+</button>
-                        </div>
-                        <div class="flex flex-col gap-1 shrink-0">
-                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
-                                <input type="checkbox" id="style-bold-name"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs font-bold text-gray-400">B</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="הילה">
-                                <input type="checkbox" id="style-glow-name"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
-                                <input type="checkbox" id="style-italic-name"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs italic text-gray-400">I</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="צל">
-                                <input type="checkbox" id="style-shadow-name"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-gray-400">S</span>
-                            </label>
-                        </div>
-                    </div>
-                    <label for="name-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
-                        (height):</label>
-                    <input type="range" id="name-offset" min="-100" max="200" value="80" class="flex-1">
-                    <div class="flex items-center gap-2 mt-1">
-                        <label for="name-width" class="text-xs text-gray-400"
-                            data-i18n="editContent.width">Width:</label>
-                        <input type="range" id="name-width" min="100" max="800" value="450" class="flex-1">
-                    </div>
-                </div>
-
-                <!-- 4. Core Stats (Damage / AC) -->
-                <div class="control-group">
-                    <label for="edit-core-stats" class="text-sm font-bold text-amber-500 mb-1 block"
-                        data-i18n="editContent.coreStats">4. Damage / AC (Bold)</label>
-                    <div class="flex gap-2 items-center mb-2">
-                        <input type="text" id="edit-core-stats" placeholder="לדוגמה: 1d8 משופר"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
-                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
-                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
-                                data-target="coreStatsSize">-</button>
-                            <span class="font-value text-xs w-8 text-center text-white"
-                                id="coreStatsSize-display">42px</span>
-                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
-                                data-target="coreStatsSize">+</button>
-                        </div>
-                        <div class="flex flex-col gap-1 shrink-0">
-                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
-                                <input type="checkbox" id="style-bold-coreStats" checked
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs font-bold text-gray-400">B</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="הילה">
-                                <input type="checkbox" id="style-glow-coreStats"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
-                                <input type="checkbox" id="style-italic-coreStats"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs italic text-gray-400">I</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="צל">
-                                <input type="checkbox" id="style-shadow-coreStats"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-gray-400">S</span>
-                            </label>
-                        </div>
-                    </div>
-                    <label for="coreStats-offset" class="text-xs text-gray-400"
-                        data-i18n="editContent.position">Position (height):</label>
-                    <input type="range" id="coreStats-offset" min="600" max="1350" value="893" class="flex-1">
-                    <div class="flex items-center gap-2 mt-1">
-                        <label for="coreStats-width" class="text-xs text-gray-400"
-                            data-i18n="editContent.width">Width:</label>
-                        <input type="range" id="coreStats-width" min="100" max="800" value="537" class="flex-1">
-                    </div>
-                </div>
-
-                <!-- 5. Quick Description (Bottom) -->
-                <div class="control-group">
-                    <label for="edit-quick-stats" class="text-sm font-medium text-gray-300 mb-1 block"
-                        data-i18n="editContent.quickDesc">5. Quick Description</label>
-                    <div class="flex gap-2 items-start mb-2">
-                        <textarea id="edit-quick-stats" placeholder="לדוגמה: חרב זו זוהרת בחושך" rows="2"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
-                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
-                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
-                                data-target="statsSize">-</button>
-                            <span class="font-value text-xs w-8 text-center text-white"
-                                id="statsSize-display">36px</span>
-                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
-                                data-target="statsSize">+</button>
-                        </div>
-                        <div class="flex flex-col gap-1 shrink-0">
-                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
-                                <input type="checkbox" id="style-bold-stats" checked
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs font-bold text-gray-400">B</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="הילה">
-                                <input type="checkbox" id="style-glow-stats"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
-                                <input type="checkbox" id="style-italic-stats"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs italic text-gray-400">I</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="צל">
-                                <input type="checkbox" id="style-shadow-stats"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-gray-400">S</span>
-                            </label>
-                        </div>
-                    </div>
-                    <label for="stats-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
-                        (height):</label>
-                    <input type="range" id="stats-offset" min="600" max="1350" value="969" class="flex-1">
-                    <div class="flex items-center gap-2 mt-1">
-                        <label for="stats-width" class="text-xs text-gray-400"
-                            data-i18n="editContent.width">Width:</label>
-                        <input type="range" id="stats-width" min="100" max="800" value="450" class="flex-1">
-                    </div>
-                </div>
-
-                <!-- 6. Gold -->
-                <div class="control-group">
-                    <label for="edit-gold" class="text-sm font-medium text-gray-300 mb-1 block"
-                        data-i18n="editContent.price">6. Price (Gold)</label>
-                    <div class="flex gap-2 items-center mb-2">
-                        <input type="text" id="edit-gold" value="400"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
-                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
-                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
-                                data-target="goldSize">-</button>
-                            <span class="font-value text-xs w-8 text-center text-white"
-                                id="goldSize-display">24px</span>
-                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
-                                data-target="goldSize">+</button>
-                        </div>
-                        <div class="flex flex-col gap-1 shrink-0">
-                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
-                                <input type="checkbox" id="style-bold-gold"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs font-bold text-gray-400">B</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="הילה">
-                                <input type="checkbox" id="style-glow-gold"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
-                                <input type="checkbox" id="style-italic-gold"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs italic text-gray-400">I</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="צל">
-                                <input type="checkbox" id="style-shadow-gold"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-gray-400">S</span>
-                            </label>
-                        </div>
-                    </div>
-                    <label for="gold-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
-                        (height):</label>
-                    <input type="range" id="gold-offset" min="0" max="480" value="111" class="flex-1">
+        <!-- 1. Edit Content Accordion Item -->
+        <div class="accordion-item">
+            <div class="stone-btn accordion-header" data-target="edit-content">
+                <div class="btn-content">
+                    <img src="assets/icons/icon-edit.png" class="icon-img" alt="Edit">
+                    <span class="label" data-i18n="editSidebar.editContent">עריכת תוכן</span>
+                    <span class="accordion-arrow">▼</span>
                 </div>
             </div>
+            <div id="edit-content" class="accordion-content hidden">
+                <!-- ===== FRONT SIDE CONTROLS ===== -->
+                <div id="front-controls" class="space-y-4">
+                    <h4 class="text-amber-400 text-sm font-bold border-b border-amber-600 pb-1 mb-3"
+                        data-i18n="editContent.frontSide">צד קדמי</h4>
 
-            <!-- ===== BACK SIDE CONTROLS ===== -->
-            <div id="back-controls" class="space-y-4 hidden">
-                <h4 class="text-amber-400 text-sm font-bold border-b border-amber-600 pb-1 mb-3"
-                    data-i18n="editContent.backSide">צד אחורי</h4>
-
-                <!-- Ability Name -->
-                <div class="control-group">
-                    <label for="edit-ability-name" class="text-sm font-medium text-gray-300 mb-1 block"
-                        data-i18n="editContent.abilityName">שם יכולת</label>
-                    <div class="flex gap-2 items-center mb-2">
-                        <input type="text" id="edit-ability-name"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
-                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
-                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
-                                data-target="abilityNameSize">-</button>
-                            <span class="font-value text-xs w-8 text-center text-white"
-                                id="abilityNameSize-display">62px</span>
-                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
-                                data-target="abilityNameSize">+</button>
+                    <!-- 1. Rarity (Top) -->
+                    <div class="control-group">
+                        <label for="edit-rarity" class="text-sm font-medium text-gray-300 mb-1 block"
+                            data-i18n="editContent.rarity">1. נדירות</label>
+                        <div class="flex gap-2 items-center mb-2">
+                            <input type="text" id="edit-rarity"
+                                class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                            <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                                <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                    data-target="raritySize">-</button>
+                                <span class="font-value text-xs w-8 text-center text-white"
+                                    id="raritySize-display">24px</span>
+                                <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                    data-target="raritySize">+</button>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                    <input type="checkbox" id="style-bold-rarity"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs font-bold text-gray-400">B</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="הילה">
+                                    <input type="checkbox" id="style-glow-rarity"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                    <input type="checkbox" id="style-italic-rarity"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs italic text-gray-400">I</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="צל">
+                                    <input type="checkbox" id="style-shadow-rarity"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-gray-400">S</span>
+                                </label>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-1 shrink-0">
-                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
-                                <input type="checkbox" id="style-bold-abilityName" checked
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs font-bold text-gray-400">B</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="הילה">
-                                <input type="checkbox" id="style-glow-abilityName"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
-                                <input type="checkbox" id="style-italic-abilityName"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs italic text-gray-400">I</span>
-                            </label>
+                        <label for="rarity-offset" class="text-xs text-gray-400"
+                            data-i18n="editContent.position">Position
+                            (height):</label>
+                        <input type="range" id="rarity-offset" min="-100" max="200" value="50" class="flex-1">
+                        <div class="flex items-center gap-2 mt-1">
+                            <label for="rarity-width" class="text-xs text-gray-400"
+                                data-i18n="editContent.width">Width:</label>
+                            <input type="range" id="rarity-width" min="100" max="800" value="500" class="flex-1">
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label for="ability-offset" class="text-xs text-gray-400"
-                            data-i18n="editContent.positionLabel">Position:</label>
-                        <input type="range" id="ability-offset" min="50" max="300" value="220" class="flex-1">
+
+                    <!-- 2. Type -->
+                    <div class="control-group">
+                        <label for="edit-type" class="text-sm font-medium text-gray-300 mb-1 block"
+                            data-i18n="editContent.type">2. סוג</label>
+                        <div class="flex gap-2 items-center mb-2">
+                            <input type="text" id="edit-type"
+                                class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                            <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                                <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                    data-target="typeSize">-</button>
+                                <span class="font-value text-xs w-8 text-center text-white"
+                                    id="typeSize-display">24px</span>
+                                <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                    data-target="typeSize">+</button>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                    <input type="checkbox" id="style-bold-type"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs font-bold text-gray-400">B</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="הילה">
+                                    <input type="checkbox" id="style-glow-type"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                    <input type="checkbox" id="style-italic-type"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs italic text-gray-400">I</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="צל">
+                                    <input type="checkbox" id="style-shadow-type"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-gray-400">S</span>
+                                </label>
+                            </div>
+                        </div>
+                        <label for="type-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
+                            (height):</label>
+                        <input type="range" id="type-offset" min="-100" max="200" value="71" class="flex-1">
+                        <div class="flex items-center gap-2 mt-1">
+                            <label for="type-width" class="text-xs text-gray-400"
+                                data-i18n="editContent.width">Width:</label>
+                            <input type="range" id="type-width" min="200" max="700" value="450" class="flex-1">
+                        </div>
+                    </div>
+
+                    <!-- 3. Name -->
+                    <div class="control-group">
+                        <label for="edit-name" class="text-sm font-medium text-gray-300 mb-1 block"
+                            data-i18n="editContent.name">3. שם החפץ</label>
+                        <div class="flex gap-2 items-center mb-2">
+                            <input type="text" id="edit-name"
+                                class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                            <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                                <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                    data-target="nameSize">-</button>
+                                <span class="font-value text-xs w-8 text-center text-white"
+                                    id="nameSize-display">60px</span>
+                                <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                    data-target="nameSize">+</button>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                    <input type="checkbox" id="style-bold-name"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs font-bold text-gray-400">B</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="הילה">
+                                    <input type="checkbox" id="style-glow-name"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                    <input type="checkbox" id="style-italic-name"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs italic text-gray-400">I</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="צל">
+                                    <input type="checkbox" id="style-shadow-name"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-gray-400">S</span>
+                                </label>
+                            </div>
+                        </div>
+                        <label for="name-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
+                            (height):</label>
+                        <input type="range" id="name-offset" min="-100" max="200" value="80" class="flex-1">
+                        <div class="flex items-center gap-2 mt-1">
+                            <label for="name-width" class="text-xs text-gray-400"
+                                data-i18n="editContent.width">Width:</label>
+                            <input type="range" id="name-width" min="100" max="800" value="450" class="flex-1">
+                        </div>
+                    </div>
+
+                    <!-- 4. Core Stats (Damage / AC) -->
+                    <div class="control-group">
+                        <label for="edit-core-stats" class="text-sm font-bold text-amber-500 mb-1 block"
+                            data-i18n="editContent.coreStats">4. Damage / AC (Bold)</label>
+                        <div class="flex gap-2 items-center mb-2">
+                            <input type="text" id="edit-core-stats" placeholder="לדוגמה: 1d8 משופר"
+                                class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                            <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                                <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                    data-target="coreStatsSize">-</button>
+                                <span class="font-value text-xs w-8 text-center text-white"
+                                    id="coreStatsSize-display">42px</span>
+                                <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                    data-target="coreStatsSize">+</button>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                    <input type="checkbox" id="style-bold-coreStats" checked
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs font-bold text-gray-400">B</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="הילה">
+                                    <input type="checkbox" id="style-glow-coreStats"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                    <input type="checkbox" id="style-italic-coreStats"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs italic text-gray-400">I</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="צל">
+                                    <input type="checkbox" id="style-shadow-coreStats"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-gray-400">S</span>
+                                </label>
+                            </div>
+                        </div>
+                        <label for="coreStats-offset" class="text-xs text-gray-400"
+                            data-i18n="editContent.position">Position (height):</label>
+                        <input type="range" id="coreStats-offset" min="600" max="1350" value="893" class="flex-1">
+                        <div class="flex items-center gap-2 mt-1">
+                            <label for="coreStats-width" class="text-xs text-gray-400"
+                                data-i18n="editContent.width">Width:</label>
+                            <input type="range" id="coreStats-width" min="100" max="800" value="537" class="flex-1">
+                        </div>
+                    </div>
+
+                    <!-- 5. Quick Description (Bottom) -->
+                    <div class="control-group">
+                        <label for="edit-quick-stats" class="text-sm font-medium text-gray-300 mb-1 block"
+                            data-i18n="editContent.quickDesc">5. Quick Description</label>
+                        <div class="flex gap-2 items-start mb-2">
+                            <textarea id="edit-quick-stats" placeholder="לדוגמה: חרב זו זוהרת בחושך" rows="2"
+                                class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
+                            <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                                <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                    data-target="statsSize">-</button>
+                                <span class="font-value text-xs w-8 text-center text-white"
+                                    id="statsSize-display">36px</span>
+                                <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                    data-target="statsSize">+</button>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                    <input type="checkbox" id="style-bold-stats" checked
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs font-bold text-gray-400">B</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="הילה">
+                                    <input type="checkbox" id="style-glow-stats"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                    <input type="checkbox" id="style-italic-stats"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs italic text-gray-400">I</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="צל">
+                                    <input type="checkbox" id="style-shadow-stats"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-gray-400">S</span>
+                                </label>
+                            </div>
+                        </div>
+                        <label for="stats-offset" class="text-xs text-gray-400"
+                            data-i18n="editContent.position">Position
+                            (height):</label>
+                        <input type="range" id="stats-offset" min="600" max="1350" value="969" class="flex-1">
+                        <div class="flex items-center gap-2 mt-1">
+                            <label for="stats-width" class="text-xs text-gray-400"
+                                data-i18n="editContent.width">Width:</label>
+                            <input type="range" id="stats-width" min="100" max="800" value="450" class="flex-1">
+                        </div>
+                    </div>
+
+                    <!-- 6. Gold -->
+                    <div class="control-group">
+                        <label for="edit-gold" class="text-sm font-medium text-gray-300 mb-1 block"
+                            data-i18n="editContent.price">6. Price (Gold)</label>
+                        <div class="flex gap-2 items-center mb-2">
+                            <input type="text" id="edit-gold" value="400"
+                                class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                            <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                                <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                    data-target="goldSize">-</button>
+                                <span class="font-value text-xs w-8 text-center text-white"
+                                    id="goldSize-display">24px</span>
+                                <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                    data-target="goldSize">+</button>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                    <input type="checkbox" id="style-bold-gold"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs font-bold text-gray-400">B</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="הילה">
+                                    <input type="checkbox" id="style-glow-gold"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                    <input type="checkbox" id="style-italic-gold"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs italic text-gray-400">I</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="צל">
+                                    <input type="checkbox" id="style-shadow-gold"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-gray-400">S</span>
+                                </label>
+                            </div>
+                        </div>
+                        <label for="gold-offset" class="text-xs text-gray-400" data-i18n="editContent.position">Position
+                            (height):</label>
+                        <input type="range" id="gold-offset" min="0" max="480" value="111" class="flex-1">
+                        <div class="flex items-center gap-2 mt-1">
+                            <label for="gold-width" class="text-xs text-gray-400"
+                                data-i18n="editContent.width">Width:</label>
+                            <input type="range" id="gold-width" min="100" max="800" value="500" class="flex-1">
+                        </div>
                     </div>
                 </div>
 
-                <!-- Mechanics (Ability Desc) -->
-                <div class="control-group">
-                    <label for="edit-ability-desc" class="text-sm font-medium text-gray-300 mb-1 block"
-                        data-i18n="editContent.mechanics">מכניקה</label>
-                    <div class="flex gap-2 items-start mb-2">
-                        <textarea id="edit-ability-desc" rows="3"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
-                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0 mt-1">
-                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
-                                data-target="mechSize">-</button>
-                            <span class="font-value text-xs w-8 text-center text-white"
-                                id="mechSize-display">50px</span>
-                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
-                                data-target="mechSize">+</button>
-                        </div>
-                        <div class="flex flex-col gap-1 shrink-0 mt-1">
-                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
-                                <input type="checkbox" id="style-bold-mech"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs font-bold text-gray-400">B</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="הילה">
-                                <input type="checkbox" id="style-glow-mech"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
-                                <input type="checkbox" id="style-italic-mech"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs italic text-gray-400">I</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label for="mech-offset" class="text-xs text-gray-400"
-                            data-i18n="editContent.positionLabel">Position:</label>
-                        <input type="range" id="mech-offset" min="100" max="500" value="320" class="flex-1">
-                    </div>
-                    <div class="flex items-center gap-2 mt-2">
-                        <label for="ability-width" class="text-xs text-gray-400" data-i18n="editContent.textWidth">Text
-                            Width:</label>
-                        <input type="range" id="ability-width" min="100" max="800" value="600" class="flex-1">
-                    </div>
-                </div>
+                <!-- ===== BACK SIDE CONTROLS ===== -->
+                <div id="back-controls" class="space-y-4 hidden">
+                    <h4 class="text-amber-400 text-sm font-bold border-b border-amber-600 pb-1 mb-3"
+                        data-i18n="editContent.backSide">צד אחורי</h4>
 
-                <!-- Lore (Fluff) -->
-                <div class="control-group">
-                    <label for="edit-desc" class="text-sm font-medium text-gray-300 mb-1 block"
-                        data-i18n="editContent.lore">רקע וסיפור (לור)</label>
-                    <div class="flex gap-2 items-start mb-2">
-                        <textarea id="edit-desc" rows="3"
-                            class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
-                        <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0 mt-1">
-                            <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
-                                data-target="loreSize">-</button>
-                            <span class="font-value text-xs w-8 text-center text-white"
-                                id="loreSize-display">46px</span>
-                            <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
-                                data-target="loreSize">+</button>
+                    <!-- Ability Name -->
+                    <div class="control-group">
+                        <label for="edit-ability-name" class="text-sm font-medium text-gray-300 mb-1 block"
+                            data-i18n="editContent.abilityName">שם יכולת</label>
+                        <div class="flex gap-2 items-center mb-2">
+                            <input type="text" id="edit-ability-name"
+                                class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                            <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0">
+                                <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                    data-target="abilityNameSize">-</button>
+                                <span class="font-value text-xs w-8 text-center text-white"
+                                    id="abilityNameSize-display">62px</span>
+                                <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                    data-target="abilityNameSize">+</button>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                    <input type="checkbox" id="style-bold-abilityName" checked
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs font-bold text-gray-400">B</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="הילה">
+                                    <input type="checkbox" id="style-glow-abilityName"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                    <input type="checkbox" id="style-italic-abilityName"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs italic text-gray-400">I</span>
+                                </label>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-1 shrink-0 mt-1">
-                            <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
-                                <input type="checkbox" id="style-bold-lore"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs font-bold text-gray-400">B</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="הילה">
-                                <input type="checkbox" id="style-glow-lore"
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
-                                <input type="checkbox" id="style-italic-lore" checked
-                                    class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
-                                <span class="text-xs italic text-gray-400">I</span>
-                            </label>
+                        <div class="flex items-center gap-2">
+                            <label for="ability-offset" class="text-xs text-gray-400"
+                                data-i18n="editContent.positionLabel">Position:</label>
+                            <input type="range" id="ability-offset" min="50" max="300" value="220" class="flex-1">
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label for="lore-offset" class="text-xs text-gray-400"
-                            data-i18n="editContent.positionLabel">Position:</label>
-                        <input type="range" id="lore-offset" min="400" max="1200" value="1100" class="flex-1">
+
+                    <!-- Mechanics (Ability Desc) -->
+                    <div class="control-group">
+                        <label for="edit-ability-desc" class="text-sm font-medium text-gray-300 mb-1 block"
+                            data-i18n="editContent.mechanics">מכניקה</label>
+                        <div class="flex gap-2 items-start mb-2">
+                            <textarea id="edit-ability-desc" rows="3"
+                                class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
+                            <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0 mt-1">
+                                <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                    data-target="mechSize">-</button>
+                                <span class="font-value text-xs w-8 text-center text-white"
+                                    id="mechSize-display">50px</span>
+                                <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                    data-target="mechSize">+</button>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0 mt-1">
+                                <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                    <input type="checkbox" id="style-bold-mech"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs font-bold text-gray-400">B</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="הילה">
+                                    <input type="checkbox" id="style-glow-mech"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                    <input type="checkbox" id="style-italic-mech"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs italic text-gray-400">I</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label for="mech-offset" class="text-xs text-gray-400"
+                                data-i18n="editContent.positionLabel">Position:</label>
+                            <input type="range" id="mech-offset" min="100" max="500" value="320" class="flex-1">
+                        </div>
+                        <div class="flex items-center gap-2 mt-2">
+                            <label for="ability-width" class="text-xs text-gray-400"
+                                data-i18n="editContent.textWidth">Text
+                                Width:</label>
+                            <input type="range" id="ability-width" min="100" max="800" value="600" class="flex-1">
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 mt-1">
-                        <label for="lore-width" class="text-xs text-gray-400"
-                            data-i18n="editContent.width">Width:</label>
-                        <input type="range" id="lore-width" min="100" max="800" value="550" class="flex-1">
+
+                    <!-- Lore (Fluff) -->
+                    <div class="control-group">
+                        <label for="edit-desc" class="text-sm font-medium text-gray-300 mb-1 block"
+                            data-i18n="editContent.lore">רקע וסיפור (לור)</label>
+                        <div class="flex gap-2 items-start mb-2">
+                            <textarea id="edit-desc" rows="3"
+                                class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white"></textarea>
+                            <div class="flex items-center gap-1 bg-gray-800 rounded px-2 py-0.5 shrink-0 mt-1">
+                                <button type="button" class="font-btn font-decrease text-gray-400 hover:text-white"
+                                    data-target="loreSize">-</button>
+                                <span class="font-value text-xs w-8 text-center text-white"
+                                    id="loreSize-display">46px</span>
+                                <button type="button" class="font-btn font-increase text-gray-400 hover:text-white"
+                                    data-target="loreSize">+</button>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0 mt-1">
+                                <label class="flex items-center gap-1 cursor-pointer" title="מודגש">
+                                    <input type="checkbox" id="style-bold-lore"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs font-bold text-gray-400">B</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="הילה">
+                                    <input type="checkbox" id="style-glow-lore"
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs text-yellow-400" style="text-shadow: 0 0 2px #fcd34d;">H</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="נטוי">
+                                    <input type="checkbox" id="style-italic-lore" checked
+                                        class="accent-amber-500 w-4 h-4 rounded-sm bg-gray-700 border-gray-600">
+                                    <span class="text-xs italic text-gray-400">I</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label for="lore-offset" class="text-xs text-gray-400"
+                                data-i18n="editContent.positionLabel">Position:</label>
+                            <input type="range" id="lore-offset" min="400" max="1200" value="1100" class="flex-1">
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <label for="lore-width" class="text-xs text-gray-400"
+                                data-i18n="editContent.width">Width:</label>
+                            <input type="range" id="lore-width" min="100" max="800" value="550" class="flex-1">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 2. Text Design Section -->
-        <div id="text-design" class="scroll-section hidden">
-            <h3 data-i18n="textDesign.title">עיצוב טקסט</h3>
-            <div class="control-group">
-                <label for="font-family-select" data-i18n="textDesign.fontLabel">גופן</label>
-                <select id="font-family-select">
-                    <option value="Heebo" data-i18n="textDesign.fonts.heebo">Heebo (Regular)</option>
-                    <option value="Rubik" data-i18n="textDesign.fonts.rubik">Rubik (Rounded)</option>
-                    <option value="Frank Ruhl Libre" data-i18n="textDesign.fonts.frank">Frank Ruhl (Literary)</option>
-                    <option value="Assistant" data-i18n="textDesign.fonts.assistant">Assistant (Clean)</option>
-                </select>
-            </div>
-
-            <!-- Text Backdrop Controls -->
-            <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700 mt-4">
-                <div class="flex items-center gap-2 mb-2">
-                    <input type="checkbox" id="text-backdrop-enabled" class="accent-amber-500 w-4 h-4">
-                    <label for="text-backdrop-enabled" class="text-sm font-bold" style="color: #fbbf24;">רקע לטקסט
-                        (Backdrop)</label>
+        <!-- 2. Text Design Accordion Item -->
+        <div class="accordion-item">
+            <div class="stone-btn accordion-header" data-target="text-design">
+                <div class="btn-content">
+                    <span class="icon">🎨</span>
+                    <span class="label" data-i18n="editSidebar.textDesign">עיצוב טקסט</span>
+                    <span class="accordion-arrow">▼</span>
                 </div>
-                <div id="text-backdrop-controls" class="hidden">
-                    <div class="flex justify-between text-xs text-gray-400 mb-1">
-                        <span>שקיפות (Opacity)</span>
-                        <span id="text-backdrop-opacity-val">50%</span>
+            </div>
+            <div id="text-design" class="accordion-content hidden">
+                <div class="control-group">
+                    <label for="font-family-select" data-i18n="textDesign.fontLabel">גופן</label>
+                    <select id="font-family-select">
+                        <option value="Heebo" data-i18n="textDesign.fonts.heebo">Heebo (Regular)</option>
+                        <option value="Rubik" data-i18n="textDesign.fonts.rubik">Rubik (Rounded)</option>
+                        <option value="Frank Ruhl Libre" data-i18n="textDesign.fonts.frank">Frank Ruhl (Literary)
+                        </option>
+                        <option value="Assistant" data-i18n="textDesign.fonts.assistant">Assistant (Clean)</option>
+                    </select>
+                </div>
+
+                <!-- Text Backdrop Controls -->
+                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700 mt-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <input type="checkbox" id="text-backdrop-enabled" class="accent-amber-500 w-4 h-4">
+                        <label for="text-backdrop-enabled" class="text-sm font-bold" style="color: #fbbf24;">רקע לטקסט
+                            (Backdrop)</label>
                     </div>
-                    <input type="range" id="text-backdrop-opacity" min="0" max="100" value="50" class="w-full">
+                    <div id="text-backdrop-controls" class="hidden">
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span>שקיפות (Opacity)</span>
+                            <span id="text-backdrop-opacity-val">50%</span>
+                        </div>
+                        <input type="range" id="text-backdrop-opacity" min="0" max="100" value="50" class="w-full">
+                    </div>
                 </div>
             </div>
-
         </div>
 
-        <!-- 3. Image Tuning Section -->
-        <div id="image-tuning" class="scroll-section hidden">
-            <h3 data-i18n="imageTuning.title">כיוונון תמונה</h3>
-
-            <!-- Global Margin Controls -->
-            <div class="control-group bg-gray-800 p-3 rounded-lg border border-amber-600 mb-4">
-                <label class="block text-sm font-bold mb-3" style="color: #fbbf24;"
-                    data-i18n="imageTuning.globalMargin">
-                </label>
-
-                <!-- Lock checkbox -->
-                <div class="flex items-center gap-2 mb-3">
-                    <input type="checkbox" id="global-margin-lock" checked class="accent-amber-500 w-4 h-4">
-                    <label for="global-margin-lock" class="text-xs text-gray-300 cursor-pointer"
-                        data-i18n="imageTuning.lockRatio">
+        <!-- 3. Image Tuning Accordion Item -->
+        <div class="accordion-item">
+            <div class="stone-btn accordion-header" data-target="image-tuning">
+                <div class="btn-content">
+                    <span class="icon">🖼️</span>
+                    <span class="label" data-i18n="editSidebar.imageTuning">כיוונון תמונה</span>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+            </div>
+            <div id="image-tuning" class="accordion-content hidden">
+                <!-- Global Margin Controls -->
+                <div class="control-group bg-gray-800 p-3 rounded-lg border border-amber-600 mb-4">
+                    <label class="block text-sm font-bold mb-3" style="color: #fbbf24;"
+                        data-i18n="imageTuning.globalMargin">
                     </label>
+
+                    <!-- Lock checkbox -->
+                    <div class="flex items-center gap-2 mb-3">
+                        <input type="checkbox" id="global-margin-lock" checked class="accent-amber-500 w-4 h-4">
+                        <label for="global-margin-lock" class="text-xs text-gray-300 cursor-pointer"
+                            data-i18n="imageTuning.lockRatio">
+                        </label>
+                    </div>
+
+                    <!-- Height (Vertical) Slider -->
+                    <div class="mb-3">
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span data-i18n="imageTuning.verticalShrink">↕️ Vertical Shrink</span>
+                            <span id="global-margin-y-val">0</span>
+                        </div>
+                        <input type="range" id="global-margin-y" min="-100" max="100" value="6" class="w-full">
+                    </div>
+
+                    <!-- Width (Horizontal) Slider -->
+                    <div>
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span data-i18n="imageTuning.horizontalShrink">↔️ Horizontal Shrink</span>
+                            <span id="global-margin-x-val">0</span>
+                        </div>
+                        <input type="range" id="global-margin-x" min="-100" max="100" value="6" class="w-full">
+                    </div>
                 </div>
 
-                <!-- Height (Vertical) Slider -->
-                <div class="mb-3">
-                    <div class="flex justify-between text-xs text-gray-400 mb-1">
-                        <span data-i18n="imageTuning.verticalShrink">↕️ Vertical Shrink</span>
-                        <span id="global-margin-y-val">0</span>
-                    </div>
-                    <input type="range" id="global-margin-y" min="-100" max="100" value="6" class="w-full">
+                <!-- Auto Layout Button -->
+                <div class="mb-4">
+                    <button id="auto-layout-btn" class="btn-primary w-full"
+                        style="background: linear-gradient(135deg, #8b5cf6, #6366f1); border-color: #7c3aed;">
+                        <span data-i18n="imageTuning.autoLayout">✨ Auto Layout</span>
+                    </button>
                 </div>
 
-                <!-- Width (Horizontal) Slider -->
-                <div>
-                    <div class="flex justify-between text-xs text-gray-400 mb-1">
-                        <span data-i18n="imageTuning.horizontalShrink">↔️ Horizontal Shrink</span>
-                        <span id="global-margin-x-val">0</span>
+                <div class="layout-controls space-y-4">
+                    <!-- Image Offset -->
+                    <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                        <label for="image-offset" class="block text-sm font-bold mb-2" style="color: #fbbf24;"
+                            data-i18n="imageTuning.imagePosition">Image Position</label>
+                        <input type="range" id="image-offset" min="-150" max="150" value="0" class="w-full">
                     </div>
-                    <input type="range" id="global-margin-x" min="-100" max="100" value="6" class="w-full">
+
+                    <!-- Zoom -->
+                    <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                        <label for="image-scale" class="block text-sm font-bold mb-2"
+                            style="color: #fbbf24; display: flex; justify-content: space-between;">
+                            <span data-i18n="imageTuning.zoom">Zoom</span>
+                            <span id="image-scale-val">1.0</span>
+                        </label>
+                        <input type="range" id="image-scale" min="0.5" max="2.0" step="0.1" value="0.8" class="w-full">
+                    </div>
+
+                    <!-- Rotation -->
+                    <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                        <label for="image-rotation" class="block text-sm font-bold mb-2"
+                            style="color: #fbbf24; display: flex; justify-content: space-between;">
+                            <span data-i18n="imageTuning.rotation">Rotation</span>
+                            <span id="image-rotation-val">0°</span>
+                        </label>
+                        <input type="range" id="image-rotation" min="-180" max="180" step="5" value="0" class="w-full">
+                    </div>
+
+                    <!-- Fade (Vignette) -->
+                    <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                        <label for="image-fade" class="block text-sm font-bold mb-2"
+                            style="color: #fbbf24; display: flex; justify-content: space-between;">
+                            <span data-i18n="imageTuning.fade">Frame Fade</span>
+                            <span id="image-fade-val">0</span>
+                        </label>
+                        <input type="range" id="image-fade" min="0" max="100" value="100" class="w-full">
+                    </div>
+
+                    <!-- Shadow (Drop Shadow) -->
+                    <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
+                        <label for="image-shadow" class="block text-sm font-bold mb-2"
+                            style="color: #fbbf24; display: flex; justify-content: space-between;">
+                            <span data-i18n="imageTuning.shadow">Shadow</span>
+                            <span id="image-shadow-val">0</span>
+                        </label>
+                        <input type="range" id="image-shadow" min="0" max="100" value="78" class="w-full">
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Auto Layout Button -->
-            <div class="mb-4">
-                <button id="auto-layout-btn" class="btn-primary w-full"
-                    style="background: linear-gradient(135deg, #8b5cf6, #6366f1); border-color: #7c3aed;">
-                    <span data-i18n="imageTuning.autoLayout">✨ Auto Layout</span>
-                </button>
+        <!-- 4. Card Background Accordion Item -->
+        <div class="accordion-item">
+            <div class="stone-btn accordion-header" data-target="card-background">
+                <div class="btn-content">
+                    <span class="icon">🎴</span>
+                    <span class="label" data-i18n="editSidebar.cardBackground">רקע הקלף</span>
+                    <span class="accordion-arrow">▼</span>
+                </div>
             </div>
+            <div id="card-background" class="accordion-content hidden">
+                <div class="control-group">
+                    <label for="bg-theme-select" data-i18n="cardBackground.themeLabel">נושא הרקע</label>
+                    <select id="bg-theme-select"
+                        class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white mb-3">
+                        <optgroup label="יסודות קלאסיים">
+                            <option value="Fire">🔥 אש (Fire)</option>
+                            <option value="Ice">❄️ קרח (Ice)</option>
+                            <option value="Lightning">⚡ ברק (Lightning)</option>
+                            <option value="Nature">🌿 טבע (Nature)</option>
+                            <option value="Ocean">🌊 ים (Ocean)</option>
+                        </optgroup>
+                        <optgroup label="קסם ורוחניות">
+                            <option value="Arcane">✨ קסם (Arcane)</option>
+                            <option value="Divine">👼 קדושה (Divine)</option>
+                            <option value="Necrotic">💀 מוות (Necrotic)</option>
+                            <option value="Shadow">🌑 צל (Shadow)</option>
+                            <option value="Celestial">🌟 שמימי (Celestial)</option>
+                        </optgroup>
+                        <optgroup label="חומרים וסגנונות">
+                            <option value="Industrial">⚙️ תעשייתי (Industrial)</option>
+                            <option value="Iron">🗡️ ברזל (Iron)</option>
+                            <option value="Blood">🩸 דם (Blood)</option>
+                            <option value="Old Scroll">📜 מגילה (Scroll)</option>
+                            <option value="Elemental">🌈 יסודות (Elemental)</option>
+                        </optgroup>
+                    </select>
 
-            <div class="layout-controls space-y-4">
-                <!-- Image Offset -->
-                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
-                    <label for="image-offset" class="block text-sm font-bold mb-2" style="color: #fbbf24;"
-                        data-i18n="imageTuning.imagePosition">Image Position</label>
-                    <input type="range" id="image-offset" min="-150" max="150" value="0" class="w-full">
+                    <!-- Card Style Select (same styles as image generation) -->
+                    <label for="bg-style-select" data-i18n="cardBackground.styleLabel">סגנון הקלף</label>
+                    <select id="bg-style-select"
+                        class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white mb-3">
+                        <optgroup label="רציני וקלאסי">
+                            <option value="watercolor">🎨 צבעי מים (Watercolor)</option>
+                            <option value="oil">🖼️ ציור שמן (Oil Painting)</option>
+                            <option value="realistic">📷 ריאליסטי (Realistic)</option>
+                            <option value="sketch">✏️ רישום עיפרון (Sketch)</option>
+                        </optgroup>
+                        <optgroup label="פנטזיה ואומנות">
+                            <option value="dark_fantasy">🏰 פנטזיה אפלה (Dark Fantasy)</option>
+                            <option value="epic_fantasy">📜 תחריט עתיק (Epic Fantasy)</option>
+                            <option value="anime">🎌 אנימה (Anime)</option>
+                            <option value="stained_glass">🪟 ויטראז' (Stained Glass)</option>
+                        </optgroup>
+                        <optgroup label="מודרני וייחודי">
+                            <option value="pixel">👾 פיקסל ארט (Pixel Art)</option>
+                            <option value="ink_drawing">✒️ דיו ביד (Ink Drawing)</option>
+                            <option value="simple_icon">🎯 אייקון שטוח (Flat Icon)</option>
+                            <option value="silhouette">🏛️ צללית הרלדית (Heraldic)</option>
+                            <option value="synthwave">💜 סינת'וייב (Synthwave)</option>
+                        </optgroup>
+                    </select>
+
+                    <!-- Model Select for Background -->
+                    <label for="bg-model-select">מודל AI</label>
+                    <select id="bg-model-select"
+                        class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white mb-3">
+                        <option value="getimg-flux">⚡ FLUX Schnell (מהיר)</option>
+                        <option value="getimg-zimage">🎨 Z-Image Turbo (איכות גבוהה)</option>
+                    </select>
+
+                    <button id="generate-bg-btn" class="btn-primary w-full mb-2" data-i18n="cardBackground.generate">צור
+                        רקע</button>
+                    <button id="reset-bg-btn" class="btn-primary w-full" data-i18n="cardBackground.reset">חזור לברירת
+                        מחדל</button>
+
+                    <!-- Ready-made Backgrounds -->
+                    <button id="ready-made-bg-btn" class="btn-primary w-full mt-2">
+                        <span class="icon">🖼️</span> <span data-i18n="cardBackground.readyMadeLabel">Ready-Made
+                            Backgrounds</span>
+                    </button>
                 </div>
 
-                <!-- Zoom -->
-                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
-                    <label for="image-scale" class="block text-sm font-bold mb-2"
+                <!-- Background Controls -->
+                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700 mt-2">
+                    <label for="bg-scale" class="block text-sm font-bold mb-2"
                         style="color: #fbbf24; display: flex; justify-content: space-between;">
-                        <span data-i18n="imageTuning.zoom">Zoom</span>
-                        <span id="image-scale-val">1.0</span>
+                        <span data-i18n="cardBackground.scale">Background Scale</span>
+                        <span id="bg-scale-val">1.0</span>
                     </label>
-                    <input type="range" id="image-scale" min="0.5" max="2.0" step="0.1" value="0.8" class="w-full">
+                    <input type="range" id="bg-scale" min="1.0" max="2.0" step="0.1" value="1.0" class="w-full">
                 </div>
 
-                <!-- Rotation -->
-                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
-                    <label for="image-rotation" class="block text-sm font-bold mb-2"
+                <!-- Center Fade Controls -->
+                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700 mt-2">
+                    <label for="center-fade" class="block text-sm font-bold mb-2"
                         style="color: #fbbf24; display: flex; justify-content: space-between;">
-                        <span data-i18n="imageTuning.rotation">Rotation</span>
-                        <span id="image-rotation-val">0°</span>
+                        <span data-i18n="cardBackground.centerFade">הבהרת מרכז</span>
+                        <span id="center-fade-val">0</span>
                     </label>
-                    <input type="range" id="image-rotation" min="-180" max="180" step="5" value="0" class="w-full">
+                    <input type="range" id="center-fade" min="0" max="100" step="5" value="0" class="w-full">
+                    <p class="text-xs text-gray-400 mt-1" data-i18n="cardBackground.centerFadeHint">פייד שמנת מהמרכז
+                        לשיפור
+                        קריאות</p>
                 </div>
-
-                <!-- Fade (Vignette) -->
-                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
-                    <label for="image-fade" class="block text-sm font-bold mb-2"
-                        style="color: #fbbf24; display: flex; justify-content: space-between;">
-                        <span data-i18n="imageTuning.fade">Frame Fade</span>
-                        <span id="image-fade-val">0</span>
-                    </label>
-                    <input type="range" id="image-fade" min="0" max="100" value="100" class="w-full">
-                </div>
-
-                <!-- Shadow (Drop Shadow) -->
-                <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700">
-                    <label for="image-shadow" class="block text-sm font-bold mb-2"
-                        style="color: #fbbf24; display: flex; justify-content: space-between;">
-                        <span data-i18n="imageTuning.shadow">Shadow</span>
-                        <span id="image-shadow-val">0</span>
-                    </label>
-                    <input type="range" id="image-shadow" min="0" max="100" value="78" class="w-full">
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. Card Background Section -->
-        <div id="card-background" class="scroll-section hidden">
-            <h3 data-i18n="cardBackground.title">רקע הקלף</h3>
-            <div class="control-group">
-                <label for="bg-theme-select" data-i18n="cardBackground.themeLabel">נושא הרקע</label>
-                <select id="bg-theme-select"
-                    class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white mb-3">
-                    <optgroup label="יסודות קלאסיים">
-                        <option value="Fire">🔥 אש (Fire)</option>
-                        <option value="Ice">❄️ קרח (Ice)</option>
-                        <option value="Lightning">⚡ ברק (Lightning)</option>
-                        <option value="Nature">🌿 טבע (Nature)</option>
-                        <option value="Ocean">🌊 ים (Ocean)</option>
-                    </optgroup>
-                    <optgroup label="קסם ורוחניות">
-                        <option value="Arcane">✨ קסם (Arcane)</option>
-                        <option value="Divine">👼 קדושה (Divine)</option>
-                        <option value="Necrotic">💀 מוות (Necrotic)</option>
-                        <option value="Shadow">🌑 צל (Shadow)</option>
-                        <option value="Celestial">🌟 שמימי (Celestial)</option>
-                    </optgroup>
-                    <optgroup label="חומרים וסגנונות">
-                        <option value="Industrial">⚙️ תעשייתי (Industrial)</option>
-                        <option value="Iron">🗡️ ברזל (Iron)</option>
-                        <option value="Blood">🩸 דם (Blood)</option>
-                        <option value="Old Scroll">📜 מגילה (Scroll)</option>
-                        <option value="Elemental">🌈 יסודות (Elemental)</option>
-                    </optgroup>
-                </select>
-
-                <!-- Card Style Select (same styles as image generation) -->
-                <label for="bg-style-select" data-i18n="cardBackground.styleLabel">סגנון הקלף</label>
-                <select id="bg-style-select"
-                    class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white mb-3">
-                    <optgroup label="רציני וקלאסי">
-                        <option value="watercolor">🎨 צבעי מים (Watercolor)</option>
-                        <option value="oil">🖼️ ציור שמן (Oil Painting)</option>
-                        <option value="realistic">📷 ריאליסטי (Realistic)</option>
-                        <option value="sketch">✏️ רישום עיפרון (Sketch)</option>
-                    </optgroup>
-                    <optgroup label="פנטזיה ואומנות">
-                        <option value="dark_fantasy">🏰 פנטזיה אפלה (Dark Fantasy)</option>
-                        <option value="epic_fantasy">📜 תחריט עתיק (Epic Fantasy)</option>
-                        <option value="anime">🎌 אנימה (Anime)</option>
-                        <option value="stained_glass">🪟 ויטראז' (Stained Glass)</option>
-                    </optgroup>
-                    <optgroup label="מודרני וייחודי">
-                        <option value="pixel">👾 פיקסל ארט (Pixel Art)</option>
-                        <option value="ink_drawing">✒️ דיו ביד (Ink Drawing)</option>
-                        <option value="simple_icon">🎯 אייקון שטוח (Flat Icon)</option>
-                        <option value="silhouette">🏛️ צללית הרלדית (Heraldic)</option>
-                        <option value="synthwave">💜 סינת'וייב (Synthwave)</option>
-                    </optgroup>
-                </select>
-
-                <!-- Model Select for Background -->
-                <label for="bg-model-select">מודל AI</label>
-                <select id="bg-model-select"
-                    class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white mb-3">
-                    <option value="getimg-flux">⚡ FLUX Schnell (מהיר)</option>
-                    <option value="getimg-zimage">🎨 Z-Image Turbo (איכות גבוהה)</option>
-                </select>
-
-                <button id="generate-bg-btn" class="btn-primary w-full mb-2" data-i18n="cardBackground.generate">צור
-                    רקע</button>
-                <button id="reset-bg-btn" class="btn-primary w-full" data-i18n="cardBackground.reset">חזור לברירת
-                    מחדל</button>
-
-                <!-- Ready-made Backgrounds -->
-                <button id="ready-made-bg-btn" class="btn-primary w-full mt-2">
-                    <span class="icon">🖼️</span> <span data-i18n="cardBackground.readyMadeLabel">Ready-Made
-                        Backgrounds</span>
-                </button>
-            </div>
-
-            <!-- Background Controls -->
-            <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700 mt-2">
-                <label for="bg-scale" class="block text-sm font-bold mb-2"
-                    style="color: #fbbf24; display: flex; justify-content: space-between;">
-                    <span data-i18n="cardBackground.scale">Background Scale</span>
-                    <span id="bg-scale-val">1.0</span>
-                </label>
-                <input type="range" id="bg-scale" min="1.0" max="2.0" step="0.1" value="1.0" class="w-full">
-            </div>
-
-            <!-- Center Fade Controls -->
-            <div class="control-group bg-gray-800 p-3 rounded-lg border border-gray-700 mt-2">
-                <label for="center-fade" class="block text-sm font-bold mb-2"
-                    style="color: #fbbf24; display: flex; justify-content: space-between;">
-                    <span data-i18n="cardBackground.centerFade">הבהרת מרכז</span>
-                    <span id="center-fade-val">0</span>
-                </label>
-                <input type="range" id="center-fade" min="0" max="100" step="5" value="0" class="w-full">
-                <p class="text-xs text-gray-400 mt-1" data-i18n="cardBackground.centerFadeHint">פייד שמנת מהמרכז לשיפור
-                    קריאות</p>
             </div>
         </div>
     </div>
